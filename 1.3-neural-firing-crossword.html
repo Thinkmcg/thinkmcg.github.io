@@ -1,0 +1,613 @@
+<title>Neural Firing Crossword</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#eef0f4;
+    --surface:#ffffff;
+    --surface-2:#f7f8fc;
+    --ink:#1b1f2b;
+    --muted:#5b6274;
+    --accent:#4338ca;
+    --accent-ink:#ffffff;
+    --accent-soft:#e4e6fb;
+    --good:#127a56;
+    --good-soft:#dcf3e9;
+    --bad:#c23a2e;
+    --bad-soft:#fbe2df;
+    --line:#c7cbe0;
+    --cell-bg:#ffffff;
+    --cell-block:#dde0ee;
+    --shadow: 0 1px 2px rgba(27,31,43,.06), 0 10px 28px rgba(27,31,43,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12141c;
+      --surface:#1a1d29;
+      --surface-2:#20232f;
+      --ink:#e8e9f5;
+      --muted:#a0a5c2;
+      --accent:#948dff;
+      --accent-ink:#12141c;
+      --accent-soft:#2b2760;
+      --good:#59d6a6;
+      --good-soft:#163a2e;
+      --bad:#ff8177;
+      --bad-soft:#3d1f1c;
+      --line:#343850;
+      --cell-bg:#20232f;
+      --cell-block:#2a2e40;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12141c;
+    --surface:#1a1d29;
+    --surface-2:#20232f;
+    --ink:#e8e9f5;
+    --muted:#a0a5c2;
+    --accent:#948dff;
+    --accent-ink:#12141c;
+    --accent-soft:#2b2760;
+    --good:#59d6a6;
+    --good-soft:#163a2e;
+    --bad:#ff8177;
+    --bad-soft:#3d1f1c;
+    --line:#343850;
+    --cell-bg:#20232f;
+    --cell-block:#2a2e40;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Public Sans", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:16px;
+  }
+  h1,h2,h3{font-family:"Fraunces", Georgia, serif; text-wrap:balance; margin:0;}
+  .wrap{max-width:1180px; margin:0 auto; padding-block:20px 48px;}
+
+  .masthead{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:22px 26px;
+    margin-bottom:18px;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+  }
+  h1{font-size:clamp(22px,4vw,30px); font-weight:600; margin-top:4px;}
+  .sub{color:var(--muted); font-size:14.5px; margin-top:4px;}
+
+  .idrow{display:flex; flex-wrap:wrap; gap:14px; margin-top:16px;}
+  .field{display:flex; flex-direction:column; gap:4px; flex:1 1 180px;}
+  .field label{font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600;}
+  .field input{
+    font-family:inherit; font-size:14.5px; padding:8px 10px;
+    border:1px solid var(--line); border-radius:9px;
+    background:var(--surface-2); color:var(--ink);
+  }
+  .field input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+
+  .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  button{
+    font-family:"Public Sans", sans-serif; font-size:13.5px; font-weight:600;
+    border-radius:9px; padding:9px 15px; cursor:pointer;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+  }
+  button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  button.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  button.ghost{background:transparent;}
+  #status{
+    font-family:"IBM Plex Mono", monospace; font-size:13px; color:var(--muted);
+    align-self:center; margin-left:auto;
+  }
+
+  .layout{display:flex; flex-direction:column; gap:20px;}
+  .grid-panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:20px;
+    overflow-x:auto;
+  }
+  .clue-panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    display:grid; grid-template-columns:1fr 1fr; gap:20px;
+  }
+  .clue-col h2{font-size:15px; font-weight:600; margin-bottom:8px; color:var(--accent);}
+  .clue-col ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px;}
+  .clue-col li{font-size:13.3px; line-height:1.35; color:var(--ink); display:flex; gap:6px; cursor:pointer; border-radius:6px; padding:3px 5px;}
+  .clue-col li:hover{background:var(--surface-2);}
+  .clue-col li.current{background:var(--accent-soft); color:var(--ink);}
+  .clue-col li b{font-family:"IBM Plex Mono", monospace; color:var(--muted); flex:0 0 auto;}
+
+  .grid{
+    display:grid;
+    gap:1px;
+    background:var(--line);
+    border:2px solid var(--ink);
+    border-radius:4px;
+    width:max-content;
+    --cell-px:32px;
+    grid-template-columns:repeat(var(--cols), var(--cell-px));
+    grid-template-rows:repeat(var(--rows), var(--cell-px));
+  }
+  .cell{position:relative; background:var(--cell-bg);}
+  .cell.block{background:var(--cell-block);}
+  .cell .num{
+    position:absolute; top:1px; left:2px;
+    font-family:"IBM Plex Mono", monospace; font-size:8.5px; color:var(--muted);
+    pointer-events:none;
+  }
+  .cell input{
+    width:100%; height:100%; border:none; background:transparent; color:var(--ink);
+    text-align:center; text-transform:uppercase; font-family:"IBM Plex Mono", monospace;
+    font-weight:600; font-size:16px; padding:0;
+  }
+  .cell input:focus{outline:none; background:var(--accent-soft);}
+  .cell.hint{background:var(--accent-soft);}
+  .cell input.correct{color:var(--good); background:var(--good-soft);}
+  .cell input.incorrect{color:var(--bad); background:var(--bad-soft);}
+
+  footer.note{color:var(--muted); font-size:12.5px; margin-top:16px; line-height:1.5;}
+
+  @media (max-width:640px){
+    .clue-panel{grid-template-columns:1fr;}
+    .grid{--cell-px:26px;}
+    #status{margin-left:0;}
+  }
+
+  @media print{
+    body{background:#fff; padding:0;}
+    .no-print{display:none !important;}
+    .masthead,.grid-panel,.clue-panel{box-shadow:none; border-color:#888;}
+    .layout{display:block;}
+    .grid-panel{overflow:visible; margin-bottom:14px;}
+    .clue-panel{display:block; columns:2; column-gap:22px; max-height:none; overflow:visible;}
+    .clue-col{break-inside:avoid; margin-bottom:10px;}
+    .grid{
+      --cell-px: calc(min(9mm, 260mm / var(--cols)));
+      color:#000; border-color:#000;
+    }
+    .cell.block{background:#ccc;}
+    .cell input{color:#000; font-size:calc(var(--cell-px) * .5);}
+    @page{ size: landscape; margin:10mm; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <div class="eyebrow">AP Psychology · Unit 1.3</div>
+    <h1>Neurons and Neural Firing</h1>
+    <div class="sub">Crossword review — nervous system cells, neural transmission, neurotransmitters, hormones, and psychoactive drugs.</div>
+
+    <div class="idrow no-print">
+      <div class="field">
+        <label for="sname">Name</label>
+        <input id="sname" type="text" autocomplete="off" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="speriod">Period / Class</label>
+        <input id="speriod" type="text" autocomplete="off" placeholder="e.g. Period 3">
+      </div>
+      <div class="field">
+        <label for="sdate">Date</label>
+        <input id="sdate" type="text" autocomplete="off" placeholder="mm/dd/yyyy">
+      </div>
+    </div>
+
+    <div class="idrow print-id" style="display:none;">
+      <div><b>Name:</b> <span id="pname"></span></div>
+      <div><b>Period:</b> <span id="pperiod"></span></div>
+      <div><b>Date:</b> <span id="pdate"></span></div>
+    </div>
+
+    <div class="actions no-print">
+      <button class="primary" id="btnCheck">Check answers</button>
+      <button id="btnClear">Clear grid</button>
+      <button id="btnPrint" class="ghost">Print / Save as PDF</button>
+      <span id="status"></span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="grid-panel">
+      <div class="grid" id="grid" role="group" aria-label="Crossword grid"></div>
+    </div>
+    <div class="clue-panel">
+      <div class="clue-col">
+        <h2>Across</h2>
+        <ol id="acrossList"></ol>
+      </div>
+      <div class="clue-col">
+        <h2>Down</h2>
+        <ol id="downList"></ol>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note no-print">
+    Fill in the grid, then click <b>Check answers</b> to see your progress. When you're finished, click <b>Print / Save as PDF</b>, choose "Save as PDF" as the printer, and upload the PDF to the Read 1.3 assignment in Canvas.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const WORDS = [
+    {a:"NEURON", c:"Cell that transmits signals throughout the brain and body"},
+    {a:"GLIALCELLS", c:"Support cells that provide neurons with structure, insulation, and waste removal"},
+    {a:"REFLEXARC", c:"Simple, automatic response to a stimulus, like pulling a hand off a hot stove"},
+    {a:"INTERNEURON", c:"Neuron that processes information in the spinal cord during a reflex"},
+    {a:"THRESHOLD", c:"Level of stimulation needed to trigger a neural impulse"},
+    {a:"DEPOLARIZATION", c:"Electrical shift that begins the neural signal"},
+    {a:"NEUROTRANSMITTERS", c:"Chemical messengers that carry signals between neurons"},
+    {a:"DOPAMINE", c:"Neurotransmitter linked to movement, learning, and pleasure"},
+    {a:"SEROTONIN", c:"Neurotransmitter linked to mood and appetite"},
+    {a:"GABA", c:"Major inhibitory neurotransmitter that reduces anxiety"},
+    {a:"ACETYLCHOLINE", c:"Neurotransmitter involved in muscle movement and memory"},
+    {a:"HORMONES", c:"Chemical messengers released by glands that act outside the nervous system"},
+    {a:"ADRENALINE", c:"Hormone that increases heart rate during stress"},
+    {a:"MELATONIN", c:"Hormone that regulates the sleep-wake cycle"},
+    {a:"OXYTOCIN", c:"Hormone that promotes bonding and trust"},
+    {a:"STIMULANTS", c:"Drugs, such as caffeine, that increase neural activity"},
+    {a:"DEPRESSANTS", c:"Drugs, such as alcohol, that reduce neural activity"},
+    {a:"OPIOIDS", c:"Drugs that relieve pain and produce a sense of euphoria"},
+    {a:"ADDICTION", c:"Chronic condition in which drug use becomes compulsive"},
+    {a:"WITHDRAWAL", c:"Physical or psychological symptoms that follow stopping drug use"}
+  ];
+
+  function buildCrossword(words){
+    const SIZE = 50;
+    const mid = Math.floor(SIZE/2);
+    const grid = Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+    const list = words.map(w=>({answer:w.a.toUpperCase(), clue:w.c}))
+                       .sort((a,b)=>b.answer.length-a.answer.length);
+    const placed = [];
+
+    function inBounds(r,c){return r>=0 && r<SIZE && c>=0 && c<SIZE;}
+    function cellFor(dir,row,col,i){return dir==='H' ? [row,col+i] : [row+i,col];}
+
+    function canPlace(answer,row,col,dir){
+      const len = answer.length;
+      const [br,bc] = dir==='H' ? [row,col-1] : [row-1,col];
+      const [ar,ac] = dir==='H' ? [row,col+len] : [row+len,col];
+      if (inBounds(br,bc) && grid[br][bc]) return null;
+      if (inBounds(ar,ac) && grid[ar][ac]) return null;
+      let crossings = 0;
+      for (let i=0;i<len;i++){
+        const [r,c] = cellFor(dir,row,col,i);
+        if (!inBounds(r,c)) return null;
+        const existing = grid[r][c];
+        const ch = answer[i];
+        if (existing){
+          if (existing !== ch) return null;
+          crossings++;
+        } else {
+          if (dir==='H'){
+            if (inBounds(r-1,c) && grid[r-1][c]) return null;
+            if (inBounds(r+1,c) && grid[r+1][c]) return null;
+          } else {
+            if (inBounds(r,c-1) && grid[r][c-1]) return null;
+            if (inBounds(r,c+1) && grid[r][c+1]) return null;
+          }
+        }
+      }
+      return crossings;
+    }
+
+    function commit(answer,row,col,dir){
+      for (let i=0;i<answer.length;i++){
+        const [r,c] = cellFor(dir,row,col,i);
+        grid[r][c] = answer[i];
+      }
+    }
+
+    const first = list[0];
+    commit(first.answer, mid, mid - Math.floor(first.answer.length/2), 'H');
+    placed.push({...first, row:mid, col: mid - Math.floor(first.answer.length/2), dir:'H'});
+
+    for (let idx=1; idx<list.length; idx++){
+      const w = list[idx];
+      let best = null;
+      for (const p of placed){
+        for (let pi=0; pi<p.answer.length; pi++){
+          const letter = p.answer[pi];
+          for (let wi=0; wi<w.answer.length; wi++){
+            if (w.answer[wi] !== letter) continue;
+            const dir = p.dir==='H' ? 'V' : 'H';
+            let row,col;
+            if (p.dir==='H'){ row = p.row - wi; col = p.col + pi; }
+            else { row = p.row + pi; col = p.col - wi; }
+            const score = canPlace(w.answer,row,col,dir);
+            if (score !== null){
+              const centerDist = Math.abs(row-mid) + Math.abs(col-mid);
+              if (!best || score>best.score || (score===best.score && centerDist<best.centerDist)){
+                best = {row,col,dir,score,centerDist};
+              }
+            }
+          }
+        }
+      }
+      if (best){
+        commit(w.answer, best.row, best.col, best.dir);
+        placed.push({...w, row:best.row, col:best.col, dir:best.dir});
+      } else {
+        let r = mid + 14 + idx;
+        let c = mid - Math.floor(w.answer.length/2);
+        if (r >= SIZE-1) r = SIZE-2;
+        commit(w.answer, r, c, 'H');
+        placed.push({...w, row:r, col:c, dir:'H'});
+      }
+    }
+
+    let minR=SIZE,maxR=-1,minC=SIZE,maxC=-1;
+    for (const p of placed){
+      const len = p.answer.length;
+      if (p.dir==='H'){
+        minR=Math.min(minR,p.row); maxR=Math.max(maxR,p.row);
+        minC=Math.min(minC,p.col); maxC=Math.max(maxC,p.col+len-1);
+      } else {
+        minR=Math.min(minR,p.row); maxR=Math.max(maxR,p.row+len-1);
+        minC=Math.min(minC,p.col); maxC=Math.max(maxC,p.col);
+      }
+    }
+    const height = maxR-minR+1, width = maxC-minC+1;
+    const norm = placed.map(p=>({...p, row:p.row-minR, col:p.col-minC}));
+    const outGrid = Array.from({length:height},()=>Array(width).fill(null));
+    for (const p of norm){
+      for (let i=0;i<p.answer.length;i++){
+        const [r,c] = p.dir==='H' ? [p.row,p.col+i] : [p.row+i,p.col];
+        outGrid[r][c] = p.answer[i];
+      }
+    }
+
+    let num = 1;
+    const numberAt = {};
+    for (let r=0;r<height;r++){
+      for (let c=0;c<width;c++){
+        if (!outGrid[r][c]) continue;
+        const startsAcross = (c===0 || !outGrid[r][c-1]) && c+1<width && outGrid[r][c+1];
+        const startsDown = (r===0 || !outGrid[r-1][c]) && r+1<height && outGrid[r+1][c];
+        if (startsAcross || startsDown) numberAt[r+','+c] = num++;
+      }
+    }
+    const entries = norm.map(p=>({...p, number:numberAt[p.row+','+p.col]}))
+                         .sort((a,b)=>a.number-b.number);
+
+    return {height,width,grid:outGrid,entries};
+  }
+
+  const {height,width,grid,entries} = buildCrossword(WORDS);
+
+  const gridEl = document.getElementById('grid');
+  gridEl.style.setProperty('--cols', width);
+  gridEl.style.setProperty('--rows', height);
+
+  const inputs = {};
+  const solutions = {};
+  const acrossMap = {};
+  const downMap = {};
+  for (const e of entries){
+    for (let i=0;i<e.answer.length;i++){
+      const r = e.dir==='H' ? e.row : e.row+i;
+      const c = e.dir==='H' ? e.col+i : e.col;
+      const key = r+','+c;
+      if (e.dir==='H') acrossMap[key] = {entry:e, index:i};
+      else downMap[key] = {entry:e, index:i};
+    }
+  }
+
+  const numberAt = {};
+  entries.forEach(e=>{ numberAt[e.row+','+e.col] = e.number; });
+
+  for (let r=0;r<height;r++){
+    for (let c=0;c<width;c++){
+      const div = document.createElement('div');
+      const key = r+','+c;
+      if (!grid[r][c]){
+        div.className='cell block';
+        gridEl.appendChild(div);
+        continue;
+      }
+      div.className='cell';
+      if (numberAt[key]){
+        const n = document.createElement('span');
+        n.className='num'; n.textContent = numberAt[key];
+        div.appendChild(n);
+      }
+      const inp = document.createElement('input');
+      inp.maxLength = 1;
+      inp.autocomplete = 'off';
+      inp.spellcheck = false;
+      inp.id = 'cell-'+r+'-'+c;
+      inp.dataset.r = r; inp.dataset.c = c;
+      solutions[key] = grid[r][c];
+      div.appendChild(inp);
+      inputs[key] = inp;
+      gridEl.appendChild(div);
+    }
+  }
+
+  let activeDir = 'across';
+
+  function focusCell(r,c){
+    const el = inputs[r+','+c];
+    if (el){ el.focus(); el.select && el.select(); }
+  }
+
+  function clearHighlights(){
+    document.querySelectorAll('.cell.hint').forEach(el=>el.classList.remove('hint'));
+    document.querySelectorAll('.clue-col li.current').forEach(el=>el.classList.remove('current'));
+  }
+
+  function highlightEntry(entry){
+    clearHighlights();
+    for (let i=0;i<entry.answer.length;i++){
+      const r = entry.dir==='H' ? entry.row : entry.row+i;
+      const c = entry.dir==='H' ? entry.col+i : entry.col;
+      const el = inputs[r+','+c];
+      if (el) el.closest('.cell').classList.add('hint');
+    }
+    const li = document.getElementById((entry.dir==='H'?'a-':'d-')+entry.number);
+    if (li) li.classList.add('current');
+  }
+
+  function onCellFocus(r,c){
+    const key = r+','+c;
+    const across = acrossMap[key];
+    const down = downMap[key];
+    let entry = null;
+    if (activeDir==='across' && across) entry = across.entry;
+    else if (activeDir==='down' && down) entry = down.entry;
+    else if (across) { activeDir='across'; entry = across.entry; }
+    else if (down) { activeDir='down'; entry = down.entry; }
+    if (entry) highlightEntry(entry);
+  }
+
+  function moveInDir(r,c,dir,delta){
+    const key = r+','+c;
+    const map = dir==='across' ? acrossMap : downMap;
+    const cur = map[key];
+    if (!cur) return false;
+    const targetIndex = cur.index + delta;
+    if (targetIndex < 0 || targetIndex >= cur.entry.answer.length) return false;
+    const nr = cur.entry.dir==='H' ? cur.entry.row : cur.entry.row+targetIndex;
+    const nc = cur.entry.dir==='H' ? cur.entry.col+targetIndex : cur.entry.col;
+    focusCell(nr,nc);
+    return true;
+  }
+
+  Object.keys(inputs).forEach(key=>{
+    const [r,c] = key.split(',').map(Number);
+    const inp = inputs[key];
+
+    inp.addEventListener('focus', ()=>onCellFocus(r,c));
+
+    inp.addEventListener('click', ()=>{
+      const across = acrossMap[key], down = downMap[key];
+      if (across && down){
+        activeDir = (activeDir==='across') ? 'down' : 'across';
+        onCellFocus(r,c);
+      }
+    });
+
+    inp.addEventListener('input', ()=>{
+      inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,1);
+      inp.classList.remove('correct','incorrect');
+      if (inp.value) moveInDir(r,c,activeDir,1);
+      saveProgress();
+    });
+
+    inp.addEventListener('keydown', (ev)=>{
+      if (ev.key === 'Backspace' && !inp.value){
+        ev.preventDefault();
+        moveInDir(r,c,activeDir,-1);
+      } else if (ev.key === 'ArrowRight'){
+        ev.preventDefault(); activeDir='across'; moveInDir(r,c,'across',1) || focusCell(r,c);
+      } else if (ev.key === 'ArrowLeft'){
+        ev.preventDefault(); activeDir='across'; moveInDir(r,c,'across',-1) || focusCell(r,c);
+      } else if (ev.key === 'ArrowDown'){
+        ev.preventDefault(); activeDir='down'; moveInDir(r,c,'down',1) || focusCell(r,c);
+      } else if (ev.key === 'ArrowUp'){
+        ev.preventDefault(); activeDir='down'; moveInDir(r,c,'down',-1) || focusCell(r,c);
+      }
+    });
+  });
+
+  function renderClueList(dir, el){
+    const items = entries.filter(e=>e.dir===dir).sort((a,b)=>a.number-b.number);
+    el.innerHTML='';
+    items.forEach(e=>{
+      const li = document.createElement('li');
+      li.id = (dir==='H'?'a-':'d-')+e.number;
+      li.innerHTML = '<b>'+e.number+'.</b><span>'+e.clue+'</span>';
+      li.addEventListener('click', ()=>{
+        activeDir = dir==='H' ? 'across' : 'down';
+        focusCell(e.row, e.col);
+      });
+      el.appendChild(li);
+    });
+  }
+  renderClueList('H', document.getElementById('acrossList'));
+  renderClueList('V', document.getElementById('downList'));
+
+  const statusEl = document.getElementById('status');
+
+  document.getElementById('btnCheck').addEventListener('click', ()=>{
+    let correct=0, filled=0, total=0;
+    Object.keys(inputs).forEach(key=>{
+      const inp = inputs[key];
+      total++;
+      if (inp.value) filled++;
+      if (!inp.value){ inp.classList.remove('correct','incorrect'); return; }
+      if (inp.value === solutions[key]){
+        inp.classList.add('correct'); inp.classList.remove('incorrect'); correct++;
+      } else {
+        inp.classList.add('incorrect'); inp.classList.remove('correct');
+      }
+    });
+    statusEl.textContent = correct+' / '+total+' correct ('+filled+' filled in)';
+  });
+
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    if (!confirm('Clear the whole grid?')) return;
+    Object.values(inputs).forEach(inp=>{
+      inp.value=''; inp.classList.remove('correct','incorrect');
+    });
+    statusEl.textContent='';
+    saveProgress();
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', ()=>{
+    document.getElementById('pname').textContent = document.getElementById('sname').value || '—';
+    document.getElementById('pperiod').textContent = document.getElementById('speriod').value || '—';
+    document.getElementById('pdate').textContent = document.getElementById('sdate').value || '—';
+    document.querySelector('.print-id').style.display='flex';
+    document.querySelector('.print-id').style.gap='18px';
+    document.querySelector('.print-id').style.fontSize='13px';
+    window.print();
+  });
+
+  function saveProgress(){
+    try{
+      const data = {};
+      Object.keys(inputs).forEach(k=>{ data[k]=inputs[k].value; });
+      localStorage.setItem('neuralFiringCrossword', JSON.stringify(data));
+      localStorage.setItem('neuralFiringCrosswordName', JSON.stringify({
+        name: document.getElementById('sname').value,
+        period: document.getElementById('speriod').value,
+        date: document.getElementById('sdate').value
+      }));
+    } catch(e){}
+  }
+
+  try{
+    const saved = JSON.parse(localStorage.getItem('neuralFiringCrossword') || '{}');
+    Object.keys(saved).forEach(k=>{ if (inputs[k]) inputs[k].value = saved[k]; });
+    const meta = JSON.parse(localStorage.getItem('neuralFiringCrosswordName') || '{}');
+    if (meta.name) document.getElementById('sname').value = meta.name;
+    if (meta.period) document.getElementById('speriod').value = meta.period;
+    if (meta.date) document.getElementById('sdate').value = meta.date;
+  } catch(e){}
+
+  ['sname','speriod','sdate'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', saveProgress);
+  });
+})();
+</script>
