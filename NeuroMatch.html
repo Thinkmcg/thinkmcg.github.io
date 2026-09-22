@@ -1,0 +1,1167 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>NeuroMatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F3FA;
+    --surface: #FFFFFF;
+    --surface-2: #E8E9F5;
+    --ink: #1C1B2E;
+    --muted: #666a89;
+    --primary: #3D348B;
+    --primary-2: #6E5AE0;
+    --primary-tint: #ECE9FB;
+    --accent: #E8890C;
+    --success: #157A6E;
+    --success-bg: #DAF2ED;
+    --error: #C4293B;
+    --error-bg: #FBE2E4;
+    --border: #D9DAEC;
+    --shadow: rgba(41, 34, 90, 0.14);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #131328;
+      --surface: #1B1B36;
+      --surface-2: #242545;
+      --ink: #ECEBF7;
+      --muted: #A2A4C6;
+      --primary: #9384F0;
+      --primary-2: #B3A5FF;
+      --primary-tint: #2A2552;
+      --accent: #F4A93F;
+      --success: #55D2BE;
+      --success-bg: rgba(85, 210, 190, 0.14);
+      --error: #FF8A93;
+      --error-bg: rgba(255, 138, 147, 0.14);
+      --border: #34365E;
+      --shadow: rgba(0, 0, 0, 0.4);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #131328;
+    --surface: #1B1B36;
+    --surface-2: #242545;
+    --ink: #ECEBF7;
+    --muted: #A2A4C6;
+    --primary: #9384F0;
+    --primary-2: #B3A5FF;
+    --primary-tint: #2A2552;
+    --accent: #F4A93F;
+    --success: #55D2BE;
+    --success-bg: rgba(85, 210, 190, 0.14);
+    --error: #FF8A93;
+    --error-bg: rgba(255, 138, 147, 0.14);
+    --border: #34365E;
+    --shadow: rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Libre Franklin", -apple-system, BlinkMacSystemFont, sans-serif;
+    padding-inline: 16px;
+    min-height: 100%;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-block: 20px 48px;
+  }
+
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  .brandline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .mark {
+    width: 34px;
+    height: 34px;
+    flex: none;
+  }
+
+  .brand-title {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 13.5px;
+    margin: 2px 0 18px;
+  }
+
+  .statbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 84px;
+  }
+
+  .stat .num {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .lbl {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  .stat.correct .num { color: var(--success); }
+  .stat.miss .num { color: var(--error); }
+
+  .dots {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .dot.current {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-tint);
+  }
+
+  .dot.done {
+    border-color: var(--success);
+    background: var(--success);
+    color: #fff;
+  }
+
+  .board {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 28px var(--shadow);
+  }
+
+  .round-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .round-eyebrow {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .round-title {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 23px;
+    margin-top: 2px;
+  }
+
+  .progress-track {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+    margin: 14px 0 18px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    border-radius: 4px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+
+  .instructions {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .instructions b { color: var(--ink); }
+
+  .bank-label, .defs-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+    min-height: 44px;
+  }
+
+  .chip {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    background: var(--primary-tint);
+    border: 1.5px solid var(--primary-2);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: grab;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    box-shadow: 0 1px 0 var(--shadow);
+  }
+
+  .chip:hover { transform: translateY(-1px); box-shadow: 0 4px 10px var(--shadow); }
+  .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .chip:active { cursor: grabbing; }
+
+  .chip.selected {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--primary-tint);
+  }
+
+  .chip.wrong-flash {
+    background: var(--error-bg);
+    border-color: var(--error);
+    color: var(--error);
+    animation: shake 0.4s ease;
+  }
+
+  .chip.placed {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+    cursor: default;
+  }
+
+  .chip-ghost {
+    z-index: 999;
+    opacity: 0.95;
+  }
+
+  .chip.source-hidden { opacity: 0; pointer-events: none; }
+
+  .defs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .def-slot {
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    gap: 14px;
+    align-items: center;
+    background: var(--bg);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .def-slot.hover {
+    border-color: var(--primary);
+    background: var(--primary-tint);
+  }
+
+  .def-slot.matched {
+    border-style: solid;
+    border-color: var(--success);
+    background: var(--success-bg);
+  }
+
+  .def-slot.error {
+    border-style: solid;
+    border-color: var(--error);
+    background: var(--error-bg);
+    animation: shake 0.4s ease;
+  }
+
+  .drop-zone {
+    min-height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    text-align: center;
+    cursor: pointer;
+    font-family: "Libre Franklin", sans-serif;
+  }
+
+  .drop-zone:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 8px; }
+
+  .def-text {
+    font-size: 14px;
+    line-height: 1.48;
+  }
+
+  .def-slot.matched .def-text { color: var(--ink); }
+
+  @keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(3px); }
+    30%, 50%, 70% { transform: translateX(-5px); }
+    40%, 60% { transform: translateX(5px); }
+  }
+
+  .pop {
+    position: fixed;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--success);
+    pointer-events: none;
+    z-index: 1000;
+    animation: pop-up 0.7s ease forwards;
+  }
+
+  @keyframes pop-up {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-26px); }
+  }
+
+  .banner {
+    margin-top: 18px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    box-shadow: 0 10px 24px var(--shadow);
+  }
+
+  .banner-text { font-size: 14px; }
+  .banner-text b { font-family: "Fraunces", serif; font-style: italic; font-size: 17px; }
+
+  .btn {
+    background: #fff;
+    color: var(--primary);
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .final-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 10px 28px var(--shadow);
+  }
+
+  .final-title {
+    font-family: "Fraunces", serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 26px;
+  }
+
+  .final-sub { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  .final-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 22px 0;
+    flex-wrap: wrap;
+  }
+
+  .final-stats .num {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .final-stats .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .def-slot { grid-template-columns: 1fr; }
+    .drop-zone { min-height: 34px; }
+    .statbar { gap: 8px; }
+    .dots { margin-left: 0; width: 100%; justify-content: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip, .btn, .progress-fill { transition: none; }
+    .shake-off, .def-slot.error, .chip.wrong-flash { animation: none; }
+    .pop { animation: none; opacity: 0; }
+  }
+
+  .name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .name-row label {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .name-row input {
+    font-family: "Libre Franklin", sans-serif;
+    font-size: 14px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    min-width: 220px;
+  }
+
+  .name-row input:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+  .print-only { display: none; }
+
+  .final-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 9px 17px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+  .btn-outline:hover { transform: translateY(-1px); }
+  .btn-outline:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+  .print-hint {
+    max-width: 380px;
+    margin: 12px auto 0;
+    font-size: 12.5px;
+    color: var(--error);
+    line-height: 1.4;
+  }
+
+  .breakdown {
+    margin: 22px 0 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    text-align: left;
+  }
+
+  .breakdown-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .breakdown table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .breakdown th, .breakdown td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .breakdown th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .breakdown td.num-col, .breakdown th.num-col {
+    text-align: right;
+    font-family: "JetBrains Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .brandline, .tagline, .statbar, .board, #replayBtn, #printBtn, .name-row, .print-hint {
+      display: none !important;
+    }
+    .print-only { display: block; }
+    .final-card {
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+    }
+    .final-stats { justify-content: flex-start; gap: 40px; }
+    .breakdown { border-top-color: #999; }
+    .breakdown th, .breakdown td { border-bottom-color: #ccc; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="brandline">
+    <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" fill="var(--primary-2)"/>
+      <circle cx="29" cy="9" r="3" fill="var(--accent)"/>
+      <circle cx="30" cy="28" r="4" fill="var(--primary)"/>
+      <circle cx="10" cy="29" r="3" fill="var(--success)"/>
+      <circle cx="20" cy="19" r="3.5" fill="var(--primary-2)"/>
+      <path d="M12 12 L20 19 L29 9 M20 19 L30 28 M20 19 L10 29" stroke="var(--border)" stroke-width="1.6"/>
+    </svg>
+    <span class="brand-title">NeuroMatch</span>
+  </div>
+  <p class="tagline">AP Psychology · Unit 1.4 — drag each term onto its matching definition.</p>
+
+  <div class="statbar">
+    <div class="stat correct"><span class="num" id="scoreNum">0</span><span class="lbl">Score</span></div>
+    <div class="stat miss"><span class="num" id="missNum">0</span><span class="lbl">Misses</span></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="round-head">
+      <div>
+        <div class="round-eyebrow" id="roundEyebrow">Round 1 of 5</div>
+        <h2 class="round-title" id="roundTitle">The Core Structures</h2>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="instructions"><b>Drag</b> a term onto its definition — or tap a term, then tap the definition it matches.</p>
+
+    <div class="bank-label">Terms</div>
+    <div class="bank" id="bank"></div>
+
+    <div class="defs-label">Definitions</div>
+    <div class="defs" id="defs"></div>
+
+    <div class="banner" id="banner" hidden>
+      <div class="banner-text"><b id="bannerTitle">Round complete!</b><br><span id="bannerSub"></span></div>
+      <button class="btn" id="nextBtn">Next round</button>
+    </div>
+  </div>
+
+  <div class="final-card" id="finalCard" hidden>
+    <div class="print-only" id="printHead" style="margin-bottom:18px;">
+      <div style="font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;">NeuroMatch — Unit 1.4 Results</div>
+      <div style="font-size:13px;color:#444;margin-top:4px;">AP Psychology · The Brain</div>
+    </div>
+
+    <div class="final-title">Unit 1.4 complete</div>
+    <div class="final-sub">Every structure, region, and researcher — matched.</div>
+
+    <div class="name-row">
+      <label for="studentName">Name:</label>
+      <input type="text" id="studentName" placeholder="Type your name" autocomplete="name">
+    </div>
+    <div class="print-only" id="printMeta" style="font-size:13px;color:#444;margin-bottom:4px;"></div>
+
+    <div class="final-stats">
+      <div><div class="num" id="finalScore">0</div><div class="lbl">Points</div></div>
+      <div><div class="num" id="finalAcc">0%</div><div class="lbl">Accuracy</div></div>
+      <div><div class="num" id="finalMiss">0</div><div class="lbl">Misses</div></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Round-by-round</div>
+      <table>
+        <thead>
+          <tr><th>Round</th><th class="num-col">Misses</th></tr>
+        </thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+    </div>
+
+    <div class="final-actions">
+      <button class="btn" id="replayBtn" style="background:var(--primary);color:#fff;">Play again</button>
+      <button class="btn-outline" id="printBtn">Print / Save as PDF</button>
+    </div>
+    <p class="print-hint" id="printHint" hidden>Pop-ups are blocked for this page. Allow pop-ups for claude.ai, then click the button again — or use your browser's own Print command (Ctrl/Cmd + P).</p>
+  </div>
+
+  <div class="sr-only" role="status" aria-live="polite" id="liveRegion"></div>
+</div>
+
+<script>
+(function () {
+  var ROUNDS = [
+    {
+      title: "The Core Structures",
+      pairs: [
+        { term: "Brain", def: "The central organ of the nervous system — it processes sensory information, regulates bodily functions, and enables cognition, emotion, and behavior." },
+        { term: "Brain Stem", def: "Connects the brain to the spinal cord and controls vital functions such as heartbeat, breathing, and sleep cycles." },
+        { term: "Reticular Activating System", def: "A network of neurons in the brain stem that regulates wakefulness and sleep-wake transitions and filters incoming sensory information." },
+        { term: "Cerebellum", def: "Located at the back of the brain; coordinates voluntary movement, balance, and motor skills, and contributes to attention and language." },
+        { term: "Cerebral Cortex", def: "The brain's outer layer, responsible for complex functions like perception, thought, language, and conscious awareness." }
+      ]
+    },
+    {
+      title: "The Four Lobes",
+      pairs: [
+        { term: "Occipital Lobes", def: "Located at the back of the brain; process visual information and support visual perception." },
+        { term: "Temporal Lobes", def: "Located on the sides of the brain; involved in auditory processing, language comprehension, memory, and emotional response." },
+        { term: "Parietal Lobes", def: "Located at the top and back of the brain; process touch, temperature, and pain, and support spatial orientation and body awareness." },
+        { term: "Frontal Lobes", def: "Located at the front of the brain; involved in decision-making, problem-solving, planning, and controlling behavior and emotion." }
+      ]
+    },
+    {
+      title: "Lateralization & Language",
+      pairs: [
+        { term: "Brain Lateralization", def: "The tendency for certain neural functions to be specialized to one side of the brain rather than the other." },
+        { term: "Corpus Callosum", def: "The band of neurons between the hemispheres that lets the two sides of the brain communicate seamlessly." },
+        { term: "Split-Brain Research", def: "Studies by Roger Sperry and Michael Gazzaniga on patients with a severed corpus callosum, showing the hemispheres can act independently." },
+        { term: "Broca's Area", def: "A region of the frontal lobe (left hemisphere) that directs the muscle movements involved in speech." },
+        { term: "Wernicke's Area", def: "A region of the temporal lobe (left hemisphere) responsible for language comprehension." },
+        { term: "Aphasia", def: "The inability to produce or comprehend language, often caused by damage to Broca's or Wernicke's Area." }
+      ]
+    },
+    {
+      title: "Plasticity & Growth",
+      pairs: [
+        { term: "Plasticity", def: "The brain's ability to change or adapt by developing new or alternative neural pathways from existing neurons." },
+        { term: "Neurogenesis", def: "The slow process by which the brain creates small amounts of entirely new neurons." },
+        { term: "Acetylcholine", def: "A neurotransmitter that surges after repeated genuine mistakes, priming the brain's neurons for a window of change." },
+        { term: "Window of Plasticity", def: "The roughly 60-minute period after ~30 minutes of repeated failure during which the brain is primed to learn a new skill." }
+      ]
+    },
+    {
+      title: "Studying the Brain",
+      pairs: [
+        { term: "EEG", def: "Electroencephalography — measures the brain's electrical activity using electrodes on the scalp; useful for studying brain waves and diagnosing epilepsy." },
+        { term: "fMRI", def: "Functional Magnetic Resonance Imaging — detects changes in blood flow to show which brain areas are active during a specific task." },
+        { term: "Case Study", def: "An in-depth examination of an individual subject, often someone with a unique brain injury, revealing links between brain structures and function." },
+        { term: "Lesioning", def: "Deliberately damaging a specific brain area in research to observe the resulting changes in behavior and cognition." }
+      ]
+    }
+  ];
+
+  var state = {
+    round: 0,
+    score: 0,
+    misses: 0,
+    matchedInRound: 0,
+    missesThisRound: 0,
+    roundStats: [],
+    selectedChip: null
+  };
+
+  var dotsEl = document.getElementById("dots");
+  var boardEl = document.getElementById("board");
+  var bankEl = document.getElementById("bank");
+  var defsEl = document.getElementById("defs");
+  var roundEyebrow = document.getElementById("roundEyebrow");
+  var roundTitle = document.getElementById("roundTitle");
+  var progressFill = document.getElementById("progressFill");
+  var bannerEl = document.getElementById("banner");
+  var bannerTitle = document.getElementById("bannerTitle");
+  var bannerSub = document.getElementById("bannerSub");
+  var nextBtn = document.getElementById("nextBtn");
+  var finalCard = document.getElementById("finalCard");
+  var replayBtn = document.getElementById("replayBtn");
+  var scoreNum = document.getElementById("scoreNum");
+  var missNum = document.getElementById("missNum");
+  var liveRegion = document.getElementById("liveRegion");
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function announce(msg) { liveRegion.textContent = msg; }
+
+  function buildDots() {
+    dotsEl.innerHTML = "";
+    ROUNDS.forEach(function (r, i) {
+      var d = document.createElement("div");
+      d.className = "dot" + (i === state.round ? " current" : "") + (i < state.round ? " done" : "");
+      d.textContent = i < state.round ? "✓" : String(i + 1);
+      d.title = r.title;
+      dotsEl.appendChild(d);
+    });
+  }
+
+  function updateStats() {
+    scoreNum.textContent = state.score;
+    missNum.textContent = state.misses;
+  }
+
+  function updateProgress() {
+    var total = ROUNDS[state.round].pairs.length;
+    var pct = Math.round((state.matchedInRound / total) * 100);
+    progressFill.style.width = pct + "%";
+  }
+
+  function createChip(pair, idx) {
+    var chip = document.createElement("div");
+    chip.className = "chip";
+    chip.setAttribute("role", "button");
+    chip.setAttribute("tabindex", "0");
+    chip.dataset.id = String(idx);
+    chip.textContent = pair.term;
+    chip.setAttribute("aria-label", "Term: " + pair.term);
+
+    chip.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleSelect(chip);
+      }
+    });
+
+    chip.addEventListener("pointerdown", function (e) {
+      if (chip.classList.contains("placed")) return;
+      onChipPointerDown(e, chip);
+    });
+
+    return chip;
+  }
+
+  function createSlot(pair, idx) {
+    var slot = document.createElement("div");
+    slot.className = "def-slot";
+    slot.dataset.id = String(idx);
+
+    var zoneWrap = document.createElement("div");
+    var zoneBtn = document.createElement("button");
+    zoneBtn.type = "button";
+    zoneBtn.className = "drop-zone";
+    zoneBtn.textContent = "Drop term here";
+    zoneBtn.setAttribute("aria-label", "Definition slot " + (idx + 1) + ", currently empty");
+    zoneWrap.appendChild(zoneBtn);
+    zoneWrap.className = "zone-wrap";
+
+    var text = document.createElement("div");
+    text.className = "def-text";
+    text.textContent = pair.def;
+
+    slot.appendChild(zoneWrap);
+    slot.appendChild(text);
+
+    zoneBtn.addEventListener("click", function () {
+      if (slot.classList.contains("matched")) return;
+      if (state.selectedChip) {
+        attemptMatch(state.selectedChip, slot, zoneWrap);
+      } else {
+        zoneBtn.style.color = "var(--primary)";
+        setTimeout(function () { zoneBtn.style.color = ""; }, 350);
+      }
+    });
+
+    return slot;
+  }
+
+  function toggleSelect(chip) {
+    if (state.selectedChip === chip) {
+      chip.classList.remove("selected");
+      state.selectedChip = null;
+      return;
+    }
+    if (state.selectedChip) state.selectedChip.classList.remove("selected");
+    state.selectedChip = chip;
+    chip.classList.add("selected");
+  }
+
+  function deselect() {
+    if (state.selectedChip) state.selectedChip.classList.remove("selected");
+    state.selectedChip = null;
+  }
+
+  function floatPop(x, y) {
+    var pop = document.createElement("div");
+    pop.className = "pop";
+    pop.textContent = "+10";
+    pop.style.left = x + "px";
+    pop.style.top = y + "px";
+    document.body.appendChild(pop);
+    setTimeout(function () { pop.remove(); }, 700);
+  }
+
+  function attemptMatch(chip, slot, zoneWrap) {
+    if (chip.classList.contains("placed") || slot.classList.contains("matched")) return;
+    var correct = chip.dataset.id === slot.dataset.id;
+    if (correct) {
+      var rect = slot.getBoundingClientRect();
+      chip.classList.remove("selected");
+      chip.classList.add("placed");
+      zoneWrap.innerHTML = "";
+      zoneWrap.appendChild(chip);
+      slot.classList.add("matched");
+      var zb = slot.querySelector(".drop-zone");
+      state.score += 10;
+      state.matchedInRound++;
+      updateStats();
+      updateProgress();
+      floatPop(rect.left + 20, rect.top);
+      announce(chip.textContent + " matched correctly.");
+      if (state.matchedInRound === ROUNDS[state.round].pairs.length) {
+        state.roundStats.push({ title: ROUNDS[state.round].title, misses: state.missesThisRound });
+        setTimeout(showRoundBanner, 300);
+      }
+    } else {
+      slot.classList.add("error");
+      chip.classList.add("wrong-flash");
+      state.misses++;
+      state.missesThisRound++;
+      updateStats();
+      announce("Not quite. Try again.");
+      setTimeout(function () {
+        slot.classList.remove("error");
+        chip.classList.remove("wrong-flash");
+      }, 420);
+    }
+    deselect();
+  }
+
+  var dragGhost = null;
+
+  function onChipPointerDown(e, chip) {
+    e.preventDefault();
+    var startX = e.clientX, startY = e.clientY;
+    var dragging = false;
+    var rect = chip.getBoundingClientRect();
+    var offsetX = startX - rect.left, offsetY = startY - rect.top;
+
+    try { chip.setPointerCapture(e.pointerId); } catch (err) {}
+
+    function onMove(ev) {
+      var dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (!dragging && Math.hypot(dx, dy) > 6) {
+        dragging = true;
+        chip.classList.add("source-hidden");
+        dragGhost = chip.cloneNode(true);
+        dragGhost.classList.add("chip-ghost");
+        dragGhost.style.position = "fixed";
+        dragGhost.style.left = rect.left + "px";
+        dragGhost.style.top = rect.top + "px";
+        dragGhost.style.width = rect.width + "px";
+        dragGhost.style.pointerEvents = "none";
+        document.body.appendChild(dragGhost);
+      }
+      if (dragging && dragGhost) {
+        dragGhost.style.left = (ev.clientX - offsetX) + "px";
+        dragGhost.style.top = (ev.clientY - offsetY) + "px";
+        var el = document.elementFromPoint(ev.clientX, ev.clientY);
+        var slot = el && el.closest(".def-slot");
+        var all = defsEl.querySelectorAll(".def-slot.hover");
+        for (var i = 0; i < all.length; i++) { if (all[i] !== slot) all[i].classList.remove("hover"); }
+        if (slot && !slot.classList.contains("matched")) slot.classList.add("hover");
+      }
+    }
+
+    function onUp(ev) {
+      try { chip.releasePointerCapture(e.pointerId); } catch (err) {}
+      chip.removeEventListener("pointermove", onMove);
+      chip.removeEventListener("pointerup", onUp);
+      chip.removeEventListener("pointercancel", onUp);
+
+      var hoveredSlots = defsEl.querySelectorAll(".def-slot.hover");
+      for (var i = 0; i < hoveredSlots.length; i++) hoveredSlots[i].classList.remove("hover");
+
+      if (dragging) {
+        if (dragGhost) { dragGhost.remove(); dragGhost = null; }
+        chip.classList.remove("source-hidden");
+        var el = document.elementFromPoint(ev.clientX, ev.clientY);
+        var slot = el && el.closest(".def-slot");
+        if (slot && !slot.classList.contains("matched")) {
+          var zoneWrap = slot.querySelector(".zone-wrap");
+          attemptMatch(chip, slot, zoneWrap);
+        }
+      } else {
+        toggleSelect(chip);
+      }
+    }
+
+    chip.addEventListener("pointermove", onMove);
+    chip.addEventListener("pointerup", onUp);
+    chip.addEventListener("pointercancel", onUp);
+  }
+
+  function showRoundBanner() {
+    var isLast = state.round === ROUNDS.length - 1;
+    bannerTitle.textContent = "Round complete!";
+    bannerSub.textContent = ROUNDS[state.round].pairs.length + " of " + ROUNDS[state.round].pairs.length + " matched.";
+    nextBtn.textContent = isLast ? "See results" : "Next round";
+    bannerEl.hidden = false;
+  }
+
+  function renderRound() {
+    var round = ROUNDS[state.round];
+    state.matchedInRound = 0;
+    state.missesThisRound = 0;
+    state.selectedChip = null;
+    bannerEl.hidden = true;
+    boardEl.hidden = false;
+    finalCard.hidden = true;
+
+    roundEyebrow.textContent = "Round " + (state.round + 1) + " of " + ROUNDS.length;
+    roundTitle.textContent = round.title;
+
+    bankEl.innerHTML = "";
+    defsEl.innerHTML = "";
+
+    var termOrder = shuffle(round.pairs.map(function (p, i) { return i; }));
+    var defOrder = shuffle(round.pairs.map(function (p, i) { return i; }));
+
+    termOrder.forEach(function (idx) {
+      bankEl.appendChild(createChip(round.pairs[idx], idx));
+    });
+    defOrder.forEach(function (idx) {
+      defsEl.appendChild(createSlot(round.pairs[idx], idx));
+    });
+
+    updateProgress();
+    buildDots();
+  }
+
+  function updatePrintMeta() {
+    var name = document.getElementById("studentName").value.trim();
+    var today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    document.getElementById("printMeta").textContent =
+      (name ? "Name: " + name : "Name: _______________________") + "   ·   Date: " + today;
+  }
+
+  function buildBreakdown() {
+    var body = document.getElementById("breakdownBody");
+    body.innerHTML = "";
+    state.roundStats.forEach(function (r) {
+      var tr = document.createElement("tr");
+      var td1 = document.createElement("td");
+      td1.textContent = r.title;
+      var td2 = document.createElement("td");
+      td2.className = "num-col";
+      td2.textContent = r.misses;
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      body.appendChild(tr);
+    });
+  }
+
+  function showFinal() {
+    boardEl.hidden = true;
+    finalCard.hidden = false;
+    var totalPairs = ROUNDS.reduce(function (s, r) { return s + r.pairs.length; }, 0);
+    var attempts = totalPairs + state.misses;
+    var acc = Math.round((totalPairs / attempts) * 100);
+    document.getElementById("finalScore").textContent = state.score;
+    document.getElementById("finalAcc").textContent = acc + "%";
+    document.getElementById("finalMiss").textContent = state.misses;
+    buildBreakdown();
+    updatePrintMeta();
+    buildDots();
+  }
+
+  nextBtn.addEventListener("click", function () {
+    state.round++;
+    if (state.round >= ROUNDS.length) {
+      showFinal();
+    } else {
+      renderRound();
+    }
+  });
+
+  replayBtn.addEventListener("click", function () {
+    state.round = 0;
+    state.score = 0;
+    state.misses = 0;
+    state.roundStats = [];
+    updateStats();
+    renderRound();
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function buildReportDoc() {
+    var name = document.getElementById("studentName").value.trim();
+    var today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    var totalPairs = ROUNDS.reduce(function (s, r) { return s + r.pairs.length; }, 0);
+    var attempts = totalPairs + state.misses;
+    var acc = Math.round((totalPairs / attempts) * 100);
+
+    var rows = state.roundStats.map(function (r) {
+      return "<tr><td>" + escapeHtml(r.title) + "</td><td>" + r.misses + "</td></tr>";
+    }).join("");
+
+    return [
+      "<!doctype html><html><head><meta charset=\"utf-8\">",
+      "<title>NeuroMatch Results" + (name ? " - " + escapeHtml(name) : "") + "</title>",
+      "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">",
+      "<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,500&family=Libre+Franklin:wght@400;600;700&family=JetBrains+Mono:wght@700&display=swap\" rel=\"stylesheet\">",
+      "<style>",
+      "body{font-family:'Libre Franklin',Arial,sans-serif;color:#1C1B2E;max-width:640px;margin:40px auto;padding:0 20px;background:#fff;}",
+      "h1{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:600;font-size:26px;margin:0 0 4px;}",
+      ".sub{color:#666a89;font-size:13px;margin-bottom:24px;}",
+      ".meta{font-size:14px;margin-bottom:22px;}",
+      ".stats{display:flex;gap:36px;margin-bottom:28px;}",
+      ".stat .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;}",
+      ".stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666a89;}",
+      "table{width:100%;border-collapse:collapse;font-size:13px;}",
+      "th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #ddd;}",
+      "th{color:#666a89;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}",
+      "td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums;}",
+      ".no-print{background:#FEF3C7;border:1px solid #F2B90C;border-radius:10px;padding:14px 16px;margin-bottom:26px;font-size:14px;line-height:1.5;}",
+      ".no-print kbd{background:#fff;border:1px solid #ccc;border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;}",
+      ".no-print button{margin-top:10px;background:#3D348B;color:#fff;border:none;font-weight:700;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;}",
+      "@media print{body{margin:0;}.no-print{display:none;}}",
+      "</style></head><body>",
+      "<div class=\"no-print\"><strong>To save this as a PDF:</strong> press <kbd>Ctrl</kbd>+<kbd>P</kbd> (Windows/Chromebook) or <kbd>Cmd</kbd>+<kbd>P</kbd> (Mac), then choose “Save as PDF” as the destination and submit that file to Canvas.<br><button onclick=\"window.print()\" type=\"button\">Try print dialog</button></div>",
+      "<h1>NeuroMatch — Unit 1.4 Results</h1>",
+      "<div class=\"sub\">AP Psychology · The Brain</div>",
+      "<div class=\"meta\">Name: " + (name ? escapeHtml(name) : "_______________________") + "&nbsp;&nbsp;·&nbsp;&nbsp;Date: " + today + "</div>",
+      "<div class=\"stats\">",
+      "<div class=\"stat\"><div class=\"num\">" + state.score + "</div><div class=\"lbl\">Points</div></div>",
+      "<div class=\"stat\"><div class=\"num\">" + acc + "%</div><div class=\"lbl\">Accuracy</div></div>",
+      "<div class=\"stat\"><div class=\"num\">" + state.misses + "</div><div class=\"lbl\">Misses</div></div>",
+      "</div>",
+      "<table><thead><tr><th>Round</th><th>Misses</th></tr></thead><tbody>" + rows + "</tbody></table>",
+      "</body></html>"
+    ].join("");
+  }
+
+  document.getElementById("printBtn").addEventListener("click", function () {
+    var printHint = document.getElementById("printHint");
+    var w = null;
+    try { w = window.open("", "_blank"); } catch (e) { w = null; }
+    if (w) {
+      printHint.hidden = true;
+      w.document.open();
+      w.document.write(buildReportDoc());
+      w.document.close();
+    } else {
+      printHint.hidden = false;
+    }
+  });
+
+  document.getElementById("studentName").addEventListener("input", updatePrintMeta);
+
+  function start(data) {
+    if (data && typeof data.score === "number") {
+      state.score = data.score;
+      state.misses = data.misses || 0;
+      state.round = data.round || 0;
+    }
+    updateStats();
+    if (state.round >= ROUNDS.length) {
+      showFinal();
+    } else {
+      renderRound();
+    }
+  }
+
+  try {
+    if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
+      window.claude.hot.snapshot(function () {
+        return { score: state.score, misses: state.misses, round: state.round };
+      });
+    }
+  } catch (e) {}
+
+  try {
+    if (window.claude && window.claude.hot && window.claude.hot.ready) {
+      window.claude.hot.ready(start);
+    } else {
+      start(window.claude && window.claude.hot ? window.claude.hot.data : null);
+    }
+  } catch (e) {
+    start(null);
+  }
+})();
+</script>
+
+</body></html>
