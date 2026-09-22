@@ -1,65 +1,24 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>NeuroMatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F2F3FA;
-    --surface: #FFFFFF;
-    --surface-2: #E8E9F5;
-    --ink: #1C1B2E;
-    --muted: #666a89;
-    --primary: #3D348B;
-    --primary-2: #6E5AE0;
-    --primary-tint: #ECE9FB;
-    --accent: #E8890C;
-    --success: #157A6E;
-    --success-bg: #DAF2ED;
-    --error: #C4293B;
-    --error-bg: #FBE2E4;
-    --border: #D9DAEC;
-    --shadow: rgba(41, 34, 90, 0.14);
-    color-scheme: light;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #131328;
-      --surface: #1B1B36;
-      --surface-2: #242545;
-      --ink: #ECEBF7;
-      --muted: #A2A4C6;
-      --primary: #9384F0;
-      --primary-2: #B3A5FF;
-      --primary-tint: #2A2552;
-      --accent: #F4A93F;
-      --success: #55D2BE;
-      --success-bg: rgba(85, 210, 190, 0.14);
-      --error: #FF8A93;
-      --error-bg: rgba(255, 138, 147, 0.14);
-      --border: #34365E;
-      --shadow: rgba(0, 0, 0, 0.4);
-      color-scheme: dark;
-    }
-  }
-
-  :root[data-theme="dark"] {
-    --bg: #131328;
-    --surface: #1B1B36;
-    --surface-2: #242545;
-    --ink: #ECEBF7;
-    --muted: #A2A4C6;
-    --primary: #9384F0;
-    --primary-2: #B3A5FF;
-    --primary-tint: #2A2552;
-    --accent: #F4A93F;
-    --success: #55D2BE;
-    --success-bg: rgba(85, 210, 190, 0.14);
-    --error: #FF8A93;
-    --error-bg: rgba(255, 138, 147, 0.14);
-    --border: #34365E;
-    --shadow: rgba(0, 0, 0, 0.4);
+    --bg: #0E0E10;
+    --surface: #191815;
+    --surface-2: #232019;
+    --ink: #F4EFE3;
+    --muted: #A79F8E;
+    --gold: #C5B358;
+    --gold-bright: #E4CE72;
+    --gold-ink: #17140F;
+    --gold-soft: rgba(197, 179, 88, 0.16);
+    --good: #5FBF77;
+    --good-soft: rgba(95, 191, 119, 0.16);
+    --bad: #E2584A;
+    --bad-soft: rgba(226, 88, 74, 0.16);
+    --line: #3A362C;
+    --shadow: rgba(0, 0, 0, 0.55);
     color-scheme: dark;
   }
 
@@ -73,290 +32,178 @@
     min-height: 100%;
   }
 
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; margin: 0; }
+
   .wrap {
-    max-width: 760px;
+    max-width: 780px;
     margin: 0 auto;
     padding-block: 20px 48px;
   }
 
-  h1, h2, h3 { text-wrap: balance; margin: 0; }
-
-  .brandline {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-
-  .mark {
-    width: 34px;
-    height: 34px;
-    flex: none;
-  }
-
-  .brand-title {
-    font-family: "Fraunces", Georgia, serif;
-    font-weight: 600;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-  }
-
-  .tagline {
-    color: var(--muted);
-    font-size: 13.5px;
-    margin: 2px 0 18px;
-  }
-
-  .statbar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  .masthead {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px var(--shadow);
+    padding: 22px 26px;
     margin-bottom: 18px;
   }
 
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 84px;
+  .brandrow { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+  .mark { width: 30px; height: 30px; flex: none; }
+
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
   }
 
-  .stat .num {
+  h1 { font-size: clamp(22px, 4vw, 30px); font-weight: 600; margin-top: 4px; font-style: italic; }
+  .sub { color: var(--muted); font-size: 14.5px; margin-top: 4px; }
+
+  .idrow { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+  .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 160px; }
+  .field label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .field input {
+    font-family: inherit; font-size: 14.5px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 9px;
+    background: var(--surface-2); color: var(--ink);
+  }
+  .field input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+  .idrow.print-id { font-size: 13px; }
+  .idrow.print-id b { color: var(--ink); }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  #status {
     font-family: "JetBrains Mono", monospace;
-    font-weight: 700;
-    font-size: 18px;
+    font-size: 13px;
+    color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
 
-  .stat .lbl {
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-  }
+  #status b { color: var(--ink); }
 
-  .stat.correct .num { color: var(--success); }
-  .stat.miss .num { color: var(--error); }
-
-  .dots {
-    display: flex;
-    gap: 7px;
-    align-items: center;
-    margin-left: auto;
-  }
+  .dots { display: flex; gap: 7px; align-items: center; margin-left: auto; }
 
   .dot {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid var(--line);
+    background: var(--surface-2);
     color: var(--muted);
     font-family: "JetBrains Mono", monospace;
     font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-weight: 700;
   }
 
-  .dot.current {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--primary-tint);
-  }
+  .dot.current { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .dot.done { border-color: var(--good); background: var(--good); color: #10231a; }
 
-  .dot.done {
-    border-color: var(--success);
-    background: var(--success);
-    color: #fff;
-  }
+  .layout { display: flex; flex-direction: column; gap: 18px; }
 
-  .board {
+  .board, .final-card {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px var(--shadow);
     padding: 22px;
-    box-shadow: 0 10px 28px var(--shadow);
-  }
-
-  .round-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 4px;
   }
 
   .round-eyebrow {
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--primary);
-    font-weight: 700;
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--gold); font-weight: 700;
   }
 
-  .round-title {
-    font-family: "Fraunces", Georgia, serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 23px;
-    margin-top: 2px;
-  }
+  .round-title { font-style: italic; font-weight: 500; font-size: 22px; margin-top: 2px; }
 
   .progress-track {
-    height: 6px;
-    border-radius: 4px;
-    background: var(--surface-2);
-    overflow: hidden;
-    margin: 14px 0 18px;
+    height: 6px; border-radius: 4px; background: var(--surface-2);
+    overflow: hidden; margin: 14px 0 18px;
   }
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
     border-radius: 4px;
-    transition: width 0.35s ease;
+    transition: width .35s ease;
     width: 0%;
   }
 
-  .instructions {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    line-height: 1.5;
-  }
-
+  .instructions { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
   .instructions b { color: var(--ink); }
 
   .bank-label, .defs-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted); font-weight: 700; margin-bottom: 8px;
   }
 
-  .bank {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 24px;
-    min-height: 44px;
-  }
+  .bank { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; min-height: 44px; }
 
   .chip {
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    background: var(--primary-tint);
-    border: 1.5px solid var(--primary-2);
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 14px;
-    padding: 9px 16px;
-    border-radius: 999px;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+    background: var(--gold-soft);
+    border: 1.5px solid var(--gold);
+    color: var(--gold-bright);
+    font-weight: 600; font-size: 14px;
+    padding: 9px 16px; border-radius: 999px;
     cursor: grab;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
-    box-shadow: 0 1px 0 var(--shadow);
+    transition: transform .12s ease, box-shadow .12s ease, background .15s ease;
+    box-shadow: 0 1px 0 rgba(0,0,0,.3);
   }
 
   .chip:hover { transform: translateY(-1px); box-shadow: 0 4px 10px var(--shadow); }
-  .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .chip:active { cursor: grabbing; }
 
-  .chip.selected {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 0 0 4px var(--primary-tint);
-  }
+  .chip.selected { background: var(--gold); color: var(--gold-ink); box-shadow: 0 0 0 4px var(--gold-soft); }
 
   .chip.wrong-flash {
-    background: var(--error-bg);
-    border-color: var(--error);
-    color: var(--error);
-    animation: shake 0.4s ease;
+    background: var(--bad-soft); border-color: var(--bad); color: var(--bad);
+    animation: shake .4s ease;
   }
 
-  .chip.placed {
-    background: var(--success-bg);
-    border-color: var(--success);
-    color: var(--success);
-    cursor: default;
-  }
+  .chip.placed { background: var(--good-soft); border-color: var(--good); color: var(--good); cursor: default; }
 
-  .chip-ghost {
-    z-index: 999;
-    opacity: 0.95;
-  }
-
+  .chip-ghost { z-index: 999; opacity: .95; }
   .chip.source-hidden { opacity: 0; pointer-events: none; }
 
-  .defs {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .defs { display: flex; flex-direction: column; gap: 10px; }
 
   .def-slot {
-    display: grid;
-    grid-template-columns: 168px 1fr;
-    gap: 14px;
-    align-items: center;
-    background: var(--bg);
-    border: 1.5px dashed var(--border);
-    border-radius: 12px;
+    display: grid; grid-template-columns: 168px 1fr; gap: 14px; align-items: center;
+    background: var(--bg); border: 1.5px dashed var(--line); border-radius: 12px;
     padding: 12px 14px;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color .15s ease, background .15s ease;
   }
 
-  .def-slot.hover {
-    border-color: var(--primary);
-    background: var(--primary-tint);
-  }
-
-  .def-slot.matched {
-    border-style: solid;
-    border-color: var(--success);
-    background: var(--success-bg);
-  }
-
-  .def-slot.error {
-    border-style: solid;
-    border-color: var(--error);
-    background: var(--error-bg);
-    animation: shake 0.4s ease;
-  }
+  .def-slot.hover { border-color: var(--gold); background: var(--gold-soft); }
+  .def-slot.matched { border-style: solid; border-color: var(--good); background: var(--good-soft); }
+  .def-slot.error { border-style: solid; border-color: var(--bad); background: var(--bad-soft); animation: shake .4s ease; }
 
   .drop-zone {
-    min-height: 40px;
-    border-radius: 999px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-size: 12.5px;
-    font-style: italic;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 8px;
-    text-align: center;
-    cursor: pointer;
+    min-height: 40px; border-radius: 999px; border: none; background: transparent;
+    color: var(--muted); font-size: 12.5px; font-style: italic;
+    display: flex; align-items: center; justify-content: center;
+    padding: 6px 8px; text-align: center; cursor: pointer;
     font-family: "Libre Franklin", sans-serif;
   }
 
-  .drop-zone:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 8px; }
+  .drop-zone:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
 
-  .def-text {
-    font-size: 14px;
-    line-height: 1.48;
-  }
-
+  .def-text { font-size: 14px; line-height: 1.48; }
   .def-slot.matched .def-text { color: var(--ink); }
 
   @keyframes shake {
@@ -367,14 +214,9 @@
   }
 
   .pop {
-    position: fixed;
-    font-family: "JetBrains Mono", monospace;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--success);
-    pointer-events: none;
-    z-index: 1000;
-    animation: pop-up 0.7s ease forwards;
+    position: fixed; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 14px;
+    color: var(--good); pointer-events: none; z-index: 1000;
+    animation: pop-up .7s ease forwards;
   }
 
   @keyframes pop-up {
@@ -384,290 +226,174 @@
 
   .banner {
     margin-top: 18px;
-    background: var(--primary);
-    color: #fff;
+    background: var(--gold);
+    color: var(--gold-ink);
     border-radius: 14px;
     padding: 16px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
     box-shadow: 0 10px 24px var(--shadow);
   }
 
   .banner-text { font-size: 14px; }
   .banner-text b { font-family: "Fraunces", serif; font-style: italic; font-size: 17px; }
 
+  button { font-family: "Libre Franklin", sans-serif; }
+
   .btn {
-    background: #fff;
-    color: var(--primary);
-    border: none;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 10px 18px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: transform 0.12s ease;
+    background: var(--gold-ink);
+    color: var(--gold-bright);
+    border: 1.5px solid var(--gold-ink);
+    font-weight: 700; font-size: 14px;
+    padding: 10px 18px; border-radius: 999px; cursor: pointer;
+    transition: transform .12s ease;
   }
   .btn:hover { transform: translateY(-1px); }
-  .btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .btn:focus-visible { outline: 2px solid var(--gold-ink); outline-offset: 2px; }
 
-  .final-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px 24px;
-    text-align: center;
-    box-shadow: 0 10px 28px var(--shadow);
+  .btn-outline {
+    background: transparent; color: var(--gold);
+    border: 1.5px solid var(--gold);
+    font-weight: 700; font-size: 14px;
+    padding: 9px 17px; border-radius: 999px; cursor: pointer;
+    transition: transform .12s ease;
   }
+  .btn-outline:hover { transform: translateY(-1px); background: var(--gold-soft); }
+  .btn-outline:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-  .final-title {
-    font-family: "Fraunces", serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 26px;
-  }
-
+  .final-title { font-style: italic; font-weight: 600; font-size: 25px; }
   .final-sub { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .final-card { text-align: center; }
 
-  .final-stats {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin: 22px 0;
-    flex-wrap: wrap;
-  }
+  .final-stats { display: flex; justify-content: center; gap: 24px; margin: 22px 0; flex-wrap: wrap; }
+  .final-stats .num { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 28px; font-variant-numeric: tabular-nums; color: var(--gold-bright); }
+  .final-stats .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 
-  .final-stats .num {
-    font-family: "JetBrains Mono", monospace;
-    font-weight: 700;
-    font-size: 28px;
-    font-variant-numeric: tabular-nums;
-  }
+  .breakdown { margin: 22px 0 4px; border-top: 1px solid var(--line); padding-top: 16px; text-align: left; }
+  .breakdown-title { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+  .breakdown table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .breakdown th, .breakdown td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .breakdown th { color: var(--muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; }
+  .breakdown td.num-col, .breakdown th.num-col { text-align: right; font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
 
-  .final-stats .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .final-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
 
-  .sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
+  footer.note { color: var(--muted); font-size: 12.5px; margin-top: 16px; line-height: 1.5; }
+  footer.note b { color: var(--ink); }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   @media (max-width: 560px) {
     .def-slot { grid-template-columns: 1fr; }
     .drop-zone { min-height: 34px; }
-    .statbar { gap: 8px; }
     .dots { margin-left: 0; width: 100%; justify-content: flex-start; }
+    .actions { flex-direction: column; align-items: flex-start; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .chip, .btn, .progress-fill { transition: none; }
-    .shake-off, .def-slot.error, .chip.wrong-flash { animation: none; }
+    .chip, .btn, .btn-outline, .progress-fill { transition: none; }
+    .def-slot.error, .chip.wrong-flash { animation: none; }
     .pop { animation: none; opacity: 0; }
   }
 
-  .name-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 6px;
-  }
-
-  .name-row label {
-    font-size: 12.5px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-
-  .name-row input {
-    font-family: "Libre Franklin", sans-serif;
-    font-size: 14px;
-    padding: 7px 12px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--ink);
-    min-width: 220px;
-  }
-
-  .name-row input:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-
-  .print-only { display: none; }
-
-  .final-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border: 1.5px solid var(--primary);
-    font-weight: 700;
-    font-size: 14px;
-    padding: 9px 17px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: transform 0.12s ease;
-  }
-  .btn-outline:hover { transform: translateY(-1px); }
-  .btn-outline:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-  .print-hint {
-    max-width: 380px;
-    margin: 12px auto 0;
-    font-size: 12.5px;
-    color: var(--error);
-    line-height: 1.4;
-  }
-
-  .breakdown {
-    margin: 22px 0 4px;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-    text-align: left;
-  }
-
-  .breakdown-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-
-  .breakdown table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  .breakdown th, .breakdown td {
-    text-align: left;
-    padding: 6px 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .breakdown th {
-    color: var(--muted);
-    font-weight: 600;
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .breakdown td.num-col, .breakdown th.num-col {
-    text-align: right;
-    font-family: "JetBrains Mono", monospace;
-    font-variant-numeric: tabular-nums;
-  }
-
   @media print {
-    body { background: #fff; }
-    .brandline, .tagline, .statbar, .board, #replayBtn, #printBtn, .name-row, .print-hint {
-      display: none !important;
-    }
-    .print-only { display: block; }
-    .final-card {
-      box-shadow: none;
-      border: none;
-      padding: 0;
-      text-align: left;
-    }
-    .final-stats { justify-content: flex-start; gap: 40px; }
-    .breakdown { border-top-color: #999; }
-    .breakdown th, .breakdown td { border-bottom-color: #ccc; }
+    body { background: #fff; color: #000; padding: 0; }
+    .no-print { display: none !important; }
+    .masthead, .final-card { box-shadow: none; border-color: #999; background: #fff; color: #000; }
+    .eyebrow, .sub, .muted, .breakdown-title { color: #444 !important; }
+    .final-title, .round-title { color: #000; }
+    .final-stats .num { color: #000; }
+    .final-stats .lbl { color: #444; }
+    .breakdown th, .breakdown td { border-bottom-color: #ccc; color: #000; }
+    .breakdown th { color: #444; }
+    .board { display: none !important; }
+    @page { margin: 14mm; }
   }
 </style>
 
 <div class="wrap">
-  <div class="brandline">
-    <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="4" fill="var(--primary-2)"/>
-      <circle cx="29" cy="9" r="3" fill="var(--accent)"/>
-      <circle cx="30" cy="28" r="4" fill="var(--primary)"/>
-      <circle cx="10" cy="29" r="3" fill="var(--success)"/>
-      <circle cx="20" cy="19" r="3.5" fill="var(--primary-2)"/>
-      <path d="M12 12 L20 19 L29 9 M20 19 L30 28 M20 19 L10 29" stroke="var(--border)" stroke-width="1.6"/>
-    </svg>
-    <span class="brand-title">NeuroMatch</span>
-  </div>
-  <p class="tagline">Psychology · Unit 1.4 — drag each term onto its matching definition.</p>
+  <div class="masthead">
+    <div class="brandrow">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" fill="var(--gold)"/>
+        <circle cx="29" cy="9" r="3" fill="var(--gold-bright)"/>
+        <circle cx="30" cy="28" r="4" fill="var(--gold)"/>
+        <circle cx="10" cy="29" r="3" fill="var(--gold-bright)"/>
+        <circle cx="20" cy="19" r="3.5" fill="var(--gold)"/>
+        <path d="M12 12 L20 19 L29 9 M20 19 L30 28 M20 19 L10 29" stroke="var(--line)" stroke-width="1.6"/>
+      </svg>
+      <div class="eyebrow">Psychology &middot; Unit 1.4</div>
+    </div>
+    <h1>NeuroMatch</h1>
+    <div class="sub">Drag-and-drop review &mdash; brain structures, lobes, lateralization, plasticity, and research methods.</div>
 
-  <div class="statbar">
-    <div class="stat correct"><span class="num" id="scoreNum">0</span><span class="lbl">Score</span></div>
-    <div class="stat miss"><span class="num" id="missNum">0</span><span class="lbl">Misses</span></div>
-    <div class="dots" id="dots"></div>
+    <div class="idrow no-print">
+      <div class="field"><label for="sname">Name</label><input id="sname" type="text" autocomplete="off" placeholder="Your name"></div>
+      <div class="field"><label for="speriod">Period / Class</label><input id="speriod" type="text" autocomplete="off" placeholder="e.g. Period 3"></div>
+      <div class="field"><label for="sdate">Date</label><input id="sdate" type="text" autocomplete="off" placeholder="mm/dd/yyyy"></div>
+    </div>
+
+    <div class="idrow print-id" style="display:none;">
+      <div><b>Name:</b> <span id="pname"></span></div>
+      <div><b>Period:</b> <span id="pperiod"></span></div>
+      <div><b>Date:</b> <span id="pdate"></span></div>
+    </div>
+
+    <div class="actions no-print">
+      <span id="status">Score <b id="scoreNum">0</b> &middot; Misses <b id="missNum">0</b></span>
+      <div class="dots" id="dots"></div>
+    </div>
   </div>
 
-  <div class="board" id="board">
-    <div class="round-head">
+  <div class="layout">
+    <div class="board" id="board">
       <div>
         <div class="round-eyebrow" id="roundEyebrow">Round 1 of 5</div>
         <h2 class="round-title" id="roundTitle">The Core Structures</h2>
       </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <p class="instructions"><b>Drag</b> a term onto its definition &mdash; or tap a term, then tap the definition it matches.</p>
+
+      <div class="bank-label">Terms</div>
+      <div class="bank" id="bank"></div>
+
+      <div class="defs-label">Definitions</div>
+      <div class="defs" id="defs"></div>
+
+      <div class="banner" id="banner" hidden>
+        <div class="banner-text"><b id="bannerTitle">Round complete!</b><br><span id="bannerSub"></span></div>
+        <button class="btn" type="button" id="nextBtn">Next round</button>
+      </div>
     </div>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    <p class="instructions"><b>Drag</b> a term onto its definition — or tap a term, then tap the definition it matches.</p>
 
-    <div class="bank-label">Terms</div>
-    <div class="bank" id="bank"></div>
+    <div class="final-card" id="finalCard" hidden>
+      <div class="final-title">Unit 1.4 complete</div>
+      <div class="final-sub">Every structure, region, and researcher &mdash; matched.</div>
 
-    <div class="defs-label">Definitions</div>
-    <div class="defs" id="defs"></div>
+      <div class="final-stats">
+        <div><div class="num" id="finalScore">0</div><div class="lbl">Points</div></div>
+        <div><div class="num" id="finalAcc">0%</div><div class="lbl">Accuracy</div></div>
+        <div><div class="num" id="finalMiss">0</div><div class="lbl">Misses</div></div>
+      </div>
 
-    <div class="banner" id="banner" hidden>
-      <div class="banner-text"><b id="bannerTitle">Round complete!</b><br><span id="bannerSub"></span></div>
-      <button class="btn" id="nextBtn">Next round</button>
+      <div class="breakdown">
+        <div class="breakdown-title">Round-by-round</div>
+        <table>
+          <thead><tr><th>Round</th><th class="num-col">Misses</th></tr></thead>
+          <tbody id="breakdownBody"></tbody>
+        </table>
+      </div>
+
+      <div class="final-actions no-print">
+        <button class="btn" type="button" id="replayBtn">Play again</button>
+        <button class="btn-outline" type="button" id="printBtn">Print / Save as PDF</button>
+      </div>
     </div>
   </div>
 
-  <div class="final-card" id="finalCard" hidden>
-    <div class="print-only" id="printHead" style="margin-bottom:18px;">
-      <div style="font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;">NeuroMatch — Unit 1.4 Results</div>
-      <div style="font-size:13px;color:#444;margin-top:4px;">AP Psychology · The Brain</div>
-    </div>
-
-    <div class="final-title">Unit 1.4 complete</div>
-    <div class="final-sub">Every structure, region, and researcher — matched.</div>
-
-    <div class="name-row">
-      <label for="studentName">Name:</label>
-      <input type="text" id="studentName" placeholder="Type your name" autocomplete="name">
-    </div>
-    <div class="print-only" id="printMeta" style="font-size:13px;color:#444;margin-bottom:4px;"></div>
-
-    <div class="final-stats">
-      <div><div class="num" id="finalScore">0</div><div class="lbl">Points</div></div>
-      <div><div class="num" id="finalAcc">0%</div><div class="lbl">Accuracy</div></div>
-      <div><div class="num" id="finalMiss">0</div><div class="lbl">Misses</div></div>
-    </div>
-
-    <div class="breakdown">
-      <div class="breakdown-title">Round-by-round</div>
-      <table>
-        <thead>
-          <tr><th>Round</th><th class="num-col">Misses</th></tr>
-        </thead>
-        <tbody id="breakdownBody"></tbody>
-      </table>
-    </div>
-
-    <div class="final-actions">
-      <button class="btn" id="replayBtn" style="background:var(--primary);color:#fff;">Play again</button>
-      <button class="btn-outline" id="printBtn">Print / Save as PDF</button>
-    </div>
-    <p class="print-hint" id="printHint" hidden>Pop-ups are blocked for this page. Allow pop-ups for claude.ai, then click the button again — or use your browser's own Print command (Ctrl/Cmd + P).</p>
-  </div>
+  <footer class="note no-print">
+    Fill in your name, period, and date above, then play through all 5 rounds. When you reach the results screen, click <b>Print / Save as PDF</b>, choose &ldquo;Save as PDF&rdquo; as the destination, and upload that file to the Unit 1.4 assignment in Canvas.
+  </footer>
 
   <div class="sr-only" role="status" aria-live="polite" id="liveRegion"></div>
 </div>
@@ -835,7 +561,7 @@
       if (state.selectedChip) {
         attemptMatch(state.selectedChip, slot, zoneWrap);
       } else {
-        zoneBtn.style.color = "var(--primary)";
+        zoneBtn.style.color = "var(--gold)";
         setTimeout(function () { zoneBtn.style.color = ""; }, 350);
       }
     });
@@ -879,7 +605,6 @@
       zoneWrap.innerHTML = "";
       zoneWrap.appendChild(chip);
       slot.classList.add("matched");
-      var zb = slot.querySelector(".drop-zone");
       state.score += 10;
       state.matchedInRound++;
       updateStats();
@@ -1006,13 +731,6 @@
     buildDots();
   }
 
-  function updatePrintMeta() {
-    var name = document.getElementById("studentName").value.trim();
-    var today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
-    document.getElementById("printMeta").textContent =
-      (name ? "Name: " + name : "Name: _______________________") + "   ·   Date: " + today;
-  }
-
   function buildBreakdown() {
     var body = document.getElementById("breakdownBody");
     body.innerHTML = "";
@@ -1039,7 +757,6 @@
     document.getElementById("finalAcc").textContent = acc + "%";
     document.getElementById("finalMiss").textContent = state.misses;
     buildBreakdown();
-    updatePrintMeta();
     buildDots();
   }
 
@@ -1061,74 +778,36 @@
     renderRound();
   });
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-
-  function buildReportDoc() {
-    var name = document.getElementById("studentName").value.trim();
-    var today = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
-    var totalPairs = ROUNDS.reduce(function (s, r) { return s + r.pairs.length; }, 0);
-    var attempts = totalPairs + state.misses;
-    var acc = Math.round((totalPairs / attempts) * 100);
-
-    var rows = state.roundStats.map(function (r) {
-      return "<tr><td>" + escapeHtml(r.title) + "</td><td>" + r.misses + "</td></tr>";
-    }).join("");
-
-    return [
-      "<!doctype html><html><head><meta charset=\"utf-8\">",
-      "<title>NeuroMatch Results" + (name ? " - " + escapeHtml(name) : "") + "</title>",
-      "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">",
-      "<link href=\"https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,500&family=Libre+Franklin:wght@400;600;700&family=JetBrains+Mono:wght@700&display=swap\" rel=\"stylesheet\">",
-      "<style>",
-      "body{font-family:'Libre Franklin',Arial,sans-serif;color:#1C1B2E;max-width:640px;margin:40px auto;padding:0 20px;background:#fff;}",
-      "h1{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:600;font-size:26px;margin:0 0 4px;}",
-      ".sub{color:#666a89;font-size:13px;margin-bottom:24px;}",
-      ".meta{font-size:14px;margin-bottom:22px;}",
-      ".stats{display:flex;gap:36px;margin-bottom:28px;}",
-      ".stat .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;}",
-      ".stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666a89;}",
-      "table{width:100%;border-collapse:collapse;font-size:13px;}",
-      "th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #ddd;}",
-      "th{color:#666a89;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}",
-      "td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums;}",
-      ".no-print{background:#FEF3C7;border:1px solid #F2B90C;border-radius:10px;padding:14px 16px;margin-bottom:26px;font-size:14px;line-height:1.5;}",
-      ".no-print kbd{background:#fff;border:1px solid #ccc;border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;}",
-      ".no-print button{margin-top:10px;background:#3D348B;color:#fff;border:none;font-weight:700;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;}",
-      "@media print{body{margin:0;}.no-print{display:none;}}",
-      "</style></head><body>",
-      "<div class=\"no-print\"><strong>To save this as a PDF:</strong> press <kbd>Ctrl</kbd>+<kbd>P</kbd> (Windows/Chromebook) or <kbd>Cmd</kbd>+<kbd>P</kbd> (Mac), then choose “Save as PDF” as the destination and submit that file to Canvas.<br><button onclick=\"window.print()\" type=\"button\">Try print dialog</button></div>",
-      "<h1>NeuroMatch — Unit 1.4 Results</h1>",
-      "<div class=\"sub\">AP Psychology · The Brain</div>",
-      "<div class=\"meta\">Name: " + (name ? escapeHtml(name) : "_______________________") + "&nbsp;&nbsp;·&nbsp;&nbsp;Date: " + today + "</div>",
-      "<div class=\"stats\">",
-      "<div class=\"stat\"><div class=\"num\">" + state.score + "</div><div class=\"lbl\">Points</div></div>",
-      "<div class=\"stat\"><div class=\"num\">" + acc + "%</div><div class=\"lbl\">Accuracy</div></div>",
-      "<div class=\"stat\"><div class=\"num\">" + state.misses + "</div><div class=\"lbl\">Misses</div></div>",
-      "</div>",
-      "<table><thead><tr><th>Round</th><th>Misses</th></tr></thead><tbody>" + rows + "</tbody></table>",
-      "</body></html>"
-    ].join("");
-  }
-
   document.getElementById("printBtn").addEventListener("click", function () {
-    var printHint = document.getElementById("printHint");
-    var w = null;
-    try { w = window.open("", "_blank"); } catch (e) { w = null; }
-    if (w) {
-      printHint.hidden = true;
-      w.document.open();
-      w.document.write(buildReportDoc());
-      w.document.close();
-    } else {
-      printHint.hidden = false;
-    }
+    document.getElementById("pname").textContent = document.getElementById("sname").value || "—";
+    document.getElementById("pperiod").textContent = document.getElementById("speriod").value || "—";
+    document.getElementById("pdate").textContent = document.getElementById("sdate").value || "—";
+    var printId = document.querySelector(".print-id");
+    printId.style.display = "flex";
+    printId.style.gap = "18px";
+    window.print();
   });
 
-  document.getElementById("studentName").addEventListener("input", updatePrintMeta);
+  function saveIdentity() {
+    try {
+      localStorage.setItem("neuroMatchIdentity", JSON.stringify({
+        name: document.getElementById("sname").value,
+        period: document.getElementById("speriod").value,
+        date: document.getElementById("sdate").value
+      }));
+    } catch (e) {}
+  }
+
+  ["sname", "speriod", "sdate"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", saveIdentity);
+  });
+
+  try {
+    var saved = JSON.parse(localStorage.getItem("neuroMatchIdentity") || "{}");
+    if (saved.name) document.getElementById("sname").value = saved.name;
+    if (saved.period) document.getElementById("speriod").value = saved.period;
+    if (saved.date) document.getElementById("sdate").value = saved.date;
+  } catch (e) {}
 
   function start(data) {
     if (data && typeof data.score === "number") {
@@ -1163,5 +842,3 @@
   }
 })();
 </script>
-
-</body></html>
