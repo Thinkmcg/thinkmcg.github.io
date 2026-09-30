@@ -1,0 +1,399 @@
+<title>Signal Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lab-bench worksheet. Stimulus card on top, a four-node signal pathway (stimulus > sense > receptor > explanation), then the choices for the current step. */
+:root {
+  --paper: #f5f6f1;
+  --card: #ffffff;
+  --ink: #1b2330;
+  --muted: #5d6675;
+  --rule: #d7dbd2;
+  --accent: #1f6f78;
+  --good: #247a4d;
+  --bad: #b8412f;
+  --vision: #3565c9; --audition: #c4731f; --olfaction: #2f8a5c; --gustation: #b63d63; --touch: #7c50bb; --vestibular: #16808c;
+  --f-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #13171d; --card: #1b2129; --ink: #e8ebe4; --muted: #9aa3ae; --rule: #2e3641; --accent: #5fc0c8; --good: #6fd19b; --bad: #f08a78;
+  --vision: #7fa2f0; --audition: #f0a55a; --olfaction: #6cc795; --gustation: #ec7fa2; --touch: #b38ef0; --vestibular: #58c6d1; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #13171d; --card: #1b2129; --ink: #e8ebe4; --muted: #9aa3ae; --rule: #2e3641; --accent: #5fc0c8; --good: #6fd19b; --bad: #f08a78;
+  --vision: #7fa2f0; --audition: #f0a55a; --olfaction: #6cc795; --gustation: #ec7fa2; --touch: #b38ef0; --vestibular: #58c6d1; color-scheme: dark; }
+
+html, body { background: var(--paper); color: var(--ink); }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+.brand h1 { font-family: var(--f-display); font-stretch: 112%; font-weight: 800; font-size: clamp(34px, 6vw, 54px); line-height: .95; margin: 0; letter-spacing: -.01em; }
+.brand h1 span { color: var(--accent); }
+.brand p { margin: 6px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.meter { display: grid; gap: 6px; min-width: 220px; }
+.meter .row { display: flex; justify-content: space-between; gap: 12px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter .row b { color: var(--ink); }
+.bar { height: 10px; border-radius: 5px; background: var(--rule); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s; }
+
+.card { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: clamp(18px, 3vw, 28px); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+.card h2 { font-family: var(--f-display); font-stretch: 112%; font-weight: 800; font-size: clamp(22px, 3.2vw, 30px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.card p { margin: 0 0 12px; max-width: 66ch; }
+.card ul { margin: 0 0 18px; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; }
+.stim { font-size: clamp(19px, 2.5vw, 23px); line-height: 1.45; margin: 0; max-width: 60ch; text-wrap: pretty; }
+
+/* pathway */
+.path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: stretch; }
+.node { position: relative; padding: 12px 14px; border: 1.5px dashed var(--rule); border-radius: var(--r); background: var(--card); min-width: 0; margin-right: 22px; transition: border-color .25s, background .25s; }
+.node:last-child { margin-right: 0; }
+.node:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -23px; width: 22px; height: 2px; background: var(--rule); }
+.node .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.node .v { font-weight: 700; font-size: 15px; line-height: 1.3; margin-top: 4px; overflow-wrap: anywhere; }
+.node.active { border-style: solid; border-color: var(--ink); }
+.node.done { border-style: solid; border-color: var(--c, var(--accent)); background: color-mix(in srgb, var(--c, var(--accent)) 10%, var(--card)); }
+.node.done:not(:last-child)::after { background: var(--c, var(--accent)); }
+.node.miss .v::after { content: " (corrected)"; font-weight: 400; color: var(--bad); font-size: 13px; }
+
+/* choices */
+.step-q { font-family: var(--f-display); font-stretch: 112%; font-weight: 500; font-size: 18px; margin: 0 0 12px; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opts.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opts.one { grid-template-columns: 1fr; }
+.opt { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--card); border: 1.5px solid var(--rule); border-radius: 9px; padding: 11px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; transition: border-color .15s, background .15s; }
+.opt span { min-width: 0; }
+.opt .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; margin-top: 6px; }
+.opt:hover:not(:disabled) { border-color: var(--ink); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--card)); }
+.opt.fade { opacity: .5; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--rule); border-radius: 5px; padding: 1px 6px; color: var(--muted); flex: none; margin-top: 2px; }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 9px; border: 1px solid var(--rule); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 320px; min-width: 0; }
+.fb .tag { font-weight: 700; }
+.fb.good .tag { color: var(--good); }
+.fb.bad .tag { color: var(--bad); }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 9px; padding: 10px 18px; background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn:hover { filter: brightness(1.1); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--rule); border-radius: 9px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.senses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 18px; }
+.sense-chip { display: flex; justify-content: space-between; gap: 8px; border-left: 4px solid var(--c); padding: 6px 10px; background: color-mix(in srgb, var(--c) 8%, var(--card)); font-size: 15px; }
+.sense-chip b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.missed { margin: 0 0 18px; display: grid; gap: 8px; }
+.missed div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.missed b { display: block; }
+.missed span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--card); border: 1.5px solid var(--rule); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+
+details.ref { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-family: var(--f-display); font-stretch: 112%; font-weight: 500; }
+.ref-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-bottom: 16px; }
+.ref-grid div { border-top: 3px solid var(--c); padding-top: 8px; min-width: 0; }
+.ref-grid h3 { margin: 0 0 4px; font-size: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 700px) {
+  .path { grid-template-columns: 1fr; gap: 14px; }
+  .node { margin-right: 0; }
+  .node:not(:last-child)::after { top: auto; bottom: -15px; right: auto; left: 24px; width: 2px; height: 14px; }
+  .opts, .opts.six { grid-template-columns: 1fr; }
+  .senses, .ref-grid { grid-template-columns: 1fr 1fr; }
+}
+@media print {
+  :root { --paper: #fff; --card: #fff; --ink: #111; --muted: #444; --rule: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ref, .row, .print-note, #pathCard { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; padding: 2px 0; }
+  .card { break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Signal <span>Path</span></h1><p>1.6 Sensation</p></div>
+    <div class="meter" aria-live="polite">
+      <div class="row"><span>Round <b id="roundNum">0</b> of 10</span><span>Signal <b id="scoreNum">0</b>/30</span></div>
+      <div class="bar"><i id="scoreBar"></i></div>
+    </div>
+  </header>
+
+  <section class="card" id="stimCard" aria-live="polite"></section>
+
+  <section class="card" id="pathCard" aria-label="Signal pathway">
+    <div class="path" id="path"></div>
+  </section>
+
+  <section class="card" id="choiceCard" aria-live="polite"></section>
+
+  <details class="ref">
+    <summary>Quick reference: the six senses</summary>
+    <div class="ref-grid" id="refGrid"></div>
+  </details>
+</div>
+
+<script>
+const SENSES = {
+  vision:     { name: "Vision",           sub: "sight",   ref: "Light is focused on the retina. Rods (dim light, peripheral) and cones (color, detail) send signals through the optic nerve." },
+  audition:   { name: "Audition",         sub: "hearing", ref: "Sound waves travel to the eardrum, then the cochlea. Fluid ripples across tiny hairs that signal the auditory cortex." },
+  olfaction:  { name: "Olfaction",        sub: "smell",   ref: "Odorant receptors in the olfactory membrane respond only to specifically shaped molecules. Pheromones affect behavior." },
+  gustation:  { name: "Gustation",        sub: "taste",   ref: "Six tastes: salty, sweet, bitter, sour, umami, oleogustus. Taste receptor cells sit in taste buds; smell and texture shape taste." },
+  touch:      { name: "Touch",            sub: "pressure, pain, temperature", ref: "Neurons in the peripheral nervous system respond to pressure, temperature, and chemical change. Gate-control explains pain." },
+  vestibular: { name: "Vestibular sense", sub: "balance", ref: "Fluid in the semicircular canals and vestibular sacs moves hair-like receptors, which signal the cerebellum." },
+};
+const RECEPTORS = {
+  rods: "Rods", cones: "Cones", cochlea: "Hair cells in the cochlea", odor: "Odorant receptors in the olfactory membrane",
+  taste: "Taste receptor cells in the taste buds", touchN: "Touch neurons in the peripheral nervous system", canals: "Hair-like receptors in the semicircular canals",
+};
+const SCEN = [
+  { s: "vision", r: "rods", t: "At night, you spot a faint star out of the corner of your eye, but it seems to disappear when you look straight at it.",
+    p: "Rods are more sensitive to light and handle peripheral vision.", w: ["Cones work best in dim light and sit at the edge of the retina.", "Sensory adaptation makes the star fade when you look at it."] },
+  { s: "vision", r: "cones", t: "In a brightly lit room, you read the tiny print on a medicine label.",
+    p: "Cones handle fine detail and are concentrated in the center of the retina.", w: ["Rods handle fine detail in bright light.", "Transduction only happens in bright light."] },
+  { s: "vision", r: "cones", t: "After staring at a green, black, and yellow flag, you look at a white wall and see a red, white, and blue flag.",
+    p: "Opponent-process theory: opposing colors share a pathway, so the opposite color shows up afterward.", w: ["Trichromatic theory: red, green, and blue cones mix to create the afterimage.", "Sensory interaction: your other senses changed the colors."] },
+  { s: "vision", r: "cones", t: "You can tell a ripe red apple from an unripe green one.",
+    p: "Trichromatic theory: color comes from combining red, green, and blue cone receptors.", w: ["Rods in the center of the retina detect the apple's color.", "Gate-control: large fibers block the wrong color."] },
+  { s: "vision", r: "cones", t: "The orange and pink light of a sunset hits your retina and becomes a message your brain can read.",
+    p: "Transduction converts light energy into neurochemical energy.", w: ["Sensory adaptation converts light into electricity.", "Sound localization turns light into signals."] },
+  { s: "audition", r: "cochlea", t: "A friend calls your name from your left, and you turn left without thinking.",
+    p: "Sound localization: your brain compares the timing and intensity of the sound at each ear.", w: ["The vestibular sense tells you where sounds come from.", "Sensory adaptation points you toward new sounds."] },
+  { s: "audition", r: "cochlea", t: "A drum's vibrations travel into your ear, and you hear the beat.",
+    p: "Vibrations ripple the fluid in the cochlea across tiny hairs, which signal the auditory cortex.", w: ["The eardrum sends the sound straight to the optic nerve.", "Rods inside the ear detect the vibrations."] },
+  { s: "audition", r: "cochlea", t: "After a few minutes in class, you stop noticing the hum of the air conditioner.",
+    p: "Sensory adaptation: receptors become less sensitive to a constant stimulus.", w: ["Sound localization: your brain can't tell where the hum is coming from.", "Gate-control: large fibers block the sound."] },
+  { s: "olfaction", r: "odor", t: "You smell smoke from the kitchen before you see it.",
+    p: "Odorant receptors are activated only by specifically shaped molecules in the air.", w: ["Smells are detected by the taste buds on your tongue.", "Pheromones in the smoke change your behavior."] },
+  { s: "olfaction", r: "odor", t: "After ten minutes in a bakery, you barely notice the smell of fresh bread.",
+    p: "Sensory adaptation lets you tune out a constant smell so you can notice changes.", w: ["The smell destroyed your odorant receptors.", "Sensory interaction with taste blocks the smell."] },
+  { s: "olfaction", r: "odor", t: "A male moth follows an invisible chemical trail released by a female of its species.",
+    p: "Pheromones are chemical signals that affect the behavior of the same species.", w: ["Sound localization guides the moth to the female.", "Opponent-process cells detect the chemical trail."] },
+  { s: "gustation", r: "taste", t: "You sip a mushroom broth and pick out its rich, savory flavor.",
+    p: "Umami (savory) is one of the six types of taste.", w: ["Savory flavors are detected by the vestibular sense.", "Umami is a smell, not a taste."] },
+  { s: "gustation", r: "taste", t: "With a stuffy nose, your favorite pizza tastes bland.",
+    p: "Sensory interaction: taste is dulled when smell is obstructed.", w: ["Sensory adaptation: your taste buds stopped working.", "Transduction stops in the tongue when you're sick."] },
+  { s: "gustation", r: "taste", t: "One friend finds broccoli painfully bitter, while another barely notices.",
+    p: "More taste receptors make some people supertasters who taste more intensely.", w: ["Bitter is not one of the six tastes.", "The first friend has adapted to broccoli."] },
+  { s: "touch", r: "touchN", t: "You touch a hot pan and pull your hand back.",
+    p: "Neurons activated by temperature signal the brain, which interprets the signal as heat and pain.", w: ["Odorant receptors in your fingers detect the heat.", "The cerebellum senses the temperature directly."] },
+  { s: "touch", r: "touchN", t: "You rub your elbow after bumping it, and it hurts less.",
+    p: "Gate-control theory: stimulating large fibers helps block pain signals from small fibers.", w: ["Sensory interaction: rubbing adds a smell that covers the pain.", "Transduction stops when you rub the skin."] },
+  { s: "touch", r: "touchN", t: "Years after losing a hand, a veteran still feels pain where the hand used to be.",
+    p: "Large fibers may fail to block constant small-fiber signals, or the brain's association areas make errors.", w: ["Nerves in the missing hand are still sending signals.", "The vestibular sense misreads the arm's position."] },
+  { s: "touch", r: "touchN", t: "By second period, you no longer feel your socks.",
+    p: "Sensory adaptation: receptors become less sensitive to constant pressure.", w: ["Gate-control blocks all touch signals from your feet.", "Kinesthesia turns off while you sit."] },
+  { s: "vestibular", r: "canals", t: "After spinning in a chair, the room seems to keep turning when you stop.",
+    p: "Fluid in the semicircular canals keeps moving, stimulating hair-like receptors that signal the cerebellum.", w: ["Your cones keep processing the spinning colors.", "Your eardrum keeps vibrating."] },
+  { s: "vestibular", r: "canals", t: "On a rocking boat, you shift your feet to stay upright as the deck tilts.",
+    p: "Tilting your head moves fluid in the inner ear, and the cerebellum uses those signals to keep you balanced.", w: ["Rods in the retina keep you balanced.", "Sound localization tells you which way the boat is tilting."] },
+];
+const ROUNDS = 10;
+const STEPS = ["sense", "receptor", "principle"];
+const STEP_Q = { sense: "Which sense picks up this stimulus?", receptor: "Which receptors detect it?", principle: "Which explanation fits?" };
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let state = fresh();
+function fresh() { return { phase: "intro", deck: [], round: 0, step: 0, score: 0, picks: [], opts: null, pick: null, log: [], name: "", period: "" }; }
+
+function buildDeck() {
+  // one scenario from every sense, then fill to ten
+  const idx = SCEN.map((_, i) => i);
+  const bySense = {};
+  shuffle(idx).forEach((i) => { (bySense[SCEN[i].s] = bySense[SCEN[i].s] || []).push(i); });
+  const first = Object.values(bySense).map((l) => l[0]);
+  const rest = shuffle(idx.filter((i) => !first.includes(i))).slice(0, ROUNDS - first.length);
+  return shuffle([...first, ...rest]);
+}
+const cur = () => SCEN[state.deck[state.round]];
+
+function makeOpts() {
+  const sc = cur(), st = STEPS[state.step];
+  if (st === "sense") return Object.keys(SENSES).map((k) => ({ key: k, label: SENSES[k].name, sub: SENSES[k].sub, c: `var(--${k})`, ok: k === sc.s }));
+  if (st === "receptor") {
+    const pool = Object.keys(RECEPTORS).filter((k) => k !== sc.r);
+    const near = sc.r === "rods" ? ["cones"] : sc.r === "cones" ? ["rods"] : [];
+    const others = [...near, ...shuffle(pool.filter((k) => !near.includes(k)))].slice(0, 3);
+    return shuffle([sc.r, ...others]).map((k) => ({ key: k, label: RECEPTORS[k], ok: k === sc.r }));
+  }
+  return shuffle([{ key: "p", label: sc.p, ok: true }, ...sc.w.map((w, i) => ({ key: "w" + i, label: w, ok: false }))]);
+}
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.deck = buildDeck(); startRound(); }
+function startRound() { state.phase = "play"; state.step = 0; state.picks = []; state.pick = null; state.opts = makeOpts(); render(); focusFirst(); }
+function choose(i) {
+  if (state.phase !== "play" || !state.opts[i]) return;
+  const o = state.opts[i], sc = cur(), st = STEPS[state.step];
+  state.pick = i;
+  state.picks.push({ step: st, ok: o.ok });
+  if (o.ok) state.score++;
+  else state.log.push({ sc: state.deck[state.round], step: st });
+  state.phase = "feedback"; render();
+  const nb = $("nextBtn"); if (nb) nb.focus();
+}
+function next() {
+  if (state.step < 2) { state.step++; state.phase = "play"; state.pick = null; state.opts = makeOpts(); render(); focusFirst(); return; }
+  state.round++;
+  if (state.round >= ROUNDS) { state.phase = "end"; render(); focusFirst(); return; }
+  startRound();
+}
+function focusFirst() { const b = document.querySelector("#choiceCard .opt, #choiceCard .btn"); if (b) b.focus({ preventScroll: true }); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "play" && /^[1-6]$/.test(e.key)) { choose(+e.key - 1); e.preventDefault(); }
+  else if (state.phase === "feedback" && e.key === "Enter" && document.activeElement?.id !== "nextBtn") { next(); e.preventDefault(); }
+});
+
+/* ---------- rendering ---------- */
+function render() {
+  $("roundNum").textContent = state.phase === "intro" ? 0 : Math.min(ROUNDS, state.round + (state.phase === "end" ? 0 : 1));
+  $("scoreNum").textContent = state.score;
+  $("scoreBar").style.width = (state.score / (ROUNDS * 3)) * 100 + "%";
+  renderStim(); renderPath(); renderChoices();
+}
+
+function renderStim() {
+  const el = $("stimCard");
+  if (state.phase === "intro") {
+    el.innerHTML = `<div class="eyebrow"><span>How to play</span><span>10 rounds · 30 points</span></div>
+      <h2>Route each stimulus to the brain</h2>
+      <p>Every round describes something you sense in real life. Send the signal down the right path in three steps:</p>
+      <ul><li><b>Sense:</b> which of the six senses picks it up.</li>
+      <li><b>Receptor:</b> which receptor cells detect it.</li>
+      <li><b>Explanation:</b> which idea from the lesson explains what happens.</li></ul>
+      <p>Each right step adds 1 point of signal. A wrong step shows you the right answer and the signal keeps going. Press <kbd>1</kbd>–<kbd>6</kbd> to choose and <kbd>Enter</kbd> to continue.</p>`;
+    return;
+  }
+  if (state.phase === "end") { el.innerHTML = endHtml(); wireEnd(); return; }
+  const sc = cur();
+  el.innerHTML = `<div class="eyebrow"><span>Stimulus · round ${state.round + 1} of ${ROUNDS}</span><span>Step ${state.step + 1} of 3</span></div>
+    <p class="stim">${esc(sc.t)}</p>`;
+}
+
+function renderPath() {
+  const card = $("pathCard");
+  card.hidden = state.phase === "end";
+  const sc = state.phase === "intro" || state.phase === "end" ? null : cur();
+  const c = sc ? `var(--${sc.s})` : "var(--accent)";
+  // node 0 is the stimulus; nodes 1-3 fill in once that step has been answered
+  const filled = sc ? ["Detected", SENSES[sc.s].name, RECEPTORS[sc.r], "Explained"] : [];
+  const labels = ["Stimulus", "Sense", "Receptor", "Explanation"];
+  $("path").innerHTML = labels.map((lab, i) => {
+    let cls = "node", v = sc ? "?" : (i === 0 ? "Waiting" : "?");
+    if (sc && i === 0) { cls += " done"; v = filled[0]; }
+    if (sc && i > 0) {
+      const pick = state.picks[i - 1];
+      if (pick) { cls += " done" + (pick.ok ? "" : " miss"); v = filled[i]; }
+      else if (i - 1 === state.step && state.phase === "play") cls += " active";
+    }
+    return `<div class="${cls}" style="--c:${c}"><div class="k">${lab}</div><div class="v">${esc(v)}</div></div>`;
+  }).join("");
+}
+
+function renderChoices() {
+  const el = $("choiceCard");
+  if (state.phase === "intro") {
+    el.innerHTML = `<div class="row"><button class="btn" id="startBtn">Start the first round</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  if (state.phase === "end") { el.hidden = true; return; }
+  el.hidden = false;
+  const st = STEPS[state.step], done = state.phase === "feedback";
+  const cls = st === "sense" ? "opts six" : st === "principle" ? "opts one" : "opts";
+  const opts = state.opts.map((o, i) => {
+    let c = "opt";
+    if (done) c += o.ok ? " correct" : i === state.pick ? " wrong" : " fade";
+    const dot = o.c ? `<i class="dot" style="--c:${o.c}"></i>` : "";
+    const sub = o.sub ? ` <small style="color:var(--muted)">(${esc(o.sub)})</small>` : "";
+    return `<button class="${c}" data-i="${i}" ${done ? "disabled" : ""}><kbd>${i + 1}</kbd>${dot}<span>${esc(o.label)}${sub}</span></button>`;
+  }).join("");
+  let fb = "";
+  if (done) {
+    const ok = state.opts[state.pick].ok, right = state.opts.find((o) => o.ok).label;
+    const last = state.step === 2, final = last && state.round === ROUNDS - 1;
+    const msg = ok ? (last ? "Signal delivered." : "Right. The signal moves on.") : `Not quite. The answer is <b>${esc(right)}</b>.`;
+    const extra = last ? ` ${esc(SENSES[cur().s].ref)}` : "";
+    fb = `<div class="fb ${ok ? "good" : "bad"}"><p><span class="tag">${msg}</span>${extra}</p>
+      <button class="btn" id="nextBtn">${final ? "See your results" : last ? "Next stimulus" : "Next step"}</button></div>`;
+  }
+  el.innerHTML = `<p class="step-q">${STEP_Q[st]}</p><div class="${cls}">${opts}</div>${fb}`;
+  el.querySelectorAll(".opt").forEach((b) => (b.onclick = () => choose(+b.dataset.i)));
+  if (done) $("nextBtn").onclick = next;
+}
+
+function endHtml() {
+  const pct = Math.round((state.score / (ROUNDS * 3)) * 100);
+  const head = pct >= 90 ? "Crystal-clear signal." : pct >= 70 ? "Strong signal." : pct >= 50 ? "Some static on the line." : "Mostly static. Review and try again.";
+  const per = {};
+  state.deck.forEach((i) => { const s = SCEN[i].s; per[s] = per[s] || { got: 0, of: 0 }; per[s].of += 3; });
+  state.deck.forEach((i) => { per[SCEN[i].s].got += 3; });
+  state.log.forEach((m) => { per[SCEN[m.sc].s].got--; });
+  const chips = Object.keys(SENSES).filter((k) => per[k]).map((k) =>
+    `<div class="sense-chip" style="--c:var(--${k})"><span>${SENSES[k].name}</span><b>${per[k].got}/${per[k].of}</b></div>`).join("");
+  const seen = new Set();
+  const missed = state.log.filter((m) => { const k = m.sc + m.step; if (seen.has(k)) return false; seen.add(k); return true; }).map((m) => {
+    const sc = SCEN[m.sc];
+    const ans = m.step === "sense" ? SENSES[sc.s].name : m.step === "receptor" ? RECEPTORS[sc.r] : sc.p;
+    return `<div><b>${esc(sc.t)}</b><span>${m.step === "principle" ? "Explanation" : m.step[0].toUpperCase() + m.step.slice(1)}: ${esc(ans)}</span></div>`;
+  }).join("");
+  return `<div class="eyebrow"><span>Results</span><span>${pct}% signal strength</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.score}/30</b><span>steps routed correctly</span></div>
+      <div class="stat"><b>${pct}%</b><span>signal strength</span></div>
+      <div class="stat"><b>${ROUNDS}</b><span>stimuli routed</span></div>
+    </div>
+    <div class="senses">${chips}</div>
+    ${missed ? `<p><b>Steps to review</b></p><div class="missed">${missed}</div>` : `<p>Every step routed correctly.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Signal Path · 1.6 Sensation · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Play again</button>
+      <button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+}
+function wireEnd() {
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    window.print();
+  };
+}
+
+function renderRef() {
+  $("refGrid").innerHTML = Object.keys(SENSES).map((k) =>
+    `<div style="--c:var(--${k})"><h3>${SENSES[k].name} <small style="color:var(--muted);font-weight:400">(${SENSES[k].sub})</small></h3><p>${esc(SENSES[k].ref)}</p></div>`).join("");
+}
+
+function start(data) { if (data && data.state) state = data.state; renderRef(); render(); }
+window.claude?.hot?.snapshot?.(() => ({ state }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
