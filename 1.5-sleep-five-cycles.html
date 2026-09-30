@@ -123,7 +123,26 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
 .missed b { display: block; }
 .missed span { color: var(--dim); font-size: 14px; }
 
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--dim); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--moon); background: var(--night); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 14px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+
 :focus-visible { outline: 2px solid var(--lamp); outline-offset: 2px; }
+
+@media print {
+  :root { --night: #fff; --panel: #fff; --panel-2: #fff; --line: #b9b9c6; --moon: #15172a; --dim: #4a4d63; --lamp: #9a5a00; --rem: #7a3fb0; --good: #1d7a4a; --bad: #b3392a; color-scheme: light; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { padding: 0; gap: 10px; }
+  .gloss, .row, .eeg, .print-note { display: none !important; }
+  .readout { grid-template-columns: 1fr; }
+  .chart, .card { break-inside: avoid; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
 
 /* glossary */
 details.gloss { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
@@ -325,7 +344,8 @@ function next() {
 function again() {
   // Keep missed terms so they come up more often next round.
   const keep = {}; Object.keys(state.missed).forEach((k) => (keep[k] = Math.min(2, state.missed[k])));
-  state = fresh(keep); $("clockBox").classList.remove("ring"); begin();
+  const who = { name: state.name, period: state.period };
+  state = Object.assign(fresh(keep), who); $("clockBox").classList.remove("ring"); begin();
 }
 function focusFirst() { const b = document.querySelector("#card .opt, #card .btn"); if (b) b.focus({ preventScroll: true }); }
 
@@ -484,8 +504,21 @@ function renderEnd(card) {
     ${missed.length ? `<p><b>Terms that woke you up</b>. These will come up more often next round.</p>
       <div class="missed">${missed.map((m) => `<div><b>${esc(m.t)}</b><span>${esc(m.d)}</span></div>`).join("")}</div>`
       : `<p>No wrong answers all night.</p>`}
-    <div class="row"><button class="btn" id="againBtn">Sleep another night</button></div>`;
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name || "")}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period || "")}"></label>
+    </div>
+    <p class="print-only">Five Cycles · AP Psych 1.5 Sleep · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Sleep another night</button>
+      <button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
   $("againBtn").onclick = again;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!(state.name || "").trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    window.print();
+  };
 }
 
 function renderGlossary() {
