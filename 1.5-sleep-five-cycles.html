@@ -166,7 +166,7 @@ details.gloss summary { cursor: pointer; padding: 12px 0; font-family: var(--f-d
   <header class="top">
     <div class="brand">
       <h1>Five <em>Cycles</em></h1>
-      <p>AP Psych 1.5 · Sleep vocabulary</p>
+      <p>1.5 Sleep</p>
     </div>
     <div class="clock" id="clockBox" aria-live="polite">
       <span class="time" id="clock">10:00</span><span class="ampm" id="ampm">PM</span>
@@ -508,7 +508,7 @@ function renderEnd(card) {
       <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name || "")}"></label>
       <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period || "")}"></label>
     </div>
-    <p class="print-only">Five Cycles · AP Psych 1.5 Sleep · completed ${esc(new Date().toLocaleString())}</p>
+    <p class="print-only">Five Cycles · 1.5 Sleep · completed ${esc(new Date().toLocaleString())}</p>
     <div class="row"><button class="btn" id="againBtn">Sleep another night</button>
       <button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
     <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
