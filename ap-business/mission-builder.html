@@ -60,6 +60,8 @@
   .final .lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-top:16px}
   .final p{font-family:Georgia,serif;font-size:19px;margin:4px 0}
   .final .vals{font-size:14px;color:var(--muted)}
+  .chip.own{border-style:dashed;border-color:var(--gold);color:var(--goldl);background:transparent}
+  .ownbox{display:flex;gap:8px;margin:8px 0}.ownbox input{flex:1}
   .hidden{display:none}
   .pop{position:fixed;right:16px;bottom:16px;background:var(--gold);color:#1a0d2e;font-weight:700;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
   .pop.show{opacity:1;transform:none}
@@ -106,7 +108,8 @@ const WEAK = ["best","number one","#1","make money","profit","biggest","greatest
 
 // ---------- state ----------
 const S = load() || {step:0, pts:0, name:"", biz:"", what:"", who:"", sorted:{}, vals:[], valWhy:"", comps:[], compWhy:"",
-  m_verb:"", m_for:"", m_how:"", m_why:"", v_future:"", v_value:"", missionFinal:"", visionFinal:"", awarded:{}};
+  m_verb:"", m_for:"", m_how:"", m_why:"", v_future:"", v_value:"", missionFinal:"", visionFinal:"", awarded:{}, customVals:[], customComps:[]};
+S.customVals=S.customVals||[]; S.customComps=S.customComps||[];
 const STEPS = ["Start","Vision vs. Mission","Core Values","Core Competencies","Mission","Vision","Final Review"];
 
 function load(){ try{ return JSON.parse(localStorage.getItem("missionBuilder")||"null"); }catch(e){ return null; } }
@@ -173,13 +176,37 @@ function a1(){}
 
 // 2 VALUES
 function r2(){
-  const chips=VALUES.map(([n,d])=>`<button class="chip ${S.vals.includes(n)?'on':''}" onclick="pick('vals','${n}',3)">${n}<small>${d}</small></button>`).join("");
+  const chips=chipsHtml(VALUES,S.customVals,"vals",3);
   return `<div class="card">${head("Core Values","What do you believe in?","Core values are defining beliefs and principles that guide a business's actions and decisions. Pick exactly <b>3</b>.")}
-  <div class="chips">${chips}</div><div class="meta"><span id="vcount">${S.vals.length}</span>/3 chosen</div>
+  <div class="chips">${chips}</div>${ownHtml("vals","value")}<div class="meta"><span id="vcount">${S.vals.length}</span>/3 chosen</div>
   <label for="valWhy">A value only matters if it changes decisions. Finish this sentence: “Because we value <b>${esc(S.vals[0]||"…")}</b>, we would never…”</label>
   <textarea id="valWhy" placeholder="e.g., sell a product we haven't tested ourselves.">${esc(S.valWhy)}</textarea>
   <div class="meta">Aim for at least 8 words that name a real choice your business would make.</div>
   ${nav(ok2())}</div>`;
+}
+function chipsHtml(base,custom,key,max){
+  const all=[...base,...(custom||[]).map(n=>[n,"your own"])];
+  return all.map(([n,d])=>`<button class="chip ${S[key].includes(n)?'on':''}" data-n="${esc(n)}" onclick="pick('${key}',this.dataset.n,${max})">${esc(n)}<small>${esc(d)}</small></button>`).join("")
+   +`<button class="chip own" onclick="showOwn('${key}')">＋ Create your own</button>`;
+}
+function ownHtml(key,noun){
+  return `<div class="ownbox hidden" id="own_${key}"><input type="text" id="ownin_${key}" maxlength="24" placeholder="Type your own ${noun} (1 to 3 words)">
+  <button class="btn" onclick="addOwn('${key}')">Add</button></div>`;
+}
+function showOwn(key){
+  const b=document.getElementById("own_"+key); b.classList.remove("hidden");
+  const i=document.getElementById("ownin_"+key); i.focus();
+  i.onkeydown=e=>{ if(e.key==="Enter") addOwn(key); };
+}
+function addOwn(key){
+  const i=document.getElementById("ownin_"+key), n=cap(i.value.trim().replace(/\s+/g," "));
+  if(!n) return;
+  const cKey= key==="vals"?"customVals":"customComps", max= key==="vals"?3:2;
+  const base= key==="vals"?VALUES:COMPS;
+  if(base.some(b=>b[0].toLowerCase()===n.toLowerCase()) || S[cKey].some(c=>c.toLowerCase()===n.toLowerCase())){ toast("That one's already on the list."); return; }
+  S[cKey].push(n);
+  if(S[key].length<max) S[key].push(n); else toast("Added! Remove one to select it.");
+  award("own_"+key,10,"Original idea!"); save(); render();
 }
 function ok2(){ return S.vals.length===3 && words(S.valWhy)>=8; }
 function pick(key,n,max){
@@ -191,9 +218,9 @@ function a2(){ bind("valWhy","valWhy",()=>{document.getElementById("next").disab
 
 // 3 COMPETENCIES
 function r3(){
-  const chips=COMPS.map(([n,d])=>`<button class="chip ${S.comps.includes(n)?'on':''}" onclick="pick('comps','${n}',2)">${n}<small>${d}</small></button>`).join("");
+  const chips=chipsHtml(COMPS,S.customComps,"comps",2);
   return `<div class="card">${head("Core Competencies","What are you great at?","Core competencies are the skills and expertise that help a business outperform rivals and gain a competitive advantage. Pick exactly <b>2</b>.")}
-  <div class="chips">${chips}</div><div class="meta">${S.comps.length}/2 chosen</div>
+  <div class="chips">${chips}</div>${ownHtml("comps","competency")}<div class="meta">${S.comps.length}/2 chosen</div>
   <label for="compWhy">How does ${esc(S.comps[0]||"this skill")} help ${esc(S.biz)} beat competitors for ${esc(S.who)}?</label>
   <textarea id="compWhy" placeholder="Be specific. What can you do that a rival can't or won't?">${esc(S.compWhy)}</textarea>
   <div class="tip">Check yourself: businesses use competencies to decide <i>which opportunities to pursue</i> and <i>where to spend resources</i>. You do too. People pick careers and college paths based on their own values and strengths.</div>
@@ -331,4 +358,6 @@ render();
 </script>
 </body>
 </html>
+
+
 
