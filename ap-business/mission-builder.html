@@ -1,0 +1,334 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Builder</title>
+<style>
+  :root{
+    --bg:#120a1f; --card:#1d1230; --card2:#26183e; --ink:#f1ebfa; --muted:#a99cc4; --line:#3d2a63;
+    --brand:#7c3aed; --brand-d:#6d28d9; --gold:#c5b358; --goldl:#e3d48a; --good:#4ade80; --bad:#f87171; --soft:#2a1a4a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#2b1650,var(--bg));background-color:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+  header{background:linear-gradient(90deg,#2e1065,#4c1d95);border-bottom:2px solid var(--gold);color:#fff;padding:14px 16px}
+  header .in{max-width:760px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px;color:var(--goldl);letter-spacing:.02em}
+  .score{font-weight:700;background:rgba(197,179,88,.15);border:1px solid var(--gold);color:var(--goldl);padding:4px 12px;border-radius:99px}
+  .bar{max-width:760px;margin:12px auto 0;height:8px;background:rgba(255,255,255,.15);border-radius:9px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--goldl));width:0;transition:width .4s}
+  main{max-width:760px;margin:20px auto;padding:0 16px 60px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  h2{margin:0 0 4px;font-size:22px;color:var(--goldl)}
+  .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .lead{color:var(--muted);margin:0 0 16px}
+  .tip{background:var(--soft);border-left:4px solid var(--gold);padding:10px 14px;border-radius:6px;margin:14px 0;font-size:15px}
+  label{display:block;font-weight:600;margin:14px 0 4px}
+  input[type=text],textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font:inherit;background:#150c26;color:var(--ink)}
+  input::placeholder,textarea::placeholder{color:#7a6c99}
+  input:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(197,179,88,.2)}
+  textarea{min-height:70px;resize:vertical}
+  button{font:inherit;cursor:pointer}
+  .btn{background:linear-gradient(180deg,var(--gold),#a8963f);color:#1a0d2e;border:0;padding:11px 20px;border-radius:9px;font-weight:700}
+  .btn:hover{background:linear-gradient(180deg,var(--goldl),var(--gold))}
+  .btn:disabled{background:#3a2d52;color:#7a6c99;cursor:not-allowed}
+  .btn.alt{background:transparent;color:var(--goldl);border:1.5px solid var(--gold)}
+  .btn.alt:hover{background:rgba(197,179,88,.12)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chip{border:1.5px solid var(--line);background:var(--card2);color:var(--ink);padding:8px 14px;border-radius:99px;font-weight:600}
+  .chip:hover{border-color:var(--gold)}
+  .chip.on{background:var(--brand);border-color:var(--gold);color:#fff;box-shadow:0 0 12px rgba(124,58,237,.6)}
+  .chip small{display:block;font-weight:400;font-size:12px;opacity:.8}
+  .sortcard{border:1.5px solid var(--line);border-radius:10px;padding:14px;margin:10px 0;background:var(--card2)}
+  .sortcard .q{font-style:italic;margin-bottom:8px}
+  .sortcard .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .sortcard.right{border-color:var(--good);background:#12301f}
+  .sortcard.wrong{border-color:var(--bad);background:#3a1620}
+  .fb{font-size:14px;margin-top:8px}
+  .build{display:grid;gap:4px}
+  .preview{background:#150c26;border:2px dashed var(--gold);border-radius:10px;padding:14px 16px;font-size:18px;font-family:Georgia,serif;margin-top:16px;min-height:60px;color:var(--goldl)}
+  .preview .ph{color:#7a6c99}
+  .meta{font-size:13px;color:var(--muted);margin-top:6px}
+  .check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+  .check:last-child{border:0}
+  .dot{flex:0 0 24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:14px;color:#120a1f;background:#5b4a80;font-weight:700}
+  .dot.ok{background:var(--good)} .dot.no{background:var(--bad)}
+  .final{border:3px double var(--gold);border-radius:12px;padding:24px;background:linear-gradient(160deg,#2a1650,#170c2b);text-align:center}
+  .final h3{margin:0;font-size:26px;font-family:Georgia,serif;color:var(--goldl)}
+  .final .by{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .final .lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-top:16px}
+  .final p{font-family:Georgia,serif;font-size:19px;margin:4px 0}
+  .final .vals{font-size:14px;color:var(--muted)}
+  .hidden{display:none}
+  .pop{position:fixed;right:16px;bottom:16px;background:var(--gold);color:#1a0d2e;font-weight:700;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
+  .pop.show{opacity:1;transform:none}
+  @media print{
+    header,.row,.noprint,.pop{display:none!important}
+    body{background:#fff;color:#000} .card{border:0;padding:0;background:#fff;box-shadow:none}
+    .final{background:#fff;border-color:#8a7a2e} .final h3{color:#4c1d95} .final p{color:#000} .final .lbl{color:#6d28d9}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="in"><h1>🐝 Mission Builder</h1><div class="score">⭐ <span id="score">0</span> pts</div></div>
+  <div class="bar"><i id="prog"></i></div>
+</header>
+<main id="app"></main>
+<div class="pop" id="pop"></div>
+
+<script>
+// ---------- data ----------
+const VALUES = [
+  ["Creativity","we try new ideas"],["Excellence","we aim for top quality"],["Transparency","we're open and honest"],
+  ["Empathy","we care about people's needs"],["Reliability","we do what we promise"],["Sustainability","we protect the planet"],
+  ["Community","we give back locally"],["Affordability","we keep it within reach"],["Innovation","we keep improving"],
+  ["Integrity","we do the right thing"],["Fun","we enjoy what we do"],["Inclusion","everyone belongs"]
+];
+const COMPS = [
+  ["Customer service","we make buyers feel valued"],["Innovation","we invent better products"],["Efficiency","we do more with less"],
+  ["Communication","we explain and connect well"],["Ethical behavior","we earn trust"],["Craftsmanship","we make things by hand, with skill"],
+  ["Technical skill","we know the tech"],["Local knowledge","we know our community"],["Design","we make things look great"],
+  ["Speed","we deliver quickly"]
+];
+const SORT = [
+  {t:"“To be the place every teen in our town goes to feel confident and creative.”",a:"vision",
+   why:"Describes an aspiration for the future and the values behind it, so it's a VISION."},
+  {t:"“We bake fresh, affordable cookies for students and teachers, using local ingredients and delivering to campus daily.”",a:"mission",
+   why:"Says what we do, for whom, and how, so it's a MISSION."},
+  {t:"“A world where no one throws away clothes that could be loved again.”",a:"vision",
+   why:"Paints the future we want and carries values (reuse, care), so it's a VISION."},
+  {t:"“We repair phones quickly and honestly for busy families so they stay connected.”",a:"mission",
+   why:"What we do (repair phones), who (busy families), how (quickly, honestly): a MISSION."}
+];
+const WEAK = ["best","number one","#1","make money","profit","biggest","greatest","stuff","things","good quality","amazing"];
+
+// ---------- state ----------
+const S = load() || {step:0, pts:0, name:"", biz:"", what:"", who:"", sorted:{}, vals:[], valWhy:"", comps:[], compWhy:"",
+  m_verb:"", m_for:"", m_how:"", m_why:"", v_future:"", v_value:"", missionFinal:"", visionFinal:"", awarded:{}};
+const STEPS = ["Start","Vision vs. Mission","Core Values","Core Competencies","Mission","Vision","Final Review"];
+
+function load(){ try{ return JSON.parse(localStorage.getItem("missionBuilder")||"null"); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem("missionBuilder", JSON.stringify(S)); }catch(e){} }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function words(s){ return (s.trim().match(/\S+/g)||[]).length; }
+function award(key, n, msg){
+  if(S.awarded[key]) return; S.awarded[key]=1; S.pts+=n; save(); toast("+"+n+" pts  "+(msg||""));
+}
+function toast(m){ const p=document.getElementById("pop"); p.textContent=m; p.classList.add("show"); setTimeout(()=>p.classList.remove("show"),1800); }
+function go(n){ S.step=n; save(); render(); window.scrollTo(0,0); }
+function cap(s){ return s? s.charAt(0).toUpperCase()+s.slice(1):s; }
+function strip(s){ return s.trim().replace(/[.\s]+$/,""); }
+
+// ---------- renderers ----------
+function render(){
+  document.getElementById("score").textContent=S.pts;
+  document.getElementById("prog").style.width=(S.step/(STEPS.length-1)*100)+"%";
+  const app=document.getElementById("app");
+  app.innerHTML = [r0,r1,r2,r3,r4,r5,r6][S.step]();
+  const after=[a0,a1,a2,a3,a4,a5,a6][S.step]; if(after) after();
+}
+function head(tag,title,lead){
+  return `<span class="tag">Level ${S.step} of 6 · ${tag}</span><h2>${title}</h2><p class="lead">${lead}</p>`;
+}
+function nav(canNext, nextLabel){
+  return `<div class="row">${S.step>0?`<button class="btn alt" onclick="go(${S.step-1})">← Back</button>`:""}
+  <button class="btn" id="next" ${canNext?"":"disabled"} onclick="go(${S.step+1})">${nextLabel||"Next →"}</button></div>`;
+}
+function bind(id, key, cb){
+  const el=document.getElementById(id); if(!el) return;
+  el.addEventListener("input",()=>{ S[key]=el.value; save(); cb&&cb(); });
+}
+
+// 0 START
+function r0(){ return `<div class="card">
+  <span class="tag">Topic 1.5 · Vision &amp; Mission</span><h2>Build your business's mission statement</h2>
+  <p class="lead">Great businesses know who they are before they sell anything. In about 20 minutes you'll learn the difference between a vision and a mission, pick your core values and competencies, and write both statements for your own business idea.</p>
+  <label for="name">Your name</label><input type="text" id="name" value="${esc(S.name)}" placeholder="First and last name">
+  <label for="biz">Your business name</label><input type="text" id="biz" value="${esc(S.biz)}" placeholder="e.g., Honey &amp; Co.">
+  <label for="what">What does your business sell or do? (a few words)</label><input type="text" id="what" value="${esc(S.what)}" placeholder="e.g., custom stickers and phone cases">
+  <label for="who">Who is your customer?</label><input type="text" id="who" value="${esc(S.who)}" placeholder="e.g., high school students">
+  ${nav(ok0(),"Start the game →")}</div>`; }
+function ok0(){ return S.name.trim()&&S.biz.trim()&&S.what.trim()&&S.who.trim(); }
+function a0(){ ["name","biz","what","who"].forEach(k=>bind(k,k,()=>{document.getElementById("next").disabled=!ok0();})); }
+
+// 1 SORT
+function r1(){
+  const cards=SORT.map((c,i)=>{
+    const ans=S.sorted[i];
+    const cls= ans? (ans===c.a?"right":"wrong"):"";
+    return `<div class="sortcard ${cls}"><div class="q">${c.t}</div>
+      <div class="opts"><button class="chip ${ans==='vision'?'on':''}" onclick="sortIt(${i},'vision')" ${ans===c.a?"disabled":""}>🔭 Vision</button>
+      <button class="chip ${ans==='mission'?'on':''}" onclick="sortIt(${i},'mission')" ${ans===c.a?"disabled":""}>🎯 Mission</button></div>
+      ${ans?`<div class="fb">${ans===c.a?"✅ ":"❌ Not quite. "}${ans===c.a?c.why:"Look again, then try the other one."}</div>`:""}</div>`;
+  }).join("");
+  return `<div class="card">${head("Warm-up","Vision or mission?","Sort each statement. Get them right to unlock the next level.")}
+  <div class="tip"><b>Vision</b> = where we want to be and what we believe (aspirations + core values).<br>
+  <b>Mission</b> = what we do, for whom, and how we'll reach our long-term goals.</div>${cards}${nav(done1())}</div>`;
+}
+function done1(){ return SORT.every((c,i)=>S.sorted[i]===c.a); }
+function sortIt(i,v){ S.sorted[i]=v; if(v===SORT[i].a) award("s"+i,10,"Correct!"); save(); render(); }
+function a1(){}
+
+// 2 VALUES
+function r2(){
+  const chips=VALUES.map(([n,d])=>`<button class="chip ${S.vals.includes(n)?'on':''}" onclick="pick('vals','${n}',3)">${n}<small>${d}</small></button>`).join("");
+  return `<div class="card">${head("Core Values","What do you believe in?","Core values are defining beliefs and principles that guide a business's actions and decisions. Pick exactly <b>3</b>.")}
+  <div class="chips">${chips}</div><div class="meta"><span id="vcount">${S.vals.length}</span>/3 chosen</div>
+  <label for="valWhy">A value only matters if it changes decisions. Finish this sentence: “Because we value <b>${esc(S.vals[0]||"…")}</b>, we would never…”</label>
+  <textarea id="valWhy" placeholder="e.g., sell a product we haven't tested ourselves.">${esc(S.valWhy)}</textarea>
+  <div class="meta">Aim for at least 8 words that name a real choice your business would make.</div>
+  ${nav(ok2())}</div>`;
+}
+function ok2(){ return S.vals.length===3 && words(S.valWhy)>=8; }
+function pick(key,n,max){
+  const a=S[key], i=a.indexOf(n);
+  if(i>-1) a.splice(i,1); else if(a.length<max) a.push(n); else { toast("Max "+max+". Click one to remove it."); return; }
+  save(); render();
+}
+function a2(){ bind("valWhy","valWhy",()=>{document.getElementById("next").disabled=!ok2(); if(ok2()) award("vw",15,"Values in action");}); if(ok2()) award("vw",15,"Values in action"); if(S.vals.length===3) award("v3",10,"3 values chosen"); }
+
+// 3 COMPETENCIES
+function r3(){
+  const chips=COMPS.map(([n,d])=>`<button class="chip ${S.comps.includes(n)?'on':''}" onclick="pick('comps','${n}',2)">${n}<small>${d}</small></button>`).join("");
+  return `<div class="card">${head("Core Competencies","What are you great at?","Core competencies are the skills and expertise that help a business outperform rivals and gain a competitive advantage. Pick exactly <b>2</b>.")}
+  <div class="chips">${chips}</div><div class="meta">${S.comps.length}/2 chosen</div>
+  <label for="compWhy">How does ${esc(S.comps[0]||"this skill")} help ${esc(S.biz)} beat competitors for ${esc(S.who)}?</label>
+  <textarea id="compWhy" placeholder="Be specific. What can you do that a rival can't or won't?">${esc(S.compWhy)}</textarea>
+  <div class="tip">Check yourself: businesses use competencies to decide <i>which opportunities to pursue</i> and <i>where to spend resources</i>. You do too. People pick careers and college paths based on their own values and strengths.</div>
+  ${nav(ok3())}</div>`;
+}
+function ok3(){ return S.comps.length===2 && words(S.compWhy)>=8; }
+function a3(){ bind("compWhy","compWhy",()=>{document.getElementById("next").disabled=!ok3(); if(ok3()) award("cw",15,"Competitive edge");}); if(S.comps.length===2) award("c2",10,"2 competencies chosen"); if(ok3()) award("cw",15,"Competitive edge"); }
+
+// 4 MISSION
+function r4(){
+  return `<div class="card">${head("Mission","Write your mission","A mission statement says <b>what you do</b>, <b>for whom</b>, and <b>how</b> you'll achieve your long-term goals. Fill in each blank.")}
+  <div class="build">
+  <label for="m_verb">1. What we do <small style="font-weight:400">(start with a verb)</small></label>
+  <input type="text" id="m_verb" value="${esc(S.m_verb)}" placeholder="e.g., design and sell custom stickers">
+  <label for="m_for">2. For whom</label>
+  <input type="text" id="m_for" value="${esc(S.m_for||S.who)}" placeholder="e.g., students who want to express themselves">
+  <label for="m_how">3. How <small style="font-weight:400">(use a competency: ${esc(S.comps.join(", "))})</small></label>
+  <input type="text" id="m_how" value="${esc(S.m_how)}" placeholder="e.g., by offering fast turnaround and friendly service">
+  <label for="m_why">4. The long-term goal or impact <small style="font-weight:400">(so that…)</small></label>
+  <input type="text" id="m_why" value="${esc(S.m_why)}" placeholder="e.g., so every student can show their style affordably">
+  </div>
+  <div class="preview" id="mprev"></div><div class="meta" id="mmeta"></div>
+  ${nav(ok4())}</div>`;
+}
+function mission(){
+  const p=[strip(S.m_verb),strip(S.m_for||""),strip(S.m_how),strip(S.m_why)];
+  if(!p[0]) return "";
+  return `${esc(S.biz)} exists to ${p[0]}${p[1]?" for "+p[1]:""}${p[2]?", "+p[2]:""}${p[3]?", "+p[3]:""}.`;
+}
+function missionPlain(){ return mission().replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'); }
+function ok4(){ return S.m_verb.trim()&&(S.m_for||S.who).trim()&&S.m_how.trim()&&S.m_why.trim(); }
+function a4(){
+  if(!S.m_for) S.m_for=S.who;
+  const upd=()=>{ const m=mission(); document.getElementById("mprev").innerHTML=m||'<span class="ph">Your mission will appear here as you type…</span>';
+    const w=words(m.replace(/<[^>]+>/g,"")); document.getElementById("mmeta").textContent=m?w+" words · aim for 15 to 35":"";
+    document.getElementById("next").disabled=!ok4(); if(ok4()) award("mis",25,"Mission drafted"); };
+  ["m_verb","m_for","m_how","m_why"].forEach(k=>bind(k,k,upd)); upd();
+}
+
+// 5 VISION
+function r5(){
+  return `<div class="card">${head("Vision","Write your vision","A vision is short and inspiring. It describes the future you want to help create and the core values behind it. Think big, think short.")}
+  <div class="tip">Your values: <b>${esc(S.vals.join(", "))}</b>. Work at least one into your vision.</div>
+  <label for="v_future">1. In the future, we want to see…</label>
+  <input type="text" id="v_future" value="${esc(S.v_future)}" placeholder="e.g., a campus where every student feels their creativity is celebrated">
+  <label for="v_value">2. Because we believe in…</label>
+  <input type="text" id="v_value" value="${esc(S.v_value)}" placeholder="e.g., creativity, inclusion and affordability">
+  <div class="preview" id="vprev"></div><div class="meta" id="vmeta"></div>
+  ${nav(ok5())}</div>`;
+}
+function vision(){
+  const f=strip(S.v_future), v=strip(S.v_value);
+  if(!f) return "";
+  return `${esc(cap(f))}${v?", because we believe in "+esc(v):""}.`;
+}
+function visionPlain(){ return vision().replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'); }
+function ok5(){ return S.v_future.trim()&&S.v_value.trim(); }
+function a5(){
+  const upd=()=>{ const v=vision(); document.getElementById("vprev").innerHTML=v||'<span class="ph">Your vision will appear here…</span>';
+    const w=words(v.replace(/<[^>]+>/g,"")); document.getElementById("vmeta").textContent=v?w+" words · aim for under 25":"";
+    document.getElementById("next").disabled=!ok5(); if(ok5()) award("vis",25,"Vision drafted"); };
+  ["v_future","v_value"].forEach(k=>bind(k,k,upd)); upd();
+}
+
+// 6 FINAL
+function r6(){
+  if(!S.missionFinal) S.missionFinal=missionPlain();
+  if(!S.visionFinal) S.visionFinal=visionPlain();
+  return `<div class="card">${head("Boss Level","Polish and publish","Edit your statements below. The checklist updates live. Fix any red items for bonus points.")}
+  <label for="visionFinal">Vision statement</label><textarea id="visionFinal">${esc(S.visionFinal)}</textarea>
+  <label for="missionFinal">Mission statement</label><textarea id="missionFinal">${esc(S.missionFinal)}</textarea>
+  <h3 style="margin:20px 0 4px;font-size:17px">Quality checklist</h3><div id="checks"></div>
+  <div class="meta" id="grade"></div>
+  <div class="row noprint"><button class="btn alt" onclick="go(5)">← Back</button>
+  <button class="btn" onclick="finish()">Finish &amp; see my card 🎉</button></div></div>
+  <div class="card hidden" id="cardwrap"></div>`;
+}
+function has(text, list){ const t=text.toLowerCase(); return list.some(w=>t.includes(w.toLowerCase())); }
+function evalChecks(){
+  const v=S.visionFinal, m=S.missionFinal, all=(v+" "+m);
+  const compWords=S.comps.flatMap(c=>c.toLowerCase().split(/\s+/).filter(x=>x.length>4));
+  const valWords=S.vals.map(x=>x.toLowerCase().replace(/ity$|ness$/,"").slice(0,5));
+  return [
+    ["Vision is concise (under 25 words)", words(v)>0 && words(v)<=25],
+    ["Vision shows a core value (names one or uses its idea)", has(v+" "+m, S.vals)||valWords.some(w=>all.toLowerCase().includes(w))],
+    ["Mission says what we do and for whom", words(m)>=10 && has(m,[S.who.split(" ")[0]]) ],
+    ["Mission explains how (uses a competency)", has(m,S.comps)||compWords.some(w=>m.toLowerCase().includes(w))||/\bby\b|\bthrough\b|\busing\b/i.test(m)],
+    ["Mission is the right length (15 to 40 words)", words(m)>=15 && words(m)<=40],
+    ["Avoids empty buzzwords (best, #1, make money, amazing…)", !has(all,WEAK)],
+    ["Vision and mission are different (not copies)", v.trim().toLowerCase()!==m.trim().toLowerCase() && words(v)>0]
+  ];
+}
+function a6(){
+  const upd=()=>{
+    const c=evalChecks();
+    document.getElementById("checks").innerHTML=c.map(([t,ok])=>`<div class="check"><div class="dot ${ok?'ok':'no'}">${ok?"✓":"!"}</div><div>${t}</div></div>`).join("");
+    const n=c.filter(x=>x[1]).length;
+    document.getElementById("grade").textContent=n+" / "+c.length+" checks passed";
+    S.checksPassed=n; S.checksTotal=c.length; save();
+  };
+  bind("visionFinal","visionFinal",upd); bind("missionFinal","missionFinal",upd); upd();
+}
+function finish(){
+  const n=S.checksPassed||0; award("fin",n*5,"Checklist bonus");
+  const wrap=document.getElementById("cardwrap"); wrap.classList.remove("hidden");
+  wrap.innerHTML=`<div class="final"><h3>${esc(S.biz)}</h3><div class="by">Created by ${esc(S.name)} · ${S.checksPassed}/${S.checksTotal} checks · ${S.pts} pts</div>
+    <div class="lbl">Vision</div><p>${esc(S.visionFinal)}</p>
+    <div class="lbl">Mission</div><p>${esc(S.missionFinal)}</p>
+    <div class="lbl">Core values</div><div class="vals">${esc(S.vals.join(" · "))}</div>
+    <div class="lbl">Core competencies</div><div class="vals">${esc(S.comps.join(" · "))}</div></div>
+    <div class="row noprint"><button class="btn" onclick="copyIt()">📋 Copy text</button>
+    <button class="btn alt" onclick="printWithFileName()">🖨️ Print / Save PDF</button>
+    <button class="btn alt" onclick="if(confirm('Start over? This clears everything.')){localStorage.removeItem('missionBuilder');location.reload();}">↺ Start over</button></div>
+    <div class="tip noprint"><b>Reflect (answer in your notes or on the back):</b> Name one real decision ${esc(S.biz)} will make this year. How do your core values and competencies tell you what to do? Then: which of your own values and strengths might guide your career or college choices?</div>`;
+  document.getElementById("score").textContent=S.pts;
+  wrap.scrollIntoView({behavior:"smooth"});
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(){
+  const clean=s=>String(s||"").replace(/[\\/:*?"<>|]+/g," ").replace(/\s+/g," ").trim();
+  const d=new Date(), date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const parts=[clean(S.name),clean(S.biz),"Mission Builder",date].filter(Boolean);
+  const old=document.title;
+  document.title=parts.join(" - ");
+  addEventListener("afterprint",()=>{document.title=old;},{once:true});
+  window.print();
+}
+function copyIt(){
+  const t=`${S.biz} (${S.name})\n\nVision: ${S.visionFinal}\nMission: ${S.missionFinal}\nCore values: ${S.vals.join(", ")}\nCore competencies: ${S.comps.join(", ")}`;
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast("Copied!"),()=>fallback(t)); else fallback(t);
+}
+function fallback(t){ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy");toast("Copied!");}catch(e){} a.remove(); }
+
+render();
+</script>
+</body>
+</html>
+
