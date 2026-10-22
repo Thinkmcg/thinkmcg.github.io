@@ -1,0 +1,324 @@
+<meta charset="utf-8">
+<title>Case Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Libre+Franklin:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout: a detective's desk. Case board of ten folders on top, the open case file below. */
+:root {
+  --desk: #e9e2d0;
+  --paper: #fbf7ec;
+  --manila: #e4c98f;
+  --ink: #23201b;
+  --muted: #6b6255;
+  --rule: #cfc4aa;
+  --stamp: #b3261e;
+  --good: #2f6f3e;
+  --bad: #b3261e;
+  --f-type: "Special Elite", "Courier New", monospace;
+  --f-body: "Libre Franklin", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Courier Prime", ui-monospace, Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --desk: #1d1a16; --paper: #28241e; --manila: #6e5a33; --ink: #efe8d8; --muted: #b2a891; --rule: #4a4235; --stamp: #f07167; --good: #7fcf8f; --bad: #f07167; color-scheme: dark; } }
+:root[data-theme="dark"] { --desk: #1d1a16; --paper: #28241e; --manila: #6e5a33; --ink: #efe8d8; --muted: #b2a891; --rule: #4a4235; --stamp: #f07167; --good: #7fcf8f; --bad: #f07167; color-scheme: dark; }
+
+html, body { background: var(--desk); color: var(--ink); }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; border-bottom: 3px double var(--ink); padding-bottom: 12px; }
+.brand h1 { font-family: var(--f-type); font-weight: 400; font-size: clamp(40px, 7vw, 64px); line-height: .95; margin: 0; letter-spacing: .02em; }
+.brand p { margin: 6px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+.score { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.score .big { font-size: clamp(28px, 5vw, 38px); font-weight: 700; line-height: 1; }
+.score small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.folder { position: relative; background: var(--manila); border-radius: 4px 4px var(--r) var(--r); padding: 18px 10px 10px; min-height: 64px; font-family: var(--f-mono); font-size: 13px; color: var(--ink); opacity: .55; min-width: 0; }
+.folder::before { content: ""; position: absolute; top: -8px; left: 10px; width: 44%; height: 10px; background: var(--manila); border-radius: 4px 4px 0 0; }
+.folder.open { opacity: 1; outline: 2px solid var(--ink); }
+.folder.done { opacity: 1; }
+.folder .st { position: absolute; right: 6px; bottom: 6px; font-family: var(--f-type); font-size: 12px; padding: 1px 6px; border: 2px solid var(--c); color: var(--c); transform: rotate(-8deg); }
+
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); padding: clamp(18px, 3vw, 28px); box-shadow: 0 1px 0 var(--rule); }
+.eyebrow { font-family: var(--f-mono); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--stamp); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+.card h2 { font-family: var(--f-type); font-weight: 400; font-size: clamp(26px, 4vw, 36px); line-height: 1.1; margin: 0 0 10px; }
+.card p { margin: 0 0 12px; max-width: 66ch; }
+.card ul { margin: 0 0 18px; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; }
+.evidence { font-family: var(--f-type); font-size: clamp(19px, 2.5vw, 23px); line-height: 1.45; margin: 0 0 18px; max-width: 60ch; border-left: 4px solid var(--stamp); padding-left: 14px; }
+.step-q { font-weight: 800; margin: 0 0 12px; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opts.five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opt { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--paper); border: 1.5px solid var(--rule); border-radius: var(--r); padding: 11px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; transition: border-color .15s, background .15s; }
+.opt span { min-width: 0; }
+.opt:hover:not(:disabled) { border-color: var(--ink); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--paper)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--paper)); }
+.opt.fade { opacity: .5; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--rule); border-radius: 4px; padding: 1px 6px; color: var(--muted); flex: none; margin-top: 2px; }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: var(--r); border: 1px dashed var(--rule); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 320px; min-width: 0; }
+.fb .tag { font-family: var(--f-type); }
+.fb.good .tag { color: var(--good); }
+.fb.bad .tag { color: var(--bad); }
+.btn { font: inherit; font-weight: 800; cursor: pointer; border-radius: var(--r); padding: 10px 18px; background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn:hover { filter: brightness(1.15); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--rule); border-radius: var(--r); padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 18px; }
+.cat-chip { display: flex; justify-content: space-between; gap: 8px; border-left: 4px solid var(--stamp); padding: 6px 10px; background: color-mix(in srgb, var(--manila) 30%, var(--paper)); font-size: 15px; }
+.cat-chip b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.missed { margin: 0 0 18px; display: grid; gap: 8px; }
+.missed div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.missed b { display: block; }
+.missed span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--paper); border: 1.5px solid var(--rule); border-radius: var(--r); padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+
+details.ref { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 800; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid h3 { grid-column: 1 / -1; margin: 10px 0 0; font-family: var(--f-mono); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--stamp); }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+
+:focus-visible { outline: 2px solid var(--stamp); outline-offset: 2px; }
+@media (max-width: 680px) {
+  .board { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .folder { font-size: 11px; padding: 16px 6px 22px; }
+  .opts, .opts.five, .ref-grid { grid-template-columns: 1fr; }
+  .cats { grid-template-columns: 1fr 1fr; }
+  .score { text-align: left; }
+}
+@media print {
+  :root { --desk: #fff; --paper: #fff; --manila: #f1e3c0; --ink: #111; --muted: #444; --rule: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ref, .row, .print-note, #playCard { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; padding: 2px 0; }
+  .card { break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Case Files</h1><p>2.2 Cognitive Processes</p></div>
+    <div class="score" aria-live="polite"><span class="big" id="pts">0</span><span class="big" style="color:var(--muted)">/20</span><small>clues solved · case <span id="caseNum">0</span> of 10</small></div>
+  </header>
+
+  <section class="board" id="board" aria-label="Case board"></section>
+  <section class="card" id="playCard" aria-live="polite"></section>
+  <section class="card" id="endCard" hidden></section>
+
+  <details class="ref">
+    <summary>Detective's notebook: every term</summary>
+    <div class="ref-grid" id="refGrid"></div>
+  </details>
+</div>
+
+<script>
+const CATS = {
+  concepts:  { name: "Concepts and schemas", terms: { "Prototype": "The most typical example of a concept.", "Assimilation": "Fitting new information into an existing schema without changing it.", "Accommodation": "Changing a schema to include new information." } },
+  solving:   { name: "Problem-solving approach", terms: { "Algorithm": "A step-by-step procedure that guarantees a solution.", "Mental set": "Approaching a problem the way that worked before." } },
+  heuristic: { name: "Heuristic (mental shortcut)", terms: { "Availability heuristic": "Judging by the information that comes to mind most easily.", "Representativeness heuristic": "Judging by how well something matches a prototype or stereotype." } },
+  trap:      { name: "Decision trap", terms: { "Framing": "Decisions swayed by how information is presented.", "Gambler's fallacy": "Believing past events change the odds of future, independent events.", "Sunk-cost fallacy": "Continuing because of resources already invested." } },
+  creative:  { name: "Executive function and creativity", terms: { "Executive function": "Planning, organizing, and carrying out goal-directed behavior.", "Divergent thinking": "Exploring many possible solutions to a problem.", "Functional fixedness": "Struggling to see new uses for an object." } },
+};
+const SCEN = [
+  { c: "concepts", a: "Prototype", o: ["Assimilation", "Accommodation", "Framing"], t: "Asked to sketch \"a chair,\" every witness draws a four-legged kitchen chair." },
+  { c: "concepts", a: "Prototype", o: ["Assimilation", "Accommodation", "Availability heuristic"], t: "When the witness hears the word \"vehicle,\" she pictures a sedan, not a tractor or a skateboard." },
+  { c: "concepts", a: "Assimilation", o: ["Accommodation", "Prototype", "Mental set"], t: "A kid who knows what dogs are sees a Great Dane for the first time and shouts, \"Big dog!\"" },
+  { c: "concepts", a: "Assimilation", o: ["Accommodation", "Prototype", "Framing"], t: "Hearing a brand-new rap song, you file it right under the music you already call hip-hop." },
+  { c: "concepts", a: "Accommodation", o: ["Assimilation", "Prototype", "Divergent thinking"], t: "After learning that tomatoes are a fruit, a student changes what counts as \"fruit\" in her mind." },
+  { c: "concepts", a: "Accommodation", o: ["Assimilation", "Prototype", "Mental set"], t: "A boy who thought all birds fly meets a penguin and updates his idea of what a bird is." },
+  { c: "solving", a: "Algorithm", o: ["Mental set", "Availability heuristic", "Divergent thinking"], t: "The safecracker tries every combination from 000 to 999 until the safe finally opens." },
+  { c: "solving", a: "Algorithm", o: ["Mental set", "Representativeness heuristic", "Executive function"], t: "To find one typo, the editor checks every word, in order, from the first page to the last." },
+  { c: "solving", a: "Mental set", o: ["Algorithm", "Functional fixedness", "Sunk-cost fallacy"], t: "The detective questions every suspect the way that cracked his last case, even though this case is different." },
+  { c: "solving", a: "Mental set", o: ["Algorithm", "Divergent thinking", "Framing"], t: "A student attacks every new puzzle with the trick from the last one, even when it clearly doesn't fit." },
+  { c: "heuristic", a: "Availability heuristic", o: ["Representativeness heuristic", "Gambler's fallacy", "Algorithm"], t: "After a week of news stories about car thefts, a neighbor is sure car theft is the town's most common crime." },
+  { c: "heuristic", a: "Availability heuristic", o: ["Representativeness heuristic", "Framing", "Mental set"], t: "Having just read about a lightning strike, Ava refuses to walk outside during a light rain." },
+  { c: "heuristic", a: "Representativeness heuristic", o: ["Availability heuristic", "Prototype", "Sunk-cost fallacy"], t: "The suspect wears a leather jacket and has a tattoo, so the witness decides he must be guilty." },
+  { c: "heuristic", a: "Representativeness heuristic", o: ["Availability heuristic", "Assimilation", "Gambler's fallacy"], t: "Everyone decides the tall new student must be on the basketball team." },
+  { c: "trap", a: "Framing", o: ["Gambler's fallacy", "Sunk-cost fallacy", "Availability heuristic"], t: "Told \"this alarm stops 95% of break-ins,\" the store owner buys it. Told \"5% of break-ins still happen,\" she wouldn't have." },
+  { c: "trap", a: "Framing", o: ["Gambler's fallacy", "Sunk-cost fallacy", "Representativeness heuristic"], t: "Customers pick the burger labeled \"80% lean\" over the identical one labeled \"20% fat.\"" },
+  { c: "trap", a: "Gambler's fallacy", o: ["Sunk-cost fallacy", "Framing", "Availability heuristic"], t: "The roulette ball has landed on black five times, so the gambler bets everything on red because it is \"due.\"" },
+  { c: "trap", a: "Gambler's fallacy", o: ["Sunk-cost fallacy", "Framing", "Mental set"], t: "After three rainy Saturdays in a row, Max is certain this Saturday has to be sunny." },
+  { c: "trap", a: "Sunk-cost fallacy", o: ["Gambler's fallacy", "Framing", "Mental set"], t: "The investor keeps pouring money into a failing shop because he has already put in $50,000." },
+  { c: "trap", a: "Sunk-cost fallacy", o: ["Gambler's fallacy", "Framing", "Functional fixedness"], t: "You sit through a terrible movie to the very end because you already paid for the ticket." },
+  { c: "creative", a: "Executive function", o: ["Divergent thinking", "Functional fixedness", "Algorithm"], t: "The rookie maps out each step of the investigation, sets deadlines, and sticks to the plan." },
+  { c: "creative", a: "Divergent thinking", o: ["Executive function", "Functional fixedness", "Mental set"], t: "Stuck without a key, the detective lists twenty different ways to get through a locked door." },
+  { c: "creative", a: "Functional fixedness", o: ["Divergent thinking", "Executive function", "Mental set"], t: "Locked in a room, the suspect never thinks to use a coin to unscrew the air vent." },
+  { c: "creative", a: "Functional fixedness", o: ["Divergent thinking", "Executive function", "Assimilation"], t: "Needing to prop open a window, you hunt for a stick and ignore the ruler sitting on your desk." },
+];
+const TOTAL = 10;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const defOf = (sc) => CATS[sc.c].terms[sc.a];
+
+let state = fresh();
+function fresh() { return { phase: "intro", deck: [], n: 0, step: 0, opts: null, pick: null, pts: 0, miss: [], log: [], name: "", period: "" }; }
+
+function buildDeck() {
+  // two cases from every category, then shuffle
+  const by = {};
+  shuffle(SCEN.map((_, i) => i)).forEach((i) => (by[SCEN[i].c] = by[SCEN[i].c] || []).push(i));
+  return shuffle(Object.values(by).flatMap((l) => l.slice(0, 2))).slice(0, TOTAL);
+}
+const cur = () => SCEN[state.deck[state.n]];
+function makeOpts() {
+  const sc = cur();
+  if (state.step === 0) return Object.keys(CATS).map((k) => ({ label: CATS[k].name, ok: k === sc.c }));
+  return shuffle([sc.a, ...sc.o]).map((t) => ({ label: t, ok: t === sc.a }));
+}
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.deck = buildDeck(); state.miss = Array(TOTAL).fill(0); startCase(); }
+function startCase() { state.phase = "play"; state.step = 0; state.pick = null; state.opts = makeOpts(); render(); focusFirst(); }
+function choose(i) {
+  if (state.phase !== "play" || !state.opts[i]) return;
+  state.pick = i;
+  if (state.opts[i].ok) state.pts++;
+  else { state.miss[state.n]++; state.log.push({ sc: state.deck[state.n], step: state.step }); }
+  state.phase = "feedback"; render();
+  const nb = $("nextBtn"); if (nb) nb.focus();
+}
+function next() {
+  if (state.step === 0) { state.step = 1; state.phase = "play"; state.pick = null; state.opts = makeOpts(); render(); focusFirst(); return; }
+  state.n++;
+  if (state.n >= TOTAL) { state.phase = "end"; render(); const b = $("againBtn"); if (b) b.focus(); return; }
+  startCase();
+}
+function focusFirst() { const b = document.querySelector("#playCard .opt, #playCard .btn"); if (b) b.focus({ preventScroll: true }); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "play" && /^[1-5]$/.test(e.key)) { choose(+e.key - 1); e.preventDefault(); }
+  else if (state.phase === "feedback" && e.key === "Enter" && document.activeElement?.id !== "nextBtn") { next(); e.preventDefault(); }
+});
+
+/* ---------- rendering ---------- */
+function render() {
+  $("pts").textContent = state.pts;
+  $("caseNum").textContent = state.phase === "intro" ? 0 : Math.min(TOTAL, state.n + (state.phase === "end" ? 0 : 1));
+  renderBoard();
+  $("playCard").hidden = state.phase === "end";
+  $("endCard").hidden = state.phase !== "end";
+  if (state.phase === "end") renderEnd(); else renderPlay();
+}
+function renderBoard() {
+  let h = "";
+  for (let i = 0; i < TOTAL; i++) {
+    const closed = state.phase === "end" || i < state.n || (i === state.n && state.phase === "feedback" && state.step === 1);
+    const open = !closed && i === state.n && state.phase !== "intro";
+    const m = state.miss[i] || 0;
+    const stamp = closed ? (m === 0 ? ["SOLVED", "var(--good)"] : m === 1 ? ["CLOSED", "var(--ink)"] : ["COLD", "var(--bad)"]) : null;
+    h += `<div class="folder${closed ? " done" : ""}${open ? " open" : ""}">Case ${String(i + 1).padStart(2, "0")}${stamp ? `<span class="st" style="--c:${stamp[1]}">${stamp[0]}</span>` : ""}</div>`;
+  }
+  $("board").innerHTML = h;
+}
+
+function renderPlay() {
+  const el = $("playCard");
+  if (state.phase === "intro") {
+    el.innerHTML = `<div class="eyebrow"><span>Briefing</span><span>10 cases · 20 clues</span></div>
+      <h2>Crack the thinking behind each case</h2>
+      <p>Every case file holds a piece of evidence: someone's thinking, a choice, or a mistake. Solve it in two steps:</p>
+      <ul><li><b>Step 1:</b> what kind of thinking it is (concepts and schemas, problem-solving, a heuristic, a decision trap, or executive function and creativity).</li>
+      <li><b>Step 2:</b> the exact concept.</li></ul>
+      <p>Each right step solves a clue. A wrong step shows you the answer, and the case moves on. Press <kbd>1</kbd>–<kbd>5</kbd> to choose and <kbd>Enter</kbd> to continue.</p>
+      <div class="row"><button class="btn" id="startBtn">Open the first case</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  const sc = cur(), done = state.phase === "feedback";
+  const opts = state.opts.map((o, i) => {
+    let c = "opt";
+    if (done) c += o.ok ? " correct" : i === state.pick ? " wrong" : " fade";
+    return `<button class="${c}" data-i="${i}" ${done ? "disabled" : ""}><kbd>${i + 1}</kbd><span>${esc(o.label)}</span></button>`;
+  }).join("");
+  let fb = "";
+  if (done) {
+    const ok = state.opts[state.pick].ok, right = state.opts.find((o) => o.ok).label;
+    const last = state.step === 1, final = last && state.n === TOTAL - 1;
+    fb = `<div class="fb ${ok ? "good" : "bad"}"><p><span class="tag">${ok ? "Clue solved. " : "Wrong lead. "}</span>${ok ? "" : `The answer is <b>${esc(right)}</b>.`}${last ? " " + esc(defOf(sc)) : ""}</p>
+      <button class="btn" id="nextBtn">${final ? "File the report" : last ? "Next case" : "Name the concept"}</button></div>`;
+  }
+  el.innerHTML = `<div class="eyebrow"><span>Case ${String(state.n + 1).padStart(2, "0")} · evidence</span><span>Step ${state.step + 1} of 2</span></div>
+    <p class="evidence">${esc(sc.t)}</p>
+    <p class="step-q">${state.step === 0 ? "What kind of thinking is this?" : "Which concept is it?"}</p>
+    <div class="opts${state.step === 0 ? " five" : ""}">${opts}</div>${fb}`;
+  el.querySelectorAll(".opt").forEach((b) => (b.onclick = () => choose(+b.dataset.i)));
+  if (done) $("nextBtn").onclick = next;
+}
+
+function renderEnd() {
+  const pct = Math.round((state.pts / (TOTAL * 2)) * 100);
+  const head = pct >= 90 ? "Master detective." : pct >= 70 ? "Solid detective work." : pct >= 50 ? "A few cases went cold." : "Back to the notebook, detective.";
+  const per = {};
+  state.deck.forEach((i) => { const k = SCEN[i].c; per[k] = per[k] || { got: 0, of: 0 }; per[k].of += 2; per[k].got += 2; });
+  state.log.forEach((m) => per[SCEN[m.sc].c].got--);
+  const chips = Object.keys(CATS).filter((k) => per[k]).map((k) => `<div class="cat-chip"><span>${CATS[k].name}</span><b>${per[k].got}/${per[k].of}</b></div>`).join("");
+  const seen = new Set();
+  const missed = state.log.filter((m) => !seen.has(m.sc) && seen.add(m.sc)).map((m) => {
+    const sc = SCEN[m.sc];
+    return `<div><b>${esc(sc.t)}</b><span>${esc(CATS[sc.c].name)} · ${esc(sc.a)}: ${esc(defOf(sc))}</span></div>`;
+  }).join("");
+  $("endCard").innerHTML = `<div class="eyebrow"><span>Final report</span><span>${pct}% of clues solved</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.pts}/20</b><span>clues solved</span></div>
+      <div class="stat"><b>${state.miss.filter((m) => m === 0).length}/10</b><span>cases solved with no wrong leads</span></div>
+      <div class="stat"><b>${state.log.length}</b><span>wrong leads</span></div>
+    </div>
+    <div class="cats">${chips}</div>
+    ${missed ? `<p><b>Cases to review</b></p><div class="missed">${missed}</div>` : `<p>Every case solved without a single wrong lead.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Case Files · 2.2 Cognitive Processes · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Play again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Case Files");
+  };
+}
+
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title;
+  document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+
+function renderRef() {
+  $("refGrid").innerHTML = Object.values(CATS).map((c) => `<h3>${c.name}</h3>` +
+    Object.entries(c.terms).map(([t, d]) => `<p><b>${esc(t)}</b>: ${esc(d)}</p>`).join("")).join("");
+}
+function start(data) { if (data && data.state) state = data.state; renderRef(); render(); }
+window.claude?.hot?.snapshot?.(() => ({ state }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
