@@ -105,8 +105,8 @@ details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
 
 <script>
 const TERMS = [
-  ["Explicit memory", "Memory you can easily describe or explain"],
-  ["Implicit memory", "Memory that is hard to put into words"],
+  ["Explicit memory", "Memory you consciously recall, like facts and events"],
+  ["Implicit memory", "Memory you use without realizing, like riding a bike"],
   ["Episodic memory", "Memory of personal experiences and events"],
   ["Semantic memory", "Memory of general facts and knowledge"],
   ["Procedural memory", "Memory for skills and procedures"],
@@ -133,13 +133,13 @@ const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) {
 const NEURON = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="7" fill="currentColor"/><path d="M24 17V4M24 31v13M17 24H4M31 24h13M19 19l-9-9M29 29l9 9M29 19l9-9M19 29l-9 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
 let state = fresh();
-function fresh() { return { phase: "intro", round: 0, pool: [], cards: [], open: [], lock: false, flips: 0, pairs: 0, misses: {}, name: "", period: "" }; }
+function fresh() { return { phase: "intro", round: 0, pool: [], cards: [], open: [], lock: false, pending: false, flips: 0, pairs: 0, misses: {}, name: "", period: "" }; }
 
 function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.pool = shuffle(TERMS.map((_, i) => i)).slice(0, ROUNDS * PAIRS); startRound(); }
 function startRound() {
   const ids = state.pool.slice(state.round * PAIRS, state.round * PAIRS + PAIRS);
   state.cards = shuffle(ids.flatMap((id) => [{ id, kind: "term" }, { id, kind: "def" }])).map((c) => ({ ...c, up: false, done: false, miss: false }));
-  state.open = []; state.lock = false; state.phase = "play"; render();
+  state.open = []; state.lock = false; state.pending = false; state.phase = "play"; render();
 }
 function flip(i) {
   const c = state.cards[i];
@@ -154,12 +154,21 @@ function flip(i) {
     renderCard(state.cards.indexOf(a)); renderCard(state.cards.indexOf(b)); renderMeter();
     if (state.cards.every((x) => x.done)) setTimeout(roundDone, 600);
   } else {
-    a.miss = b.miss = true; state.lock = true;
+    a.miss = b.miss = true; state.pending = true;
     [a.id, b.id].forEach((id) => (state.misses[id] = (state.misses[id] || 0) + 1));
-    say("No connection. Remember where those were.");
+    say('No connection. Remember where those were, then <b>click any card to flip them back.</b> <button class="btn ghost" id="flipBackBtn" style="padding:6px 12px;margin-left:6px">Flip back</button>');
     state.open.forEach(renderCard); renderMeter();
-    setTimeout(() => { a.up = b.up = a.miss = b.miss = false; const o = state.open; state.open = []; state.lock = false; o.forEach(renderCard); }, 1100);
+    const fb = $("flipBackBtn"); if (fb) { fb.onclick = flipBack; fb.focus({ preventScroll: true }); }
   }
+}
+// mismatched cards stay up until the student clicks, so they have time to study them
+function flipBack() {
+  if (!state.pending) return;
+  const o = state.open;
+  o.forEach((k) => { state.cards[k].up = false; state.cards[k].miss = false; });
+  state.open = []; state.pending = false;
+  o.forEach(renderCard);
+  say("Flip another card.");
 }
 const label = (c) => (c.kind === "term" ? TERMS[c.id][0] : TERMS[c.id][1]);
 function roundDone() {
@@ -196,7 +205,7 @@ function render() {
   if (state.phase === "intro") {
     box.innerHTML = `<div class="eyebrow"><span>How to play</span><span>3 rounds · 18 terms</span></div>
       <h2>Make the connections</h2>
-      <p>Every card hides either a memory <b>term</b> or its <b>definition</b>. Flip two cards at a time. If they belong together, they lock in and glow: a strengthened connection, just like long-term potentiation. If not, they flip back, so remember where they were.</p>
+      <p>Every card hides either a memory <b>term</b> or its <b>definition</b>. Flip two cards at a time. If they belong together, they lock in and glow: a strengthened connection, just like long-term potentiation. If not, they stay face-up until you click to flip them back, so take a moment to remember where they were.</p>
       <ul><li>Each round has 6 pairs. Clear all 3 rounds.</li><li>Fewer attempts means a better score. A perfect round takes 6 attempts.</li><li>Use Tab and Enter to flip cards with the keyboard.</li></ul>
       <div class="row"><button class="btn" id="startBtn">Start round 1</button></div>`;
     $("startBtn").onclick = begin; return;
@@ -212,6 +221,8 @@ function render() {
     <div class="grid" id="grid">${state.cards.map(cardHtml).join("")}</div>
     <p class="status" id="status">Flip any card to begin.</p>`;
   box.querySelectorAll(".mem").forEach((b) => (b.onclick = () => flip(+b.dataset.i)));
+  // while a mismatch is showing, the next click anywhere on the board only flips those two back
+  $("grid").addEventListener("click", (e) => { if (state.pending) { e.stopPropagation(); flipBack(); } }, true);
 }
 function renderEnd() {
   const best = ROUNDS * PAIRS, eff = Math.round((best / Math.max(best, state.flips)) * 100);
