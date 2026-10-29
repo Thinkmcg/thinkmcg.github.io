@@ -1,0 +1,237 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fade Out</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a misty single-screen game by design. A fading definition, a draining timer, four term choices. */
+:root {
+  color-scheme: dark;
+  --bg: #121019; --mist: #1c1928; --panel: #221e31; --ink: #f1ecff; --muted: #a79fbf; --line: #393252;
+  --glow: #c7b8ff; --timer: #8fe3cf; --warn: #ffb36b; --good: #7fe0a4; --bad: #ff8f86;
+  --f-display: "Fraunces", Georgia, serif; --f-body: "Outfit", "Segoe UI", system-ui, sans-serif; --f-mono: "DM Mono", ui-monospace, Consolas, monospace; --r: 14px;
+}
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5;
+  background: radial-gradient(800px 420px at 50% -10%, rgba(199,184,255,.14), transparent 65%), var(--bg); }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-size: clamp(36px, 7vw, 58px); line-height: 1; margin: 0; letter-spacing: -.01em;
+  background: linear-gradient(90deg, var(--ink) 30%, transparent 105%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { margin: 8px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meter { display: flex; gap: 18px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; }
+.meter span { font-size: 12px; color: var(--muted); }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(18px, 3vw, 28px); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--glow); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-family: var(--f-display); font-size: clamp(24px, 3.6vw, 32px); line-height: 1.15; margin: 0 0 10px; }
+p { margin: 0 0 12px; max-width: 64ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; max-width: 64ch; }
+.memory { position: relative; background: var(--mist); border-radius: 12px; padding: 26px 22px; min-height: 120px; display: grid; place-items: center; text-align: center; margin-bottom: 14px; overflow: hidden; }
+.memory .text { font-family: var(--f-display); font-size: clamp(21px, 3.2vw, 28px); line-height: 1.3; max-width: 32ch; will-change: opacity, filter; }
+.memory .gone { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--f-mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-size: 14px; }
+.timer { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-bottom: 16px; }
+.timer i { display: block; height: 100%; width: 100%; background: var(--timer); }
+.timer i.low { background: var(--warn); }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opt { font: inherit; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer; background: var(--mist); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.opt span { min-width: 0; }
+.opt:hover:not(:disabled) { border-color: var(--glow); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--mist)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, var(--mist)); }
+.opt.fade { opacity: .45; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--muted); flex: none; margin-top: 2px; }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 300px; min-width: 0; }
+.fb .tag { font-weight: 700; }
+.fb.good .tag { color: var(--good); }
+.fb.bad .tag { color: var(--bad); }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--glow); color: #1a1528; border: 1.5px solid var(--glow); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--mist); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+details.ref { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+@media (max-width: 600px) { .opts, .ref-grid { grid-template-columns: 1fr; } }
+@media print {
+  :root { --bg: #fff; --mist: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; --good: #2a7a43; --bad: #b3392a; color-scheme: light; }
+  html, body { background: #fff !important; }
+  h1 { color: #111; background: none; }
+  .ref, .row, .print-note, #playBox { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Fade Out</h1><p class="sub">2.5 Storing Memories</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mRound">0/12</b><span>memory</span></div>
+      <div><b id="mPts">0</b><span>points (of 120)</span></div>
+    </div>
+  </header>
+  <section class="box" id="playBox"></section>
+  <section class="box" id="endBox" hidden></section>
+  <details class="ref"><summary>Study the 14 terms</summary><div class="ref-grid" id="refGrid"></div></details>
+</div>
+
+<script>
+const TERMS = [
+  ["Sensory memory", "Holds sights and sounds for just a moment"],
+  ["Short-term memory", "Holds a small amount of information for a short time"],
+  ["Working memory", "Actively processes the information you are holding right now"],
+  ["Long-term memory", "Stores information for extended periods"],
+  ["Maintenance rehearsal", "Repeating information to keep it in short-term memory"],
+  ["Elaborative rehearsal", "Connecting new information to what you already know"],
+  ["Highly superior autobiographical memory", "Recalling your own experiences in remarkable detail"],
+  ["Amnesia", "Memory loss caused by brain injury or disease"],
+  ["Retrograde amnesia", "Losing memories from before an injury"],
+  ["Anterograde amnesia", "Being unable to form new memories"],
+  ["Alzheimer's disease", "A progressive disease that destroys memory and other mental functions"],
+  ["Infantile amnesia", "Being unable to recall memories from early childhood"],
+  ["Storage", "Keeping encoded information in memory over time"],
+  ["Capacity", "How much information a memory system can hold"],
+];
+const ROUNDS = 12, SECONDS = 12, MAXPTS = 10;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let state = fresh(), raf = 0;
+function fresh() { return { phase: "intro", order: [], n: 0, opts: [], pick: null, t0: 0, left: SECONDS, pts: 0, correct: 0, forgot: 0, log: [], name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.order = shuffle(TERMS.map((_, i) => i)).slice(0, ROUNDS); startRound(); }
+function startRound() {
+  const id = state.order[state.n];
+  // amnesia terms compete with each other, so they make tougher distractors
+  const family = TERMS.map((_, i) => i).filter((i) => i !== id && (TERMS[i][0].includes("amnesia") || TERMS[i][0].includes("memory")) === (TERMS[id][0].includes("amnesia") || TERMS[id][0].includes("memory")));
+  const rest = shuffle(TERMS.map((_, i) => i).filter((i) => i !== id && !family.includes(i)));
+  const wrong = [...shuffle(family).slice(0, 2), ...rest].slice(0, 3);
+  state.opts = shuffle([id, ...wrong]); state.pick = null; state.left = SECONDS; state.phase = "play";
+  render(); state.t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+  const b = document.querySelector(".opt"); if (b) b.focus({ preventScroll: true });
+}
+function tick(now) {
+  if (state.phase !== "play") return;
+  state.left = Math.max(0, SECONDS - (now - state.t0) / 1000);
+  const f = state.left / SECONDS, txt = $("memText"), bar = $("timerBar");
+  if (txt) { txt.style.opacity = (0.08 + 0.92 * f).toFixed(3); if (!reduce) txt.style.filter = `blur(${((1 - f) * 6).toFixed(2)}px)`; }
+  if (bar) { bar.style.width = (f * 100).toFixed(1) + "%"; bar.classList.toggle("low", f < 0.3); }
+  if (state.left <= 0) return answer(null);
+  raf = requestAnimationFrame(tick);
+}
+function answer(choiceIdx) {
+  if (state.phase !== "play") return;
+  cancelAnimationFrame(raf);
+  const id = state.order[state.n];
+  state.pick = choiceIdx;
+  if (choiceIdx === null) { state.forgot++; state.log.push(id); state.gained = 0; }
+  else if (state.opts[choiceIdx] === id) { state.correct++; state.gained = Math.max(1, Math.ceil((state.left / SECONDS) * MAXPTS)); state.pts += state.gained; }
+  else { state.log.push(id); state.gained = 0; }
+  state.phase = "feedback"; render(); $("nextBtn").focus();
+}
+function next() { state.n++; if (state.n >= ROUNDS) { state.phase = "end"; render(); $("againBtn").focus(); return; } startRound(); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "play" && /^[1-4]$/.test(e.key)) { answer(+e.key - 1); e.preventDefault(); }
+});
+
+function render() {
+  $("mRound").textContent = `${state.phase === "intro" ? 0 : Math.min(ROUNDS, state.n + (state.phase === "end" ? 0 : 1))}/${ROUNDS}`;
+  $("mPts").textContent = state.pts;
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  if (state.phase === "end") return renderEnd();
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>How to play</span><span>12 memories · 12 seconds each</span></div>
+      <h2>Catch the memory before it fades</h2>
+      <p>A definition appears, then slowly fades away, like a memory that never made it into storage. Pick the term it describes before it disappears.</p>
+      <ul><li>The faster you answer, the more points you keep, up to 10 per memory.</li><li>If it fades completely, it's forgotten: 0 points.</li><li>Press <kbd>1</kbd>–<kbd>4</kbd> to answer quickly.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Start remembering</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  const id = state.order[state.n], done = state.phase === "feedback";
+  const opts = state.opts.map((o, i) => {
+    let c = "opt";
+    if (done) c += o === id ? " correct" : i === state.pick ? " wrong" : " fade";
+    return `<button class="${c}" data-i="${i}" ${done ? "disabled" : ""}><kbd>${i + 1}</kbd><span>${esc(TERMS[o][0])}</span></button>`;
+  }).join("");
+  let fb = "";
+  if (done) {
+    const last = state.n === ROUNDS - 1;
+    const msg = state.pick === null ? `<span class="tag">Forgotten.</span> It faded before you answered. It was <b>${esc(TERMS[id][0])}</b>.`
+      : state.opts[state.pick] === id ? `<span class="tag">Stored! +${state.gained}</span> <b>${esc(TERMS[id][0])}</b>.`
+      : `<span class="tag">Not that one.</span> It was <b>${esc(TERMS[id][0])}</b>.`;
+    fb = `<div class="fb ${state.pick !== null && state.opts[state.pick] === id ? "good" : "bad"}"><p>${msg}</p><button class="btn" id="nextBtn">${last ? "See your results" : "Next memory"}</button></div>`;
+  }
+  box.innerHTML = `<div class="eyebrow"><span>Memory ${state.n + 1} of ${ROUNDS}</span><span>${done ? "" : "Answer before it fades"}</span></div>
+    <div class="memory"><div class="text" id="memText" style="${done ? "" : ""}">${esc(TERMS[id][1])}</div></div>
+    <div class="timer" aria-hidden="true"><i id="timerBar" style="width:${done ? (state.left / SECONDS) * 100 : 100}%"></i></div>
+    <div class="opts">${opts}</div>${fb}`;
+  box.querySelectorAll(".opt").forEach((b) => (b.onclick = () => answer(+b.dataset.i)));
+  if (done) $("nextBtn").onclick = next;
+}
+function renderEnd() {
+  const max = ROUNDS * MAXPTS, pct = Math.round((state.pts / max) * 100);
+  const head = state.correct === ROUNDS && pct >= 70 ? "Total recall!" : state.correct >= 10 ? "Strong storage." : state.correct >= 7 ? "Some memories slipped away." : "Time to rehearse these terms.";
+  const review = [...new Set(state.log)].map((i) => `<div><b>${esc(TERMS[i][0])}</b><span>${esc(TERMS[i][1])}</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>Results</span><span>${state.correct}/${ROUNDS} correct</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.pts}/${max}</b><span>points</span></div>
+      <div class="stat"><b>${state.correct}/${ROUNDS}</b><span>memories stored</span></div>
+      <div class="stat"><b>${state.forgot}</b><span>faded before you answered</span></div>
+    </div>
+    ${review ? `<p><b>Terms to review</b></p><div class="review">${review}</div>` : `<p>Every memory stored.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Fade Out · 2.5 Storing Memories · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Play again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Fade Out");
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("refGrid").innerHTML = TERMS.map(([t, d]) => `<p><b>${esc(t)}</b>: ${esc(d)}</p>`).join("");
+render();
+</script>

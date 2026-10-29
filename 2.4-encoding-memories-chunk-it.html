@@ -1,0 +1,224 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chunk It</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Rubik+Mono+One&display=swap">
+<style>
+/* Layout: a bright puzzle board. Definition card on top, the answer tray, then a pile of chunk tiles to tap in order. */
+:root {
+  --bg: #fff8ec; --panel: #ffffff; --ink: #2a1f3d; --muted: #6d6380; --line: #eadfcc;
+  --t1: #ff6b6b; --t2: #ffb84d; --t3: #4dc3ff; --t4: #7bd88f; --t5: #b48cff; --accent: #6a3fd1; --good: #2a8a4a; --bad: #d1433b;
+  --f-body: "Rubik", "Segoe UI", system-ui, sans-serif; --f-tile: "Rubik Mono One", "Rubik", monospace; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17131f; --panel: #221c2d; --ink: #f3eefb; --muted: #b3a9c4; --line: #3a3149; --accent: #a98bff; --good: #78d394; --bad: #f2877d; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #17131f; --panel: #221c2d; --ink: #f3eefb; --muted: #b3a9c4; --line: #3a3149; --accent: #a98bff; --good: #78d394; --bad: #f2877d; color-scheme: dark; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-tile); font-weight: 400; font-size: clamp(30px, 6vw, 48px); line-height: 1; margin: 0; letter-spacing: -.02em; }
+h1 .c { display: inline-block; padding: 2px 10px; border-radius: 8px; color: #241a33; margin-right: 4px; }
+.sub { margin: 8px 0 0; font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+.meter { display: flex; gap: 18px; font-variant-numeric: tabular-nums; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; font-weight: 800; }
+.meter span { font-size: 12px; color: var(--muted); }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); }
+.eyebrow { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-weight: 800; font-size: clamp(22px, 3.4vw, 30px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+p { margin: 0 0 12px; max-width: 64ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; max-width: 64ch; }
+.def { font-size: clamp(19px, 2.6vw, 24px); font-weight: 600; line-height: 1.35; margin: 0 0 16px; }
+.tray { min-height: 64px; border: 2px dashed var(--line); border-radius: 12px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.tray.good { border-color: var(--good); border-style: solid; }
+.tray.bad { border-color: var(--bad); border-style: solid; }
+.tray .hint { color: var(--muted); font-size: 15px; padding-left: 6px; }
+.pile { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.tile { font-family: var(--f-tile); font-size: clamp(14px, 2.4vw, 18px); color: #241a33; background: var(--c); border: 0; border-radius: 10px; padding: 12px 14px; cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.18); transition: transform .1s; min-width: 0; }
+.tile:hover:not(:disabled) { transform: translateY(-2px); }
+.tile:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
+.tile:disabled { opacity: .25; cursor: default; box-shadow: none; }
+.tray .tile { cursor: pointer; }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--accent); color: #fff; border: 1.5px solid var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); }
+.fb.good { border-color: var(--good); }
+.fb.bad { border-color: var(--bad); }
+.fb b.t { color: var(--good); }
+.fb.bad b.t { color: var(--bad); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+details.ref { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { .ref-grid { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr 1fr; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .ref, .row, .print-note, #playBox { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1><span class="c" style="background:var(--t1)">CHUNK</span><span class="c" style="background:var(--t3)">IT</span></h1><p class="sub">2.4 Encoding Memories</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mTerm">0/13</b><span>term</span></div>
+      <div><b id="mPts">0</b><span>points (of 26)</span></div>
+    </div>
+  </header>
+  <section class="box" id="playBox" aria-live="polite"></section>
+  <section class="box" id="endBox" hidden></section>
+  <details class="ref"><summary>Study the 13 terms</summary><div class="ref-grid" id="refGrid"></div></details>
+</div>
+
+<script>
+// each term is pre-split into chunks; a space in the finished term comes from a word break between chunks
+const TERMS = [
+  { t: "Encoding", c: ["EN", "COD", "ING"], d: "The process of getting information into memory" },
+  { t: "Mnemonic device", c: ["MNE", "MON", "IC", "DEVICE"], d: "A memory aid, like Roy G. Biv, that helps encode information" },
+  { t: "Method of loci", c: ["METH", "OD OF", "LO", "CI"], d: "A memory aid that links each item to a specific location" },
+  { t: "Chunking", c: ["CHUNK", "ING"], d: "Breaking information into smaller, manageable units" },
+  { t: "Hierarchy", c: ["HI", "ER", "AR", "CHY"], d: "Organizing information from broad groups down to specific details" },
+  { t: "Categories", c: ["CAT", "E", "GO", "RIES"], d: "Groups of related items, like mammals, birds, and reptiles" },
+  { t: "Spacing effect", c: ["SPAC", "ING", "EF", "FECT"], d: "Memory is better when study is spread out over time" },
+  { t: "Distributed practice", c: ["DIS", "TRIB", "UTED", "PRAC", "TICE"], d: "Studying a little at a time over many days" },
+  { t: "Massed practice", c: ["MASSED", "PRAC", "TICE"], d: "Cramming all of your studying into one session" },
+  { t: "Serial position effect", c: ["SE", "RIAL", "POSI", "TION", "EFFECT"], d: "The order of a list affects which items you remember" },
+  { t: "Primacy effect", c: ["PRI", "MA", "CY", "EFFECT"], d: "Remembering the first items on a list best" },
+  { t: "Recency effect", c: ["RE", "CEN", "CY", "EFFECT"], d: "Remembering the last items on a list best" },
+  { t: "Consolidation", c: ["CON", "SOL", "I", "DA", "TION"], d: "Stabilizing a memory after it's encoded so that it lasts" },
+];
+const COLORS = ["var(--t1)", "var(--t2)", "var(--t3)", "var(--t4)", "var(--t5)"];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let state = fresh();
+function fresh() { return { phase: "intro", order: [], n: 0, tiles: [], picked: [], tries: 0, pts: 0, result: null, log: [], name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.order = shuffle(TERMS.map((_, i) => i)); startTerm(); }
+function startTerm() {
+  const T = TERMS[state.order[state.n]];
+  // two decoy chunks from other terms that don't repeat this term's chunks
+  const used = new Set(T.c);
+  const decoys = shuffle(TERMS.filter((x) => x !== T).flatMap((x) => x.c).filter((c) => !used.has(c)));
+  const uniq = [...new Set(decoys)].slice(0, 2);
+  state.tiles = shuffle([...T.c, ...uniq]).map((text, i) => ({ text, color: COLORS[i % COLORS.length] }));
+  state.picked = []; state.tries = 0; state.result = null; state.phase = "play"; render();
+}
+function pick(i) { if (state.phase !== "play" || state.picked.includes(i)) return; state.picked.push(i); render(); focusPile(); }
+function unpick(k) { if (state.phase !== "play") return; state.picked.splice(k, 1); render(); }
+function clearTray() { state.picked = []; render(); }
+function check() {
+  const T = TERMS[state.order[state.n]];
+  const built = state.picked.map((i) => state.tiles[i].text);
+  const ok = built.length === T.c.length && built.every((c, k) => c === T.c[k]);
+  state.tries++;
+  if (ok) { const p = state.tries === 1 ? 2 : 1; state.pts += p; state.result = { ok: true, p }; state.phase = "done"; }
+  else if (state.tries < 2) { state.result = { ok: false, retry: true }; state.picked = []; }
+  else { state.result = { ok: false }; state.log.push(state.order[state.n]); state.phase = "done"; }
+  render();
+  const nb = $("nextBtn"); if (nb) nb.focus();
+}
+function next() { state.n++; if (state.n >= TERMS.length) { state.phase = "end"; render(); $("againBtn").focus(); return; } startTerm(); }
+function focusPile() { const b = document.querySelector("#pile .tile:not(:disabled)"); if (b) b.focus({ preventScroll: true }); }
+
+function render() {
+  $("mTerm").textContent = `${state.phase === "intro" ? 0 : Math.min(TERMS.length, state.n + (state.phase === "end" ? 0 : 1))}/${TERMS.length}`;
+  $("mPts").textContent = state.pts;
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  if (state.phase === "end") return renderEnd();
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>How to play</span><span>13 terms · 26 points</span></div>
+      <h2>Build each term from its chunks</h2>
+      <p>Chunking breaks information into smaller pieces, so this game breaks every encoding term into chunks. Read the definition, then tap the chunks in the right order to rebuild the term.</p>
+      <ul><li>Two of the chunks in each pile are decoys from other terms.</li><li>Tap a chunk in the tray to send it back.</li><li>Right on the first try: 2 points. Right on the second try: 1 point.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Start chunking</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  const T = TERMS[state.order[state.n]], done = state.phase === "done";
+  const trayTiles = state.picked.map((i, k) => `<button class="tile" style="--c:${state.tiles[i].color}" data-k="${k}" ${done ? "disabled" : ""} aria-label="Remove ${esc(state.tiles[i].text)}">${esc(state.tiles[i].text)}</button>`).join("");
+  const pile = state.tiles.map((t, i) => `<button class="tile" style="--c:${t.color}" data-i="${i}" ${state.picked.includes(i) || done ? "disabled" : ""}>${esc(t.text)}</button>`).join("");
+  let fb = "";
+  if (state.result) {
+    const r = state.result;
+    if (r.ok) fb = `<div class="fb good"><b class="t">Chunked it! +${r.p}</b> <b>${esc(T.t)}</b>: ${esc(T.d)}.</div>`;
+    else if (r.retry) fb = `<div class="fb bad"><b class="t">Not quite.</b> One more try for 1 point.</div>`;
+    else fb = `<div class="fb bad"><b class="t">The term was ${esc(T.t)}.</b> Chunks: ${T.c.map(esc).join(" + ")}.</div>`;
+  }
+  box.innerHTML = `<div class="eyebrow"><span>Term ${state.n + 1} of ${TERMS.length}</span><span>Try ${Math.min(2, state.tries + (done ? 0 : 1))} of 2</span></div>
+    <p class="def">${esc(T.d)}</p>
+    <div class="tray${done ? (state.result.ok ? " good" : " bad") : ""}" id="tray" aria-label="Your answer">${trayTiles || '<span class="hint">Tap chunks below to build the term here.</span>'}</div>
+    <div class="pile" id="pile" aria-label="Chunks">${pile}</div>
+    <div class="row">${done ? `<button class="btn" id="nextBtn">${state.n === TERMS.length - 1 ? "See your results" : "Next term"}</button>`
+      : `<button class="btn" id="checkBtn" ${state.picked.length ? "" : "disabled"}>Check</button><button class="btn ghost" id="clearBtn" ${state.picked.length ? "" : "disabled"}>Clear</button>`}</div>${fb}`;
+  box.querySelectorAll("#pile .tile").forEach((b) => (b.onclick = () => pick(+b.dataset.i)));
+  box.querySelectorAll("#tray .tile").forEach((b) => (b.onclick = () => unpick(+b.dataset.k)));
+  if (done) $("nextBtn").onclick = next; else { $("checkBtn").onclick = check; $("clearBtn").onclick = clearTray; }
+}
+function renderEnd() {
+  const max = TERMS.length * 2, pct = Math.round((state.pts / max) * 100);
+  const head = pct >= 90 ? "Master chunker!" : pct >= 70 ? "Solid encoding." : pct >= 50 ? "A few pieces out of place." : "Time to review your encoding terms.";
+  const firstTry = TERMS.length - state.log.length;
+  const review = state.log.map((i) => `<div><b>${esc(TERMS[i].t)}</b><span>${esc(TERMS[i].d)}</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>Results</span><span>${pct}%</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.pts}/${max}</b><span>points</span></div>
+      <div class="stat"><b>${firstTry}/${TERMS.length}</b><span>terms built</span></div>
+      <div class="stat"><b>${state.log.length}</b><span>terms missed</span></div>
+    </div>
+    ${review ? `<p><b>Terms to review</b></p><div class="review">${review}</div>` : `<p>Every term built correctly.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Chunk It · 2.4 Encoding Memories · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Play again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Chunk It");
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("refGrid").innerHTML = TERMS.map((x) => `<p><b>${esc(x.t)}</b>: ${esc(x.d)}</p>`).join("");
+render();
+</script>

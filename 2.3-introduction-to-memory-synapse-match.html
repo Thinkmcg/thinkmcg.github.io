@@ -1,0 +1,259 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Synapse Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: a neural field. Header and round meter on top, a grid of face-down cards, results below. Matched pairs glow like strengthened synapses. */
+:root {
+  --bg: #f1f5f8; --panel: #ffffff; --ink: #14212e; --muted: #5a6878; --line: #d5dee7;
+  --back: #1d3a52; --back-2: #24506f; --spark: #0fa3b1; --glow: #f5a524; --good: #2b8a57; --bad: #c8463b;
+  --f-body: "Sora", "Segoe UI", system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace; --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d151d; --panel: #15212c; --ink: #e7eef5; --muted: #9aaaba; --line: #2a3a49; --back: #1a3346; --back-2: #23485f; --spark: #39c6d3; --glow: #ffbf4d; --good: #6fd29a; --bad: #f08a7e; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0d151d; --panel: #15212c; --ink: #e7eef5; --muted: #9aaaba; --line: #2a3a49; --back: #1a3346; --back-2: #23485f; --spark: #39c6d3; --glow: #ffbf4d; --good: #6fd29a; --bad: #f08a7e; color-scheme: dark; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-weight: 800; font-size: clamp(34px, 6vw, 54px); line-height: 1; margin: 0; letter-spacing: -.02em; }
+h1 span { color: var(--spark); }
+.sub { margin: 6px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meter { display: flex; gap: 18px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; }
+.meter span { font-size: 12px; color: var(--muted); }
+.card-box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--spark); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-weight: 800; font-size: clamp(22px, 3.4vw, 30px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+p { margin: 0 0 12px; max-width: 66ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; }
+
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.mem { position: relative; min-height: 112px; border-radius: 10px; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; background: none; perspective: 900px; }
+.mem .in { position: absolute; inset: 0; transition: transform .35s; transform-style: preserve-3d; }
+.mem.up .in, .mem.done .in { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; border-radius: 10px; backface-visibility: hidden; display: grid; place-items: center; padding: 10px; text-align: center; }
+.back { background: radial-gradient(circle at 30% 30%, var(--back-2), var(--back)); color: #cfe7f2; }
+.back svg { width: 46px; height: 46px; opacity: .8; }
+.front { transform: rotateY(180deg); background: var(--panel); border: 2px solid var(--line); font-size: 14px; line-height: 1.35; padding-top: 24px; }
+.front.term { font-weight: 800; font-size: 16px; }
+.front .tag { position: absolute; top: 6px; left: 8px; font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mem.done .front { border-color: var(--glow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glow) 35%, transparent), 0 0 18px color-mix(in srgb, var(--glow) 45%, transparent); }
+.mem.miss .front { border-color: var(--bad); }
+.mem:disabled { cursor: default; }
+.mem:focus-visible { outline: 3px solid var(--spark); outline-offset: 2px; }
+.status { min-height: 1.5em; margin: 12px 0 0; color: var(--muted); }
+.status b { color: var(--ink); }
+
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--spark); color: #fff; border: 1.5px solid var(--spark); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--glow); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+details.ref { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mem { min-height: 128px; }
+  .front { font-size: 12.5px; padding: 22px 6px 6px; }
+  .front.term { font-size: 14px; }
+  .ref-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  :root { --bg: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .ref, .row, .print-note, #playBox { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .mem .in { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Synapse <span>Match</span></h1><p class="sub">2.3 Introduction to Memory</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mRound">0/3</b><span>round</span></div>
+      <div><b id="mPairs">0/18</b><span>connections</span></div>
+      <div><b id="mFlips">0</b><span>attempts</span></div>
+    </div>
+  </header>
+  <section class="card-box" id="playBox" aria-live="polite"></section>
+  <section class="card-box" id="endBox" hidden></section>
+  <details class="ref"><summary>Study the 20 terms</summary><div class="ref-grid" id="refGrid"></div></details>
+</div>
+
+<script>
+const TERMS = [
+  ["Explicit memory", "Memory you can easily describe or explain"],
+  ["Implicit memory", "Memory that is hard to put into words"],
+  ["Episodic memory", "Memory of personal experiences and events"],
+  ["Semantic memory", "Memory of general facts and knowledge"],
+  ["Procedural memory", "Memory for skills and procedures"],
+  ["Prospective memory", "Remembering to do something in the future"],
+  ["Long-term potentiation", "Synapses strengthening with repeated use"],
+  ["Central executive", "The part of working memory that directs attention"],
+  ["Phonological loop", "Holds verbal and auditory information in working memory"],
+  ["Visuospatial sketchpad", "Holds visual and spatial information in working memory"],
+  ["Sensory memory", "Briefly holds information from the senses"],
+  ["Iconic memory", "A split-second memory of a visual image"],
+  ["Echoic memory", "A brief memory of a sound"],
+  ["Short-term memory", "Holds information temporarily for processing"],
+  ["Long-term memory", "Stores information for extended periods"],
+  ["Automatic processing", "Encoding information without conscious effort"],
+  ["Effortful processing", "Encoding that takes attention and effort"],
+  ["Structural encoding", "Shallow processing of how something looks"],
+  ["Phonemic encoding", "Processing of how something sounds"],
+  ["Semantic encoding", "Deep processing of what something means"],
+];
+const ROUNDS = 3, PAIRS = 6;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const NEURON = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="7" fill="currentColor"/><path d="M24 17V4M24 31v13M17 24H4M31 24h13M19 19l-9-9M29 29l9 9M29 19l9-9M19 29l-9 9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+
+let state = fresh();
+function fresh() { return { phase: "intro", round: 0, pool: [], cards: [], open: [], lock: false, flips: 0, pairs: 0, misses: {}, name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.pool = shuffle(TERMS.map((_, i) => i)).slice(0, ROUNDS * PAIRS); startRound(); }
+function startRound() {
+  const ids = state.pool.slice(state.round * PAIRS, state.round * PAIRS + PAIRS);
+  state.cards = shuffle(ids.flatMap((id) => [{ id, kind: "term" }, { id, kind: "def" }])).map((c) => ({ ...c, up: false, done: false, miss: false }));
+  state.open = []; state.lock = false; state.phase = "play"; render();
+}
+function flip(i) {
+  const c = state.cards[i];
+  if (state.lock || c.up || c.done) return;
+  c.up = true; state.open.push(i); renderCard(i);
+  if (state.open.length < 2) return say(`Flipped: <b>${esc(label(c))}</b>. Find its partner.`);
+  state.flips++;
+  const [a, b] = state.open.map((k) => state.cards[k]);
+  if (a.id === b.id) {
+    a.done = b.done = true; state.pairs++; state.open = [];
+    say(`Connection made: <b>${esc(TERMS[a.id][0])}</b>.`);
+    renderCard(state.cards.indexOf(a)); renderCard(state.cards.indexOf(b)); renderMeter();
+    if (state.cards.every((x) => x.done)) setTimeout(roundDone, 600);
+  } else {
+    a.miss = b.miss = true; state.lock = true;
+    [a.id, b.id].forEach((id) => (state.misses[id] = (state.misses[id] || 0) + 1));
+    say("No connection. Remember where those were.");
+    state.open.forEach(renderCard); renderMeter();
+    setTimeout(() => { a.up = b.up = a.miss = b.miss = false; const o = state.open; state.open = []; state.lock = false; o.forEach(renderCard); }, 1100);
+  }
+}
+const label = (c) => (c.kind === "term" ? TERMS[c.id][0] : TERMS[c.id][1]);
+function roundDone() {
+  state.round++;
+  if (state.round >= ROUNDS) { state.phase = "end"; render(); const b = $("againBtn"); if (b) b.focus(); return; }
+  state.phase = "between"; render(); const b = $("nextBtn"); if (b) b.focus();
+}
+function say(html) { const s = $("status"); if (s) s.innerHTML = html; }
+
+/* ---------- rendering ---------- */
+function renderMeter() {
+  $("mRound").textContent = `${Math.min(ROUNDS, state.round + (state.phase === "play" ? 1 : 0))}/${ROUNDS}`;
+  $("mPairs").textContent = `${state.pairs}/${ROUNDS * PAIRS}`;
+  $("mFlips").textContent = state.flips;
+}
+function cardHtml(c, i) {
+  const cls = `mem${c.up ? " up" : ""}${c.done ? " done" : ""}${c.miss ? " miss" : ""}`;
+  const shown = c.up || c.done;
+  const aria = shown ? `${c.kind === "term" ? "Term" : "Definition"}: ${label(c)}${c.done ? ", matched" : ""}` : `Card ${i + 1}, face down`;
+  return `<button class="${cls}" data-i="${i}" aria-label="${esc(aria)}" ${c.done ? "disabled" : ""}><span class="in">
+    <span class="face back">${NEURON}</span>
+    <span class="face front ${c.kind}"><span class="tag">${c.kind === "term" ? "term" : "definition"}</span>${shown ? esc(label(c)) : ""}</span></span></button>`;
+}
+function renderCard(i) {
+  const old = document.querySelector(`.mem[data-i="${i}"]`); if (!old) return;
+  const tmp = document.createElement("div"); tmp.innerHTML = cardHtml(state.cards[i], i);
+  const el = tmp.firstElementChild; el.onclick = () => flip(i);
+  const had = document.activeElement === old; old.replaceWith(el); if (had) el.focus();
+}
+function render() {
+  renderMeter();
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>How to play</span><span>3 rounds · 18 terms</span></div>
+      <h2>Make the connections</h2>
+      <p>Every card hides either a memory <b>term</b> or its <b>definition</b>. Flip two cards at a time. If they belong together, they lock in and glow: a strengthened connection, just like long-term potentiation. If not, they flip back, so remember where they were.</p>
+      <ul><li>Each round has 6 pairs. Clear all 3 rounds.</li><li>Fewer attempts means a better score. A perfect round takes 6 attempts.</li><li>Use Tab and Enter to flip cards with the keyboard.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Start round 1</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  if (state.phase === "between") {
+    box.innerHTML = `<div class="eyebrow"><span>Round ${state.round} complete</span><span>${state.pairs} connections so far</span></div>
+      <h2>Round ${state.round} cleared</h2><p>Ready for a new set of six terms?</p>
+      <div class="row"><button class="btn" id="nextBtn">Start round ${state.round + 1}</button></div>`;
+    $("nextBtn").onclick = startRound; return;
+  }
+  if (state.phase === "end") return renderEnd();
+  box.innerHTML = `<div class="eyebrow"><span>Round ${state.round + 1} of ${ROUNDS}</span><span>Match each term to its definition</span></div>
+    <div class="grid" id="grid">${state.cards.map(cardHtml).join("")}</div>
+    <p class="status" id="status">Flip any card to begin.</p>`;
+  box.querySelectorAll(".mem").forEach((b) => (b.onclick = () => flip(+b.dataset.i)));
+}
+function renderEnd() {
+  const best = ROUNDS * PAIRS, eff = Math.round((best / Math.max(best, state.flips)) * 100);
+  const head = eff >= 85 ? "Photographic memory!" : eff >= 65 ? "Strong connections." : eff >= 45 ? "Your synapses are warming up." : "Keep practicing; repetition strengthens connections.";
+  const review = Object.entries(state.misses).filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 8)
+    .map(([id]) => `<div><b>${esc(TERMS[id][0])}</b><span>${esc(TERMS[id][1])}</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>All rounds complete</span><span>${eff}% efficiency</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.pairs}/${best}</b><span>connections made</span></div>
+      <div class="stat"><b>${state.flips}</b><span>attempts (perfect is ${best})</span></div>
+      <div class="stat"><b>${eff}%</b><span>efficiency</span></div>
+    </div>
+    ${review ? `<p><b>Terms that tripped you up</b></p><div class="review">${review}</div>` : `<p>No term gave you trouble twice. Nicely done.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Synapse Match · 2.3 Introduction to Memory · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Play again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  wirePrint("Synapse Match");
+}
+function wirePrint(game) {
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, game);
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("refGrid").innerHTML = TERMS.map(([t, d]) => `<p><b>${esc(t)}</b>: ${esc(d)}</p>`).join("");
+render();
+</script>
