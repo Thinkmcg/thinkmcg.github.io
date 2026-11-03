@@ -121,7 +121,9 @@ const $ = (id) => document.getElementById(id);
 let alarmAt = null;      // Date the alarm goes off
 let ringing = false;
 let audioCtx = null, ringTimer = null, ringStopTimer = null;
-const RING_SECONDS = 20; // the alarm stops on its own after this long
+const RING_SECONDS = 20;   // the screen flashes this long
+const REPLAY_SECONDS = [10, 18]; // the chime plays at the start, then again at each of these times
+let replayTimers = [];
 
 function fmtClock(d, withSeconds) {
   let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, "0");
@@ -155,7 +157,6 @@ function playChime() {
   const p = chime.play();
   if (p && p.catch) p.catch(() => chirp());
 }
-chime.addEventListener("ended", () => { if (ringing) ringTimer = setTimeout(playChime, 800); }); // repeat while ringing
 function unlockChime() {
   // a silent play during a click lets the chime play later without another click
   chime.muted = true;
@@ -167,12 +168,17 @@ function startRing() {
   ringing = true; document.body.classList.add("ringing"); showControls();
   $("alarmLeft").innerHTML = slots("0:00");
   ensureAudio(); playChime();
+  replayTimers.forEach(clearTimeout);
+  replayTimers = REPLAY_SECONDS.map((s) => setTimeout(() => { if (ringing) playChime(); }, s * 1000));
   $("clearBtn").hidden = false; $("clearBtn").textContent = "Stop alarm"; $("clearBtn").focus();
   clearTimeout(ringStopTimer);
-  ringStopTimer = setTimeout(() => { if (ringing) stopRing(); }, RING_SECONDS * 1000);
+  // when time runs out, let a chime that's still playing finish; Stop alarm / Esc cut it off right away
+  ringStopTimer = setTimeout(() => { if (ringing) stopRing(true); }, RING_SECONDS * 1000);
 }
-function stopRing() {
-  ringing = false; clearTimeout(ringTimer); clearTimeout(ringStopTimer); chime.pause(); chime.currentTime = 0; document.body.classList.remove("ringing");
+function stopRing(letSoundFinish) {
+  ringing = false; replayTimers.forEach(clearTimeout); replayTimers = []; clearTimeout(ringStopTimer);
+  if (!letSoundFinish) { chime.pause(); chime.currentTime = 0; }
+  document.body.classList.remove("ringing");
   clearAlarm();
 }
 
