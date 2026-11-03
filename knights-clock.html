@@ -31,7 +31,7 @@ body {
   grid-template-rows: 1fr auto auto;
   padding: max(2vh, env(safe-area-inset-top, 0px)) 4vw max(2vh, env(safe-area-inset-bottom, 0px));
 }
-body.ringing { animation: flash 1s steps(1) infinite; }
+body.ringing { animation: flash 2s steps(1) infinite; } /* 1 second purple, 1 second gold */
 @keyframes flash { 50% { background: var(--gold); color: var(--purple-deep); } }
 
 .board { display: flex; align-items: center; justify-content: center; gap: 4vw; min-height: 0; }
