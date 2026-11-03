@@ -41,6 +41,8 @@ body.ringing { animation: flash 1s steps(1) infinite; }
 .time { font-family: var(--f-digits); font-weight: 700; font-size: min(20vw, 38vh); line-height: .9; letter-spacing: .01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .time .sec { font-size: .38em; color: var(--gold-soft); margin-left: .12em; }
 .time .ampm { font-size: .28em; margin-left: .15em; letter-spacing: .05em; }
+/* Oswald's digits vary in width, so each digit sits in a fixed slot as wide as its widest digit ("0" = 0.55em) */
+.d { display: inline-block; width: .55em; text-align: center; }
 .date { font-size: min(3.6vw, 5vh); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-soft); margin-top: 1.5vh; }
 
 .alarm { display: flex; justify-content: center; align-items: stretch; gap: 2vw; margin-top: 2vh; }
@@ -50,6 +52,8 @@ body.ringing { animation: flash 1s steps(1) infinite; }
 .panel .value { font-family: var(--f-digits); font-weight: 700; font-size: min(7vw, 10vh); line-height: 1.05; font-variant-numeric: tabular-nums; }
 .panel.left .value { color: var(--gold); }
 body.ringing .panel { border-color: currentColor; }
+/* while ringing, the outline buttons (including Stop alarm) flash with the page text so they stay visible */
+body.ringing .btn.ghost { color: inherit; border-color: currentColor; }
 .ring-msg { font-family: var(--f-digits); font-size: min(6vw, 9vh); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; align-self: center; }
 
 /* control bar */
@@ -61,6 +65,7 @@ body.idle { cursor: none; }
   font: 700 18px var(--f-body); color: var(--purple-deep); background: var(--gold); border: 0; border-radius: 8px; padding: 6px 10px;
 }
 .controls input[type="number"] { width: 5.5em; }
+.controls input[type="time"], .controls label[for="alarmTime"] { cursor: pointer; }
 .btn { font: 700 16px var(--f-body); cursor: pointer; border-radius: 8px; padding: 8px 16px; border: 2px solid var(--gold); background: var(--gold); color: var(--purple-deep); }
 .btn.ghost { background: transparent; color: var(--gold); }
 .btn:hover { filter: brightness(1.08); }
@@ -115,13 +120,16 @@ body.idle { cursor: none; }
 const $ = (id) => document.getElementById(id);
 let alarmAt = null;      // Date the alarm goes off
 let ringing = false;
-let audioCtx = null, ringTimer = null;
+let audioCtx = null, ringTimer = null, ringStopTimer = null;
+const RING_SECONDS = 20; // the alarm stops on its own after this long
 
 function fmtClock(d, withSeconds) {
   let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, "0");
   const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
   return withSeconds ? { h, m, s: String(d.getSeconds()).padStart(2, "0"), ap } : `${h}:${m} ${ap}`;
 }
+// wrap each digit in a fixed-width slot so the numbers don't shift as they change
+const slots = (str) => String(str).replace(/\d/g, (d) => `<span class="d">${d}</span>`);
 function fmtLeft(ms) {
   const total = Math.max(0, Math.ceil(ms / 1000));
   const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
@@ -157,13 +165,14 @@ function unlockChime() {
 }
 function startRing() {
   ringing = true; document.body.classList.add("ringing"); showControls();
-  $("alarmLeft").textContent = "0:00";
+  $("alarmLeft").innerHTML = slots("0:00");
   ensureAudio(); playChime();
   $("clearBtn").hidden = false; $("clearBtn").textContent = "Stop alarm"; $("clearBtn").focus();
-  setTimeout(() => { if (ringing) stopRing(); }, 60000); // ring for one minute at most
+  clearTimeout(ringStopTimer);
+  ringStopTimer = setTimeout(() => { if (ringing) stopRing(); }, RING_SECONDS * 1000);
 }
 function stopRing() {
-  ringing = false; clearTimeout(ringTimer); chime.pause(); chime.currentTime = 0; document.body.classList.remove("ringing");
+  ringing = false; clearTimeout(ringTimer); clearTimeout(ringStopTimer); chime.pause(); chime.currentTime = 0; document.body.classList.remove("ringing");
   clearAlarm();
 }
 
@@ -172,7 +181,7 @@ function setAlarm(date) {
   alarmAt = date; ensureAudio(); if (!ringing) unlockChime();
   try { localStorage.setItem("knightsClockAlarm", String(+date)); } catch (e) {}
   $("alarmBox").hidden = false; $("clearBtn").hidden = false; $("clearBtn").textContent = "Clear alarm";
-  $("alarmAt").textContent = fmtClock(date, false);
+  $("alarmAt").innerHTML = slots(fmtClock(date, false));
   $("note").textContent = `Alarm set for ${fmtClock(date, false)}.`;
   tick();
 }
@@ -195,6 +204,13 @@ $("startTimerBtn").onclick = () => {
   if (!(n > 0)) { $("note").textContent = "Enter a number of minutes greater than 0."; $("mins").focus(); return; }
   setAlarm(new Date(Date.now() + n * 60000));
 };
+// open the time picker from anywhere on the box, not just its small clock icon
+function openTimePicker() {
+  const el = $("alarmTime");
+  try { el.showPicker(); } catch (e) { el.focus(); }
+}
+$("alarmTime").addEventListener("click", openTimePicker);
+document.querySelector('label[for="alarmTime"]').addEventListener("click", (e) => { e.preventDefault(); openTimePicker(); });
 $("clearBtn").onclick = () => (ringing ? stopRing() : clearAlarm());
 $("testBtn").onclick = () => { ensureAudio(); if (!ringing) playChime(); };
 $("fsBtn").onclick = async () => {
@@ -210,12 +226,12 @@ document.addEventListener("keydown", (e) => {
 /* ---------- clock ---------- */
 function tick() {
   const now = new Date(), t = fmtClock(now, true);
-  $("time").innerHTML = `${t.h}:${t.m}<span class="sec">${t.s}</span><span class="ampm">${t.ap}</span>`;
+  $("time").innerHTML = `${slots(t.h)}:${slots(t.m)}<span class="sec">${slots(t.s)}</span><span class="ampm">${t.ap}</span>`;
   $("date").textContent = now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
   document.title = `${t.h}:${t.m} ${t.ap} · Knights Clock`;
   if (alarmAt && !ringing) {
     const left = alarmAt - now;
-    if (left <= 0) startRing(); else $("alarmLeft").textContent = fmtLeft(left);
+    if (left <= 0) startRing(); else $("alarmLeft").innerHTML = slots(fmtLeft(left));
   }
 }
 function schedule() { tick(); setTimeout(schedule, 1000 - (Date.now() % 1000) + 5); } // stay on the second boundary
