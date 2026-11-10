@@ -1,0 +1,381 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Inter+Tight:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a two-column lab. Station tabs and the active station on the left; a live customer card and badges on the right (stacks on phones). */
+:root {
+  --bg: #f4f6fb; --panel: #ffffff; --soft: #eef1f8; --ink: #182033; --muted: #5a6478; --line: #d9deea;
+  --brand: #3a5bd9; --brand-ink: #ffffff; --mint: #12a17a; --sun: #f2a516; --rose: #d9465f; --plum: #7a4fd6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif; --f-body: "Inter Tight", "Segoe UI", system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1420; --panel: #171e2d; --soft: #1e2739; --ink: #e9edf6; --muted: #a2adc2; --line: #2c3750; --brand: #7d97ff; --brand-ink: #0f1420; --mint: #4fd1a5; --sun: #ffc04d; --rose: #ff7b8f; --plum: #b394ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0f1420; --panel: #171e2d; --soft: #1e2739; --ink: #e9edf6; --muted: #a2adc2; --line: #2c3750; --brand: #7d97ff; --brand-ink: #0f1420; --mint: #4fd1a5; --sun: #ffc04d; --rose: #ff7b8f; --plum: #b394ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 16px; }
+header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(32px, 5.5vw, 52px); line-height: 1; margin: 0; letter-spacing: -.02em; }
+h1 span { color: var(--brand); }
+.sub { margin: 6px 0 0; font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.xp { min-width: 240px; display: grid; gap: 6px; }
+.xp .row { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); }
+.xp .row b { color: var(--ink); }
+.bar { height: 12px; border-radius: 6px; background: var(--soft); overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--plum)); transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tab { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 7px 12px; display: inline-flex; gap: 8px; align-items: center; }
+.tab .n { font-family: var(--f-mono); font-size: 12px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
+.tab.on { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, var(--panel)); }
+.tab.done .n { background: var(--mint); color: #fff; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 32px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 17px; margin: 20px 0 8px; }
+p { margin: 0 0 12px; max-width: 72ch; }
+.lead { color: var(--muted); }
+label.f { display: grid; gap: 5px; font-weight: 600; font-size: 14.5px; margin-bottom: 12px; }
+label.f small { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=number], textarea, select { font: inherit; font-size: 15.5px; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 11px; width: 100%; min-width: 0; }
+textarea { min-height: 76px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 14px; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; }
+.chip.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.tip { border-left: 4px solid var(--sun); background: color-mix(in srgb, var(--sun) 10%, var(--panel)); border-radius: 0 10px 10px 0; padding: 12px 14px; margin: 0 0 14px; }
+.tip b.h { display: block; font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.ap { border-left-color: var(--plum); background: color-mix(in srgb, var(--plum) 10%, var(--panel)); }
+.data { border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px; margin: 0 0 14px; background: var(--soft); }
+.data .h { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mint); margin-bottom: 6px; display: block; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.tbl th { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.scroll { overflow-x: auto; }
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 10px 16px; background: var(--brand); color: var(--brand-ink); border: 1.5px solid var(--brand); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.q { display: grid; gap: 4px; margin-bottom: 12px; }
+.q .flag { font-size: 13.5px; }
+.flag.ok { color: var(--mint); }
+.flag.warn { color: var(--sun); }
+.flag.bad { color: var(--rose); }
+.meter { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.meter input { flex: 1; }
+.calc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+.out { font-family: var(--f-mono); font-size: 15px; background: var(--soft); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.tactic { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
+.tactic.on { border-color: var(--mint); background: color-mix(in srgb, var(--mint) 8%, var(--panel)); }
+.tactic input { margin-top: 4px; }
+.tactic b { display: block; }
+.tactic span { color: var(--muted); font-size: 14px; }
+
+aside { position: sticky; top: 12px; display: grid; gap: 12px; }
+.persona { background: linear-gradient(160deg, color-mix(in srgb, var(--brand) 16%, var(--panel)), var(--panel) 55%); border: 1.5px solid var(--brand); border-radius: 18px; padding: 18px; }
+.persona .face { font-size: 46px; line-height: 1; }
+.persona .nm { font-family: var(--f-display); font-weight: 800; font-size: 22px; margin: 6px 0 2px; }
+.persona .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+.persona dl { margin: 0; display: grid; gap: 8px; font-size: 14px; }
+.persona dt { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.persona dd { margin: 0; }
+.persona .empty { color: var(--muted); font-style: italic; }
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.badge { text-align: center; border: 1.5px dashed var(--line); border-radius: 12px; padding: 8px 4px; font-size: 12px; color: var(--muted); }
+.badge .e { font-size: 24px; display: block; filter: grayscale(1); opacity: .45; }
+.badge.got { border-style: solid; border-color: var(--mint); color: var(--ink); }
+.badge.got .e { filter: none; opacity: 1; }
+.avatars { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.av { font-size: 26px; background: var(--soft); border: 2px solid transparent; border-radius: 10px; cursor: pointer; padding: 4px 6px; line-height: 1; }
+.av.on { border-color: var(--brand); }
+.review dt { font-weight: 700; margin-top: 10px; }
+.review dd { margin: 2px 0 0; white-space: pre-wrap; }
+.missing { color: var(--rose); }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; max-width: 520px; margin: 14px 0; }
+.print-only { display: none; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+@media (max-width: 920px) { .layout { grid-template-columns: 1fr; } aside { position: static; } }
+@media (max-width: 600px) { .grid2, .calc { grid-template-columns: 1fr; } .who { grid-template-columns: 1fr; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --soft: #f3f3f3; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .tabs, .nav, .xp, .btn, .noprint, #station { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  #reviewPrint { display: block !important; }
+  aside { position: static; }
+  .print-only { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Customer <span>Lab</span></h1><p class="sub">Business Canvas Project · Part 2 · Topic 2.1</p></div>
+    <div class="xp" aria-live="polite">
+      <div class="row"><span>Lab progress</span><b id="xpText">0%</b></div>
+      <div class="bar"><i id="xpBar"></i></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <nav class="tabs" id="tabs" aria-label="Stations"></nav>
+      <section class="card" id="station"></section>
+      <section class="card" id="reviewPrint" hidden></section>
+    </main>
+    <aside>
+      <div class="persona" id="persona" aria-live="polite"></div>
+      <div class="card" style="padding:14px">
+        <div class="eyebrow">Badges</div>
+        <div class="badges" id="badges"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const KEY = "apbusCustomerLab";
+const AVATARS = ["🧑‍🎓", "👩‍💼", "👨‍🍳", "🧑‍💻", "👩‍🎨", "🧑‍🔧", "👵", "🧑‍⚕️", "🏃", "🎮", "🛹", "👨‍👩‍👧"];
+const TACTICS = [
+  ["personal", "Personalized service", "Remember names, preferences, and past orders so each customer feels known."],
+  ["rewards", "Rewards program", "Points, punch cards, or perks for frequent buyers."],
+  ["feedback", "Feedback opportunities", "Satisfaction surveys, comment cards, or quick polls that show you listen."],
+  ["community", "Community and social media", "A group, page, or event where customers connect with you and each other."],
+  ["service", "Fast, friendly customer service", "Easy returns, quick replies, and fixing problems on the spot."],
+  ["content", "Helpful content", "Tips, tutorials, or reminders that keep your product useful between purchases."],
+];
+const STATIONS = [
+  { id: "segment", name: "Segment Scout", badge: "🔭" },
+  { id: "pick", name: "Choose a Segment", badge: "🎯" },
+  { id: "persona", name: "Persona Builder", badge: "🪪" },
+  { id: "assume", name: "Assumptions", badge: "💡" },
+  { id: "questions", name: "Bias Buster", badge: "🕵️" },
+  { id: "relate", name: "Loyalty Architect", badge: "🤝" },
+  { id: "review", name: "Review and Submit", badge: "🏁" },
+];
+
+const blank = () => ({
+  station: 0, product: "", problem: "",
+  demo: "", psycho: "", segA: "", segB: "", dataRead: "",
+  primary: "", primaryWhy: "", notFor: "",
+  avatar: "🧑‍🎓", pName: "", pAge: "", pPlace: "", pIncome: "", pEdu: "", pValues: "", pInterests: "", pLifestyle: "", pNeeds: "", pWhere: "",
+  a1: "", a2: "", a3: "", conf: 60,
+  q: ["", "", "", "", ""],
+  attract: "", tactics: [], tacticsWhy: "", clvSpend: "", clvFreq: "", clvYears: "", cacCost: "", cacCust: "", clvNote: "", privacy: "",
+  name: "", period: "",
+});
+let S = load() || blank();
+function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v ? Object.assign(blank(), v) : null; } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const filled = (...k) => k.every((x) => String(S[x] ?? "").trim().length > 0);
+
+// which stations are complete (drives tabs, badges, and progress)
+function done(i) {
+  switch (STATIONS[i].id) {
+    case "segment": return filled("product", "problem", "demo", "psycho", "segA", "segB", "dataRead");
+    case "pick": return filled("primary", "primaryWhy");
+    case "persona": return filled("pName", "pAge", "pIncome", "pValues", "pInterests", "pLifestyle", "pNeeds");
+    case "assume": return filled("a1", "a2", "a3");
+    case "questions": return S.q.filter((x) => x.trim().length > 8).length >= 5 && S.q.every((x) => !x.trim() || biasCheck(x).level !== "bad");
+    case "relate": return filled("attract", "tacticsWhy") && S.tactics.length >= 2;
+    case "review": return [0, 1, 2, 3, 4, 5].every(done) && filled("name");
+  }
+}
+
+/* ---------- interview question bias checker ---------- */
+function biasCheck(text) {
+  const t = text.trim().toLowerCase();
+  if (!t) return { level: "", msg: "" };
+  const leading = [/\b(don'?t|doesn'?t|wouldn'?t|isn'?t|aren'?t|won'?t|shouldn'?t)\s+you\b/, /\bwouldn'?t it\b/, /\bisn'?t it\b/, /\b(love|amazing|awesome|best|terrible|annoying|great idea|obviously|so much better)\b/, /\bagree\b/, /\bhow (much|great) .* (love|like)\b/];
+  if (leading.some((r) => r.test(t))) return { level: "bad", msg: "Leading: this nudges the person toward the answer you want. Remove the opinion words and ask neutrally." };
+  if (/\b(would|will) you (buy|pay|use|purchase)\b/.test(t)) return { level: "warn", msg: "People are bad at predicting what they'd buy. Ask about what they do now instead: \"Tell me about the last time you...\"" };
+  if (/^(do|does|did|is|are|was|were|would|will|can|could|have|has|should)\b/.test(t)) return { level: "warn", msg: "Yes/no question. Fine to screen someone, but follow it with an open-ended question (how, what, why, tell me about...)." };
+  if (/^(how|what|why|tell me|describe|walk me|when|where|which)\b/.test(t)) return { level: "ok", msg: "Open-ended and neutral. Nice." };
+  return { level: "ok", msg: "Looks neutral. Check that it invites a story, not a one-word answer." };
+}
+
+/* ---------- live persona card and badges ---------- */
+function renderPersona() {
+  const line = (label, v) => `<div><dt>${label}</dt><dd>${v.trim() ? esc(v) : '<span class="empty">not yet</span>'}</dd></div>`;
+  $("persona").innerHTML = `<div class="eyebrow">Target customer profile</div>
+    <div class="face" aria-hidden="true">${S.avatar}</div>
+    <div class="nm">${esc(S.pName) || '<span class="empty">Name your customer</span>'}</div>
+    <div class="meta">${[S.pAge && "Age " + S.pAge, S.pPlace, S.pIncome].filter(Boolean).map(esc).join(" · ") || "Age · location · budget"}</div>
+    <dl>${line("Segment", S.primary)}${line("Values", S.pValues)}${line("Interests", S.pInterests)}${line("Needs and pain points", S.pNeeds)}${line("Buys because", S.a1)}</dl>`;
+  $("badges").innerHTML = STATIONS.map((s, i) => `<div class="badge${done(i) ? " got" : ""}"><span class="e" aria-hidden="true">${s.badge}</span>${s.name}</div>`).join("");
+  const pct = Math.round((STATIONS.filter((_, i) => done(i)).length / STATIONS.length) * 100);
+  $("xpText").textContent = pct + "%"; $("xpBar").style.width = pct + "%";
+}
+function renderTabs() {
+  $("tabs").innerHTML = STATIONS.map((s, i) => `<button class="tab${i === S.station ? " on" : ""}${done(i) ? " done" : ""}" data-i="${i}" aria-current="${i === S.station ? "step" : "false"}"><span class="n">${done(i) ? "✓" : i + 1}</span>${s.name}</button>`).join("");
+  $("tabs").querySelectorAll(".tab").forEach((b) => (b.onclick = () => go(+b.dataset.i)));
+}
+function go(i) { S.station = Math.max(0, Math.min(STATIONS.length - 1, i)); save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+/* ---------- field helpers ---------- */
+const area = (k, label, hint = "", rows = 3) => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<textarea id="f_${k}" data-k="${k}" rows="${rows}">${esc(S[k])}</textarea></label>`;
+const text = (k, label, hint = "") => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<input type="text" id="f_${k}" data-k="${k}" value="${esc(S[k])}"></label>`;
+const num = (k, label) => `<label class="f">${label}<input type="number" min="0" step="any" id="f_${k}" data-k="${k}" value="${esc(S[k])}"></label>`;
+const tip = (h, body, cls = "") => `<div class="tip ${cls}"><b class="h">${h}</b>${body}</div>`;
+const nav = () => `<div class="nav"><button class="btn ghost" id="prevBtn" ${S.station === 0 ? "disabled" : ""}>← Back</button><button class="btn" id="nextBtn">${S.station === STATIONS.length - 2 ? "Review my lab →" : "Next station →"}</button></div>`;
+
+/* ---------- stations ---------- */
+const VIEWS = {
+  segment: () => `<div class="eyebrow">Station 1 · Market segmentation</div><h2>Segment Scout</h2>
+    <p class="lead">Not every product is for everyone. Businesses split a market into <b>segments</b>, groups of people who share characteristics, so they can focus on the customers most likely to buy.</p>
+    ${text("product", "Your product or business idea", "from Part 1")}
+    ${area("problem", "The problem, need, or want it solves", "use what you validated in Part 1", 2)}
+    ${tip("Two kinds of customer data", "<b>Demographic</b> characteristics are measurable: age, income, education, location, occupation, household size. <b>Psychographic</b> characteristics are about the mind and lifestyle: values, interests, activities, attitudes. Clothing brands, for example, design and advertise very differently for teens than for professionals who work in an office.")}
+    <div class="data"><span class="h">Data drop · example survey (practice data, not real)</span>
+      <p style="margin-bottom:8px">A student team testing a <b>meal-prep app for busy people</b> surveyed 120 people. Read the table, then answer below.</p>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Group</th><th>People</th><th>Skip meals 3+ times a week</th><th>Say \"saving time\" matters most</th><th>Already pay for a food app</th></tr></thead>
+      <tbody><tr><td>High school students</td><td>40</td><td>45%</td><td>30%</td><td>10%</td></tr>
+      <tr><td>College students</td><td>35</td><td>63%</td><td>54%</td><td>34%</td></tr>
+      <tr><td>Working parents</td><td>25</td><td>48%</td><td>76%</td><td>52%</td></tr>
+      <tr><td>Retirees</td><td>20</td><td>15%</td><td>20%</td><td>5%</td></tr></tbody></table></div>
+    </div>
+    ${area("dataRead", "Which group looks like the best target for the meal-prep app, and which number convinced you?", "cite at least one number", 2)}
+    <h3>Now segment your own market</h3>
+    ${area("demo", "Demographic factors that matter for your product", "e.g., ages 14–18, part-time job income, lives in LA County")}
+    ${area("psycho", "Psychographic factors that matter for your product", "e.g., values convenience, into fitness, busy after-school schedule")}
+    ${tip("Using a model", "Marketing firms like Nielsen sort households into named segments based on demographics and lifestyle, such as \"Young Digerati\" (tech-savvy, affluent young families) or \"Kids &amp; Cul-de-Sacs\" (suburban families with children). You can use a model like that or invent your own segment names.")}
+    <div class="grid2">${area("segA", "Possible segment A", "give it a name and describe it", 3)}${area("segB", "Possible segment B", "a different group that might also buy", 3)}</div>${nav()}`,
+
+  pick: () => `<div class="eyebrow">Station 2 · Target customer</div><h2>Choose a Segment</h2>
+    <p class="lead">Your <b>target customers</b> are the buyers most likely to purchase because of their wants, needs, and preferences. Pick one segment to serve first.</p>
+    ${tip("Think like an investor", "Which segment has the biggest problem? Which can actually afford your product? Which can you reach easily? Focusing on one segment is usually more effective, and cheaper, than marketing to everyone.")}
+    ${text("primary", "My primary target segment", "name it")}
+    ${area("primaryWhy", "Why this segment first? Use evidence.", "cite a Part 1 interview, survey result, or observation")}
+    ${area("notFor", "Who is your product probably NOT for, and why?", "optional, but it sharpens your thinking", 2)}${nav()}`,
+
+  persona: () => `<div class="eyebrow">Station 3 · Customer profile</div><h2>Persona Builder</h2>
+    <p class="lead">A <b>customer profile</b> is a fictional description of one specific sample customer, with demographic and psychographic details plus their wants, needs, and preferences. Make them feel like a real person someone outside your team could picture.</p>
+    <div class="f" style="font-weight:600;font-size:14.5px;margin-bottom:6px">Pick an avatar</div>
+    <div class="avatars">${AVATARS.map((a) => `<button class="av${S.avatar === a ? " on" : ""}" data-av="${a}" aria-label="Avatar ${a}">${a}</button>`).join("")}</div>
+    <div class="grid2">${text("pName", "Name")}${text("pAge", "Age")}${text("pPlace", "Where they live")}${text("pIncome", "Income or budget", "e.g., $40/week allowance")}${text("pEdu", "Education or occupation")}${text("pWhere", "Where they hang out or shop", "online and in person")}</div>
+    ${area("pValues", "Values", "what matters most to them", 2)}${area("pInterests", "Interests and activities", "", 2)}${area("pLifestyle", "Lifestyle", "a typical day or week", 2)}
+    ${area("pNeeds", "Wants, needs, and pain points", "connect to the problem your product solves", 3)}${nav()}`,
+
+  assume: () => `<div class="eyebrow">Station 4 · Your hypotheses</div><h2>Assumptions</h2>
+    <p class="lead">Right now your profile is a guess. List the assumptions you're making about <b>why ${esc(S.pName || "this person")}</b> would buy your product. In Part 3 you'll interview a real person who matches the profile to test them.</p>
+    ${tip("Write them so they can be wrong", "A good assumption can be proven or disproven. \"Students like snacks\" is too vague. \"Students who play after-school sports skip meals at least 3 times a week because practice runs through dinner\" can be tested.")}
+    ${area("a1", "Assumption 1: I think they would buy because...", "", 2)}${area("a2", "Assumption 2", "", 2)}${area("a3", "Assumption 3", "", 2)}
+    <div class="meter"><span>How confident are you in these?</span><input type="range" min="0" max="100" step="5" id="f_conf" data-k="conf" value="${S.conf}" aria-label="Confidence"><b id="confOut">${S.conf}%</b></div>
+    ${tip("AP Exam connection", "On exam day, the Business Canvas Project question asks you to explain how you tested a hypothesis and how the evidence shaped a decision. These assumptions are where that story starts, so keep them specific.", "ap")}${nav()}`,
+
+  questions: () => `<div class="eyebrow">Station 5 · Interview questions</div><h2>Bias Buster</h2>
+    <p class="lead">Write at least <b>5 interview questions</b> that test your assumptions. The Bias Buster checks each one as you type. Aim for green: open-ended and neutral.</p>
+    ${tip("What good questions sound like", "\"What goods or services do you currently use to deal with ___?\" · \"Tell me about the last time you ___.\" · \"What's the hardest part of ___?\" · \"How do you decide which ___ to buy?\" Avoid questions that hint at the answer you want, like \"Wouldn't an app make this easier?\"")}
+    ${S.q.map((q, i) => { const b = biasCheck(q); return `<div class="q"><label class="f" style="margin:0">Question ${i + 1}<input type="text" data-q="${i}" value="${esc(q)}" aria-describedby="flag${i}"></label><span class="flag ${b.level}" id="flag${i}">${b.level === "ok" ? "✅ " : b.level === "warn" ? "⚠️ " : b.level === "bad" ? "🚩 " : ""}${esc(b.msg)}</span></div>`; }).join("")}
+    <button class="btn ghost" id="addQ">+ Add another question</button>${nav()}`,
+
+  relate: () => `<div class="eyebrow">Station 6 · Customer relationships</div><h2>Loyalty Architect</h2>
+    <p class="lead">Getting a customer once isn't enough. Plan how you'll <b>attract</b> ${esc(S.pName || "your customer")} and how you'll <b>keep</b> them coming back.</p>
+    ${area("attract", "How will you first reach and attract this customer?", "where they'll hear about you and why they'd try it; you'll design a persuasion-based sales tactic in Part 3", 3)}
+    <h3>Choose at least two ways to keep them</h3>
+    ${TACTICS.map(([k, n, d]) => `<label class="tactic${S.tactics.includes(k) ? " on" : ""}"><input type="checkbox" data-t="${k}" ${S.tactics.includes(k) ? "checked" : ""}><span><b>${n}</b><span>${d}</span></span></label>`).join("")}
+    ${area("tacticsWhy", "Why do these tactics fit your customer profile?", "connect to their values, lifestyle, or pain points", 3)}
+    ${tip("Why relationships pay off", "Loyal customers make repeat purchases, which raises <b>customer lifetime value</b>, and they refer friends, which lowers <b>customer acquisition cost</b>. Both can increase profit.")}
+    <h3>Optional: run the numbers</h3>
+    <div class="data"><span class="h">Customer lifetime value (estimate)</span>
+      <div class="calc">${num("clvSpend", "Average purchase ($)")}${num("clvFreq", "Purchases per year")}${num("clvYears", "Years as a customer")}</div>
+      <div class="out" id="clvOut"></div>
+      <span class="h">Customer acquisition cost</span>
+      <div class="calc">${num("cacCost", "Marketing and sales costs ($)")}${num("cacCust", "New customers gained")}<div></div></div>
+      <div class="out" id="cacOut"></div>
+      ${area("clvNote", "What do these numbers tell you about how much you could spend to win one customer?", "optional", 2)}
+    </div>
+    ${area("privacy", "Optional · Data and privacy: what customer data would you collect, and how would you protect it?", "think about what customers would and wouldn't be comfortable with", 2)}${nav()}`,
+
+  review: () => {
+    const sec = (title, rows) => `<h3>${title}</h3><dl class="review">${rows.map(([l, v]) => `<dt>${l}</dt><dd>${String(v ?? "").trim() ? esc(v) : '<span class="missing">Missing</span>'}</dd>`).join("")}</dl>`;
+    const missing = STATIONS.slice(0, 6).map((s, i) => (done(i) ? null : s.name)).filter(Boolean);
+    return `<div class="eyebrow">Station 7 · Wrap-up</div><h2>Review and Submit</h2>
+      ${missing.length ? tip("Almost there", "Finish these stations before you submit: <b>" + missing.join(", ") + "</b>.") : tip("Lab complete", "Every station is done. Add your name and period, then save your PDF.")}
+      <div class="who noprint"><label class="f">Name<input type="text" data-k="name" value="${esc(S.name)}"></label><label class="f">Period<input type="text" data-k="period" value="${esc(S.period)}"></label></div>
+      <div class="nav noprint"><button class="btn ghost" id="prevBtn">← Back</button><span><button class="btn ghost" id="resetBtn">Start over</button> <button class="btn" id="printBtn">Print / Save as PDF</button></span></div>
+      <p class="noprint" id="printNote" style="color:var(--rose)" hidden>Type your name before saving your PDF.</p>
+      <div id="reviewBody">${reviewBody(sec)}</div>`;
+  },
+};
+function reviewBody(sec) {
+  const tac = S.tactics.map((k) => TACTICS.find((t) => t[0] === k)[1]).join(", ");
+  const clv = clvVal(), cac = cacVal();
+  return sec("Product and problem", [["Product", S.product], ["Problem, need, or want", S.problem]]) +
+    sec("Market segmentation", [["Data drop: best target and evidence", S.dataRead], ["Demographic factors", S.demo], ["Psychographic factors", S.psycho], ["Segment A", S.segA], ["Segment B", S.segB], ["Primary target segment", S.primary], ["Why this segment", S.primaryWhy], ["Not for", S.notFor || "(optional)"]]) +
+    sec("Target customer profile", [["Name, age, location", [S.pName, S.pAge && "age " + S.pAge, S.pPlace].filter(Boolean).join(", ")], ["Income or budget", S.pIncome], ["Education or occupation", S.pEdu], ["Values", S.pValues], ["Interests", S.pInterests], ["Lifestyle", S.pLifestyle], ["Wants, needs, pain points", S.pNeeds], ["Where they hang out or shop", S.pWhere]]) +
+    sec("Assumptions to test in Part 3", [["Assumption 1", S.a1], ["Assumption 2", S.a2], ["Assumption 3", S.a3], ["Confidence", S.conf + "%"]]) +
+    sec("Interview questions", S.q.filter((x) => x.trim()).map((x, i) => [`Question ${i + 1}`, x]).concat(S.q.filter((x) => x.trim()).length ? [] : [["Questions", ""]])) +
+    sec("Customer relationship plan", [["Attract", S.attract], ["Keep (tactics)", tac], ["Why they fit", S.tacticsWhy], ["Customer lifetime value", clv ? `$${clv.toFixed(2)}` : "(optional)"], ["Customer acquisition cost", cac ? `$${cac.toFixed(2)}` : "(optional)"], ["What the numbers mean", S.clvNote || "(optional)"], ["Data and privacy", S.privacy || "(optional)"]]);
+}
+const n = (k) => parseFloat(S[k]);
+const clvVal = () => (n("clvSpend") > 0 && n("clvFreq") > 0 && n("clvYears") > 0 ? n("clvSpend") * n("clvFreq") * n("clvYears") : 0);
+const cacVal = () => (n("cacCost") > 0 && n("cacCust") > 0 ? n("cacCost") / n("cacCust") : 0);
+function calcOut() {
+  const c = $("clvOut"), a = $("cacOut");
+  if (c) c.textContent = clvVal() ? `$${S.clvSpend} × ${S.clvFreq} per year × ${S.clvYears} years = $${clvVal().toFixed(2)} per customer` : "Fill in all three to estimate lifetime value.";
+  if (a) a.textContent = cacVal() ? `$${S.cacCost} ÷ ${S.cacCust} customers = $${cacVal().toFixed(2)} to win each customer` : "Fill in both to estimate acquisition cost.";
+}
+
+/* ---------- render and wiring ---------- */
+function render() {
+  renderTabs(); renderPersona();
+  const st = STATIONS[S.station];
+  $("station").innerHTML = VIEWS[st.id]();
+  wire(); calcOut();
+}
+function wire() {
+  const box = $("station");
+  box.querySelectorAll("[data-k]").forEach((el) => el.addEventListener("input", () => {
+    S[el.dataset.k] = el.type === "range" ? +el.value : el.value; save(); renderPersona(); renderTabsLite();
+    if (el.dataset.k === "conf") $("confOut").textContent = el.value + "%";
+    if (/^(clv|cac)/.test(el.dataset.k)) calcOut();
+    if (el.dataset.k === "name") { $("printNote").hidden = true; }
+  }));
+  box.querySelectorAll("[data-q]").forEach((el) => el.addEventListener("input", () => {
+    const i = +el.dataset.q; S.q[i] = el.value; save();
+    const b = biasCheck(el.value), f = $("flag" + i);
+    f.className = "flag " + b.level; f.textContent = (b.level === "ok" ? "✅ " : b.level === "warn" ? "⚠️ " : b.level === "bad" ? "🚩 " : "") + b.msg;
+    renderPersona(); renderTabsLite();
+  }));
+  box.querySelectorAll("[data-av]").forEach((b) => (b.onclick = () => { S.avatar = b.dataset.av; save(); box.querySelectorAll(".av").forEach((x) => x.classList.toggle("on", x === b)); renderPersona(); }));
+  box.querySelectorAll("[data-t]").forEach((c) => c.addEventListener("change", () => {
+    const k = c.dataset.t; S.tactics = c.checked ? [...new Set([...S.tactics, k])] : S.tactics.filter((x) => x !== k);
+    c.closest(".tactic").classList.toggle("on", c.checked); save(); renderPersona(); renderTabsLite();
+  }));
+  const add = $("addQ"); if (add) add.onclick = () => { S.q.push(""); save(); render(); const last = box.querySelectorAll("[data-q]"); last[last.length - 1].focus(); };
+  const prev = $("prevBtn"); if (prev) prev.onclick = () => go(S.station - 1);
+  const next = $("nextBtn"); if (next) next.onclick = () => go(S.station + 1);
+  const pr = $("printBtn"); if (pr) pr.onclick = () => {
+    if (!S.name.trim()) { $("printNote").hidden = false; box.querySelector('[data-k="name"]').focus(); return; }
+    $("reviewPrint").innerHTML = `<p class="print-only"><b>${esc(S.name)}</b>${S.period ? " · Period " + esc(S.period.replace(/^period\s*/i, "")) : ""} · Customer Lab (Business Canvas Project Part 2) · ${esc(new Date().toLocaleDateString())}</p>` + $("reviewBody").innerHTML;
+    printWithFileName(S.name, S.period, "Customer Lab");
+  };
+  const rs = $("resetBtn"); if (rs) rs.onclick = () => {
+    if (rs.dataset.armed) { try { localStorage.removeItem(KEY); } catch (e) {} S = blank(); render(); return; }
+    rs.dataset.armed = "1"; rs.textContent = "Click again to erase everything";
+    setTimeout(() => { if (rs.isConnected) { delete rs.dataset.armed; rs.textContent = "Start over"; } }, 4000);
+  };
+}
+function renderTabsLite() { $("tabs").querySelectorAll(".tab").forEach((b, i) => { b.classList.toggle("done", !!done(i)); b.querySelector(".n").textContent = done(i) ? "✓" : i + 1; }); }
+
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, label) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), label, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+render();
+</script>
