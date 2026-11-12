@@ -1,0 +1,282 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scaffold Climb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a construction site. The growing scaffold tower on the left, the question card on the right; stacks on phones. */
+:root {
+  --sky: #eaf2f7; --panel: #ffffff; --ink: #1d2733; --muted: #5b6878; --line: #d3dde6;
+  --steel: #607487; --plank: #d99a3a; --hard: #f2b705; --good: #2f8a4f; --bad: #c8443a; --hint: #2f6fd1;
+  --f-display: "Barlow Condensed", "Arial Narrow", sans-serif; --f-body: "Barlow", "Segoe UI", system-ui, sans-serif; --f-mono: "Roboto Mono", ui-monospace, Consolas, monospace; --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --sky: #131a22; --panel: #1b242e; --ink: #e9eef4; --muted: #a0adbb; --line: #2e3a47; --steel: #8fa3b6; --plank: #e2a64c; --hard: #ffcf33; --good: #74d394; --bad: #f2867c; --hint: #79a9ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --sky: #131a22; --panel: #1b242e; --ink: #e9eef4; --muted: #a0adbb; --line: #2e3a47; --steel: #8fa3b6; --plank: #e2a64c; --hard: #ffcf33; --good: #74d394; --bad: #f2867c; --hint: #79a9ff; color-scheme: dark; }
+html, body { background: var(--sky); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1000px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(40px, 7vw, 62px); line-height: .9; margin: 0; text-transform: uppercase; letter-spacing: .01em; }
+h1 span { color: var(--plank); }
+.sub { margin: 6px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meter { display: flex; gap: 18px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; }
+.meter span { font-size: 12px; color: var(--muted); }
+.site { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.box { box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); min-width: 0; }
+#tower { width: 100%; height: auto; display: block; }
+#tower text { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--plank); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(26px, 4vw, 36px); line-height: 1; margin: 0 0 10px; text-transform: uppercase; }
+p { margin: 0 0 12px; max-width: 62ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; }
+.ask { font-size: 14px; color: var(--muted); margin: 0 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.prompt { font-size: clamp(19px, 2.6vw, 23px); font-weight: 700; line-height: 1.35; margin: 0 0 16px; }
+.prompt.term { font-family: var(--f-display); font-size: clamp(30px, 4.6vw, 40px); text-transform: uppercase; line-height: 1; }
+.opts { display: grid; gap: 10px; }
+.opt { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.opt span { min-width: 0; }
+.opt:hover:not(:disabled) { border-color: var(--plank); }
+.opt:disabled { cursor: default; }
+.opt.gone { opacity: .25; text-decoration: line-through; }
+.opt.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 13%, var(--panel)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 13%, var(--panel)); }
+.opt.fade { opacity: .5; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--muted); flex: none; margin-top: 2px; }
+.tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.hintbtn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 9px 14px; background: transparent; color: var(--hint); border: 1.5px dashed var(--hint); }
+.hintbtn:disabled { opacity: .4; cursor: default; }
+.hints { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 260px; min-width: 0; }
+.fb .tag { font-weight: 700; }
+.fb.good .tag { color: var(--good); }
+.fb.bad .tag { color: var(--bad); }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--ink); color: var(--panel); border: 1.5px solid var(--ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+details.ref { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+:focus-visible { outline: 3px solid var(--plank); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .site { grid-template-columns: 1fr; }
+  #towerBox { padding: 10px; }
+  #tower { height: 200px; width: 100%; }  /* short tower on phones so the question stays on the first screen */
+  .ref-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  :root { --sky: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .ref, .row, .print-note, #playBox { display: none !important; }
+  .site { grid-template-columns: 200px 1fr; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Scaffold <span>Climb</span></h1><p class="sub">3.4 Cognitive Development</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mLevels">0/15</b><span>levels built</span></div>
+      <div><b id="mHints">3</b><span>hints left</span></div>
+    </div>
+  </header>
+  <div class="site">
+    <section class="box" id="towerBox" aria-label="Scaffold tower"><svg id="tower" viewBox="0 0 240 420" role="img" aria-label="Scaffold tower"></svg></section>
+    <div style="display:grid;gap:16px;min-width:0">
+      <section class="box" id="playBox" aria-live="polite"></section>
+      <section class="box" id="endBox" hidden></section>
+    </div>
+  </div>
+  <details class="ref"><summary>Study the 22 terms</summary><div class="ref-grid" id="refGrid"></div></details>
+</div>
+
+<script>
+const TERMS = [
+  ["Schema", "A mental structure that organizes information and experiences"],
+  ["Assimilation", "Fitting new information into an existing schema"],
+  ["Accommodation", "Changing a schema to include new information"],
+  ["Sensorimotor stage", "Piaget's first stage, from birth to about age 2"],
+  ["Object permanence", "Knowing objects still exist when they can't be seen"],
+  ["Preoperational stage", "Piaget's stage from about age 2 to 7, marked by language and pretend play"],
+  ["Mental symbols", "Using words and symbols to stand for objects and ideas"],
+  ["Pretend play", "Imaginative play, like using a stick as a sword"],
+  ["Conservation", "Knowing quantity stays the same when its shape changes"],
+  ["Reversibility", "Knowing a change can be undone to return to the original"],
+  ["Animism", "Giving lifelike qualities to things that aren't alive"],
+  ["Egocentrism", "Difficulty seeing things from another person's point of view"],
+  ["Theory of mind", "Understanding that others have their own thoughts and feelings"],
+  ["Concrete operational stage", "Piaget's stage from about 7 to 11, with logical thinking about real events"],
+  ["Formal operational stage", "Piaget's stage from about 12 on, with abstract and hypothetical thinking"],
+  ["Hypothetical reasoning", "Thinking through \"what if\" situations using deductive logic"],
+  ["Sociocultural theory", "Vygotsky's idea that children learn through social interaction and culture"],
+  ["Scaffolding", "Support from a more knowledgeable person that fades as skill grows"],
+  ["Zone of proximal development", "The gap between what a learner can do alone and with help"],
+  ["Crystallized intelligence", "Knowledge built up over time that stays stable in adulthood"],
+  ["Fluid intelligence", "The ability to reason and solve new problems, which tends to decline with age"],
+  ["Dementia", "A cognitive disorder with major decline in memory, thinking, and social abilities"],
+];
+const LEVELS = 15, HINTS = 3;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let state = fresh();
+function fresh() { return { phase: "intro", order: [], n: 0, mode: "def", opts: [], gone: [], pick: null, built: 0, hints: HINTS, hintsUsed: 0, log: [], name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.order = shuffle(TERMS.map((_, i) => i)).slice(0, LEVELS); startQ(); }
+function startQ() {
+  const id = state.order[state.n];
+  state.mode = Math.random() < 0.6 ? "def" : "term";  // def: read the definition, pick the term
+  state.opts = shuffle([id, ...shuffle(TERMS.map((_, i) => i).filter((i) => i !== id)).slice(0, 3)]);
+  state.gone = []; state.pick = null; state.phase = "play"; render();
+  const b = document.querySelector(".opt"); if (b) b.focus({ preventScroll: true });
+}
+function useHint() {
+  if (state.phase !== "play" || state.hints <= 0 || state.gone.length) return;
+  const id = state.order[state.n];
+  state.gone = shuffle(state.opts.filter((o) => o !== id)).slice(0, 2);
+  state.hints--; state.hintsUsed++; render();
+}
+function choose(i) {
+  if (state.phase !== "play" || state.gone.includes(state.opts[i])) return;
+  const id = state.order[state.n];
+  state.pick = i;
+  if (state.opts[i] === id) state.built++; else state.log.push(id);
+  state.phase = "feedback"; render(); $("nextBtn").focus();
+}
+function next() { state.n++; if (state.n >= LEVELS) { state.phase = "end"; render(); $("againBtn").focus(); return; } startQ(); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "play" && /^[1-4]$/.test(e.key)) { choose(+e.key - 1); e.preventDefault(); }
+  else if (state.phase === "play" && (e.key === "h" || e.key === "H")) { useHint(); e.preventDefault(); }
+});
+
+/* ---------- rendering ---------- */
+function renderTower() {
+  // scaffold frame grows one plank per correct answer; a hard hat sits on the top plank
+  const H = 420, base = 400, step = 24, left = 50, right = 190;
+  let s = `<line x1="10" y1="${base}" x2="230" y2="${base}" stroke="var(--steel)" stroke-width="3"/>`;
+  const top = base - LEVELS * step;
+  s += `<text x="120" y="${top - 8}" text-anchor="middle">level ${LEVELS}</text>`;
+  s += `<line x1="${left - 6}" y1="${top}" x2="${right + 6}" y2="${top}" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 5"/>`;
+  for (let i = 0; i < LEVELS; i++) {
+    const y = base - (i + 1) * step;
+    const done = i < state.built;
+    const col = done ? "var(--steel)" : "var(--line)";
+    s += `<line x1="${left}" y1="${y}" x2="${left}" y2="${y + step}" stroke="${col}" stroke-width="3"/><line x1="${right}" y1="${y}" x2="${right}" y2="${y + step}" stroke="${col}" stroke-width="3"/>`;
+    if (done) {
+      s += `<line x1="${left}" y1="${y + step}" x2="${right}" y2="${y}" stroke="var(--steel)" stroke-width="1.5" opacity=".6"/>`;
+      s += `<rect x="${left - 8}" y="${y - 4}" width="${right - left + 16}" height="8" rx="2" fill="var(--plank)"/>`;
+    }
+  }
+  if (state.built > 0) {
+    const y = base - state.built * step - 4;
+    s += `<circle cx="120" cy="${y - 22}" r="9" fill="var(--ink)"/><path d="M108 ${y - 26} a12 10 0 0 1 24 0 z" fill="var(--hard)"/><rect x="113" y="${y - 13}" width="14" height="13" rx="3" fill="var(--ink)"/>`;
+  }
+  s += `<text x="10" y="${H - 4}">${state.built} of ${LEVELS} levels</text>`;
+  $("tower").innerHTML = s;
+}
+function render() {
+  $("mLevels").textContent = `${state.built}/${LEVELS}`;
+  $("mHints").textContent = state.hints;
+  renderTower();
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  if (state.phase === "end") return renderEnd();
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>How to play</span><span>15 levels · 3 hints</span></div>
+      <h2>Build your scaffold to the top</h2>
+      <p>Every right answer adds a level to your scaffold. Some questions show a definition and ask for the term; others show a term and ask for its definition.</p>
+      <ul><li>Stuck? <b>Ask a more knowledgeable other</b> to remove two wrong answers. You only get 3, so the support fades as you go, just like Vygotsky's scaffolding.</li>
+      <li>A wrong answer doesn't knock levels down, but that level doesn't get built.</li>
+      <li>Press <kbd>1</kbd>–<kbd>4</kbd> to answer and <kbd>H</kbd> for a hint.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Start building</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  const id = state.order[state.n], done = state.phase === "feedback";
+  const opts = state.opts.map((o, i) => {
+    let c = "opt";
+    const gone = state.gone.includes(o);
+    if (done) c += o === id ? " correct" : i === state.pick ? " wrong" : " fade";
+    else if (gone) c += " gone";
+    const label = state.mode === "def" ? TERMS[o][0] : TERMS[o][1];
+    return `<button class="${c}" data-i="${i}" ${done || gone ? "disabled" : ""}><kbd>${i + 1}</kbd><span>${esc(label)}</span></button>`;
+  }).join("");
+  const prompt = state.mode === "def"
+    ? `<p class="ask">Which term matches this definition?</p><p class="prompt">${esc(TERMS[id][1])}</p>`
+    : `<p class="ask">What does this term mean?</p><p class="prompt term">${esc(TERMS[id][0])}</p>`;
+  let fb = "";
+  if (done) {
+    const ok = state.opts[state.pick] === id, last = state.n === LEVELS - 1;
+    fb = `<div class="fb ${ok ? "good" : "bad"}"><p><span class="tag">${ok ? "Level built!" : "That plank didn't fit."}</span> <b>${esc(TERMS[id][0])}</b>: ${esc(TERMS[id][1])}.</p>
+      <button class="btn" id="nextBtn">${last ? "See your results" : "Next level"}</button></div>`;
+  }
+  box.innerHTML = `<div class="eyebrow"><span>Level ${state.n + 1} of ${LEVELS}</span><span>${state.built} built</span></div>
+    ${prompt}<div class="opts">${opts}</div>
+    ${done ? fb : `<div class="tools"><button class="hintbtn" id="hintBtn" ${state.hints && !state.gone.length ? "" : "disabled"}>Ask a more knowledgeable other</button><span class="hints">${state.hints} of ${HINTS} hints left</span></div>`}`;
+  box.querySelectorAll(".opt").forEach((b) => (b.onclick = () => choose(+b.dataset.i)));
+  if (done) $("nextBtn").onclick = next; else $("hintBtn").onclick = useHint;
+}
+function renderEnd() {
+  const head = state.built === LEVELS && state.hintsUsed === 0 ? "Built it all on your own!" : state.built === LEVELS ? "Top of the scaffold!" : state.built >= 11 ? "A tall, sturdy build." : state.built >= 8 ? "Halfway up. Keep practicing." : "Time to review the terms and climb again.";
+  const review = state.log.map((i) => `<div><b>${esc(TERMS[i][0])}</b><span>${esc(TERMS[i][1])}</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>Results</span><span>${Math.round((state.built / LEVELS) * 100)}%</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.built}/${LEVELS}</b><span>levels built</span></div>
+      <div class="stat"><b>${state.hintsUsed}</b><span>hints used</span></div>
+      <div class="stat"><b>${state.log.length}</b><span>missed terms</span></div>
+    </div>
+    ${review ? `<p><b>Terms to review</b></p><div class="review">${review}</div>` : `<p>No missed terms.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Scaffold Climb · 3.4 Cognitive Development · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Climb again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Scaffold Climb");
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("refGrid").innerHTML = TERMS.map(([t, d]) => `<p><b>${esc(t)}</b>: ${esc(d)}</p>`).join("");
+render();
+</script>

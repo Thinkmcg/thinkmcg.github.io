@@ -1,0 +1,365 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eight Crossroads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lifespan timeline across the top (sunrise to sunset), then one stage at a time: reading, two questions, and a final ordering challenge. */
+:root {
+  --bg: #f7f4ee; --panel: #ffffff; --ink: #24211d; --muted: #6a645b; --line: #e2dbcf;
+  --accent: #2f6f8f; --warm: #c8672e; --good: #2f7d4f; --bad: #b8402f; --sky: #f6d7a7;
+  --f-read: "Libre Caslon Text", Georgia, serif; --f-body: "Libre Franklin", "Segoe UI", system-ui, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17151a; --panel: #211e24; --ink: #efe9e1; --muted: #b3aba1; --line: #3a3540; --accent: #7cc0df; --warm: #f0955a; --good: #79d39b; --bad: #f08a7a; --sky: #3b2d3f; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #17151a; --panel: #211e24; --ink: #efe9e1; --muted: #b3aba1; --line: #3a3540; --accent: #7cc0df; --warm: #f0955a; --good: #79d39b; --bad: #f08a7a; --sky: #3b2d3f; color-scheme: dark; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-read); font-weight: 700; font-size: clamp(36px, 6.5vw, 56px); line-height: 1; margin: 0; letter-spacing: -.01em; }
+h1 em { font-style: italic; color: var(--warm); font-weight: 400; }
+.sub { margin: 8px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meter { display: flex; gap: 18px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; }
+.meter span { font-size: 12px; color: var(--muted); }
+.box { box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 28px); min-width: 0; }
+.road { padding: 12px; }
+#road { width: 100%; height: auto; display: block; }
+#road text { font-family: var(--f-mono); font-size: 10px; fill: var(--ink); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-family: var(--f-read); font-weight: 700; font-size: clamp(28px, 4.4vw, 38px); line-height: 1.1; margin: 0 0 14px; text-wrap: balance; }
+h2 .vs { font-style: italic; font-weight: 400; color: var(--muted); font-size: .8em; }
+p { margin: 0 0 12px; max-width: 66ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; max-width: 66ch; }
+.reading { font-family: var(--f-read); font-size: 18px; line-height: 1.75; }
+.reading p { max-width: 64ch; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 6px 0 16px; }
+.fact { border-top: 3px solid var(--accent); padding-top: 8px; min-width: 0; }
+.fact b { display: block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.fact span { font-weight: 800; }
+.fork { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 18px; }
+.path { border-radius: 10px; padding: 12px 14px; border: 1px solid var(--line); font-size: 15px; min-width: 0; }
+.path b { display: block; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+.path.up { border-left: 4px solid var(--good); }
+.path.up b { color: var(--good); }
+.path.down { border-left: 4px solid var(--bad); }
+.path.down b { color: var(--bad); }
+.ask { font-size: 14px; color: var(--muted); margin: 0 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.q { font-size: clamp(18px, 2.4vw, 21px); font-weight: 700; line-height: 1.4; margin: 0 0 14px; }
+.opts { display: grid; gap: 10px; }
+.opt { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 14px; display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.opt span { min-width: 0; }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--panel)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--panel)); }
+.opt.fade { opacity: .5; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--muted); flex: none; margin-top: 2px; }
+.peek { margin-top: 12px; border: 1px dashed var(--line); border-radius: 10px; padding: 0 14px; }
+.peek summary { cursor: pointer; padding: 10px 0; font-size: 15px; color: var(--accent); font-weight: 600; }
+.peek .reading { font-size: 16px; }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 280px; min-width: 0; }
+.fb .tag { font-weight: 800; }
+.fb.good .tag { color: var(--good); }
+.fb.bad .tag { color: var(--bad); }
+.btn { font: inherit; font-weight: 800; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--accent); color: var(--bg); border: 1.5px solid var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tray, .pile { display: grid; gap: 8px; }
+.tray { border: 2px dashed var(--line); border-radius: 12px; padding: 10px; min-height: 60px; margin-bottom: 12px; counter-reset: n; }
+.tray.good { border-color: var(--good); border-style: solid; }
+.tile { font: inherit; text-align: left; cursor: pointer; background: var(--panel); color: var(--ink); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
+.tray .tile { border-color: var(--accent); }
+.tray .tile::before { counter-increment: n; content: counter(n) ". "; font-family: var(--f-mono); color: var(--muted); }
+.tile.ok { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--panel)); }
+.tile.no { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--panel)); }
+.tile:disabled { cursor: default; }
+.pile .tile:disabled { opacity: .3; }
+.hint { color: var(--muted); font-size: 15px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 18px; }
+.stage-chip { display: flex; justify-content: space-between; gap: 8px; border-left: 4px solid var(--accent); padding: 6px 10px; background: color-mix(in srgb, var(--accent) 7%, var(--panel)); font-size: 15px; }
+.stage-chip b { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--bad); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.who label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.who input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.who input.need { border-color: var(--bad); }
+.print-note { font-size: 15px; color: var(--bad); margin: 8px 0 0; }
+.print-only { display: none; }
+:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; }
+@media (max-width: 680px) { .facts, .fork, .stages { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr 1fr; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .row, .print-note, #playBox { display: none !important; }
+  .print-only { display: block; }
+  .who input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Eight <em>Crossroads</em></h1><p class="sub">3.6 · Erikson's psychosocial stages</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mStage">0/8</b><span>stage</span></div>
+      <div><b id="mPts">0</b><span>points (of 40)</span></div>
+    </div>
+  </header>
+  <section class="box road" aria-label="Lifespan timeline"><svg id="road" viewBox="0 0 640 120" role="img" aria-label="Timeline of Erikson's eight stages"></svg></section>
+  <section class="box" id="playBox" aria-live="polite"></section>
+  <section class="box" id="endBox" hidden></section>
+</div>
+
+<script>
+const STAGES = [
+  { name: "Trust vs. Mistrust", short: "Trust", life: "Infancy", ages: "Birth to about 18 months", rel: "Caregivers", virtue: "Hope",
+    q: "Can I trust the world?",
+    read: ["A newborn can't do anything for itself. Every need, from food and warmth to comfort when it cries, depends on someone else. Erikson believed this first stage is about one question: can the world be trusted?",
+           "When caregivers respond reliably, feeding the baby when it's hungry and comforting it when it's upset, the infant learns that people are dependable and the world is a safe place. When care is inconsistent, neglectful, or harsh, the infant learns that needs might go unmet, and it may carry a sense of anxiety and suspicion into later relationships. This stage connects closely to secure attachment."],
+    up: "Feels safe, expects needs to be met, develops hope.", down: "Feels anxious and suspicious; struggles to trust others.",
+    qs: [
+      { t: "A baby's cries are usually ignored, and feedings come at random times. According to the reading, what is this infant most likely to learn?", a: "That the world is unpredictable and people can't be relied on", o: ["That the world is safe and dependable", "How to do things independently", "That it should feel guilty for crying"] },
+      { t: "Which strength, or virtue, develops when the trust vs. mistrust stage goes well?", a: "Hope", o: ["Will", "Purpose", "Wisdom"] },
+    ] },
+  { name: "Autonomy vs. Shame and Doubt", short: "Autonomy", life: "Toddlerhood", ages: "About 18 months to 3 years", rel: "Parents", virtue: "Will",
+    q: "Can I do things myself?",
+    read: ["Toddlers suddenly want to do everything on their own: feed themselves, pick their clothes, climb the stairs, and use the toilet. The central question of this stage is whether they can do things for themselves.",
+           "When parents encourage these attempts, offering safe choices and patience with spills and mistakes, toddlers develop autonomy, a sense of independence and control. When parents are overcontrolling, do everything for them, or criticize and shame them for accidents, toddlers begin to doubt their own abilities and feel ashamed of trying."],
+    up: "Feels capable and independent; develops will.", down: "Doubts own abilities; feels ashamed for trying.",
+    qs: [
+      { t: "A 2-year-old insists on putting on his own shoes. His dad laughs at him for doing it wrong and takes over every time. What is the child at risk of developing?", a: "Shame and doubt about his own abilities", o: ["A strong sense of autonomy", "Mistrust of the whole world", "Role confusion"] },
+      { t: "According to the reading, what helps a toddler develop autonomy?", a: "Parents who offer safe choices and patience with mistakes", o: ["Parents who do everything for the child", "Strict punishment for accidents", "Keeping the child away from new tasks"] },
+    ] },
+  { name: "Initiative vs. Guilt", short: "Initiative", life: "Early childhood", ages: "About 3 to 5 years", rel: "Family", virtue: "Purpose",
+    q: "Is it okay for me to do, move, and act?",
+    read: ["Preschoolers are full of ideas. They make up games, lead their friends in play, start projects, and ask endless questions. Erikson saw this stage as being about initiative: the confidence to start things on your own.",
+           "When the family supports these plans and answers questions, even when the plans are messy, children learn to take initiative and feel a sense of purpose. When their ideas are dismissed, their questions treated as annoying, or their attempts punished, children begin to feel guilty for wanting to try things, and they may hold back and let others lead."],
+    up: "Starts activities with confidence; develops purpose.", down: "Feels guilty for having ideas; holds back.",
+    qs: [
+      { t: "A 4-year-old builds a pillow fort and invites her siblings to play \"castle.\" Her mother joins in and asks about her rules. Which outcome is this supporting?", a: "Initiative", o: ["Guilt", "Industry", "Integrity"] },
+      { t: "According to the reading, what can lead a preschooler toward guilt?", a: "Having their ideas dismissed or their attempts punished", o: ["Being encouraged to ask questions", "Being allowed to lead games", "Getting help with a messy project"] },
+    ] },
+  { name: "Industry vs. Inferiority", short: "Industry", life: "School age", ages: "About 6 to 11 years", rel: "School and neighborhood", virtue: "Competence",
+    q: "Can I make it in the world of people and things?",
+    read: ["In elementary school, children learn to read, do math, play sports, and master all kinds of skills. For the first time, they also compare themselves to classmates. Erikson called the challenge of this stage industry: the feeling of being capable and hardworking.",
+           "When teachers, coaches, and parents recognize effort and progress, children develop a sense of competence and pride in their work. When children repeatedly fail, are compared unfavorably to others, or are criticized more than encouraged, they may develop a sense of inferiority, believing they just aren't good at things."],
+    up: "Feels capable and proud of skills; develops competence.", down: "Feels inferior and incapable compared to peers.",
+    qs: [
+      { t: "A 9-year-old struggles with reading. Her teacher praises each improvement and shows her how far she's come. Which outcome is the teacher encouraging?", a: "Industry", o: ["Inferiority", "Autonomy", "Generativity"] },
+      { t: "According to the reading, what is new about this stage that can lead to inferiority?", a: "Children begin comparing themselves to classmates", o: ["Children start to walk", "Children choose a career", "Children reflect on their whole life"] },
+    ] },
+  { name: "Identity vs. Role Confusion", short: "Identity", life: "Adolescence", ages: "About 12 to 18 years", rel: "Peers and role models", virtue: "Fidelity",
+    q: "Who am I, and who can I be?",
+    read: ["Adolescents try on different friend groups, styles, beliefs, and future plans. Erikson believed the main task of the teen years is answering the question \"Who am I?\" This is where the identity statuses you studied, such as achievement, foreclosure, moratorium, and diffusion, come in.",
+           "Teens who have the freedom to explore values, interests, and possible careers, with peers and role models to learn from, tend to build a stable sense of identity and stay true to it, a virtue Erikson called fidelity. Teens who can't explore, or who feel pulled in too many directions, may experience role confusion: an unclear, shifting sense of who they are and where they're going."],
+    up: "Builds a clear, stable sense of self; develops fidelity.", down: "Feels unsure who they are; drifts between roles.",
+    qs: [
+      { t: "A 16-year-old tries out for theater, volunteers at an animal shelter, and talks with mentors about careers before deciding what she values most. Which outcome is she moving toward?", a: "A stable identity", o: ["Role confusion", "Isolation", "Despair"] },
+      { t: "According to the reading, which virtue comes from resolving the identity stage?", a: "Fidelity, staying true to who you are", o: ["Care", "Hope", "Competence"] },
+    ] },
+  { name: "Intimacy vs. Isolation", short: "Intimacy", life: "Young adulthood", ages: "About 19 to 40 years", rel: "Friends and partners", virtue: "Love",
+    q: "Can I love and be loved?",
+    read: ["In young adulthood, the focus shifts to deep relationships: close friendships, romantic partners, and lasting commitments. Erikson argued that people need a secure sense of identity first, because real intimacy means sharing yourself without losing yourself.",
+           "Young adults who can form close, committed, and caring relationships develop the virtue of love. Those who avoid commitment, fear closeness, or can't open up to others may experience isolation, a sense of loneliness and disconnection even when surrounded by people. Childhood attachment can shape how this stage unfolds."],
+    up: "Forms close, committed relationships; develops love.", down: "Feels lonely and disconnected; avoids closeness.",
+    qs: [
+      { t: "A 27-year-old keeps everyone at arm's length, avoids commitment, and often feels lonely. Which outcome of Erikson's young adult stage does this reflect?", a: "Isolation", o: ["Intimacy", "Stagnation", "Mistrust"] },
+      { t: "According to the reading, why did Erikson think identity must come before intimacy?", a: "Real intimacy means sharing yourself without losing yourself", o: ["Adults no longer need friends", "Intimacy only matters in old age", "Identity forms after marriage"] },
+    ] },
+  { name: "Generativity vs. Stagnation", short: "Generativity", life: "Middle adulthood", ages: "About 40 to 65 years", rel: "Household and workplace", virtue: "Care",
+    q: "Can I make my life count?",
+    read: ["By middle adulthood, many people turn their attention outward, toward the next generation and the wider world. Erikson called this generativity: contributing something that will outlast you, whether by raising children, mentoring, doing meaningful work, or volunteering in the community.",
+           "Adults who find ways to give back and help others grow develop the virtue of care. Adults who don't may slide into stagnation, feeling stuck, unproductive, and focused only on themselves, with a sense that their life isn't making a difference."],
+    up: "Helps the next generation; develops care.", down: "Feels stuck, self-absorbed, and unproductive.",
+    qs: [
+      { t: "A 50-year-old engineer coaches her daughter's robotics team and mentors new hires at work. Which outcome does this show?", a: "Generativity", o: ["Stagnation", "Intimacy", "Industry"] },
+      { t: "According to the reading, what describes stagnation?", a: "Feeling stuck, unproductive, and focused only on yourself", o: ["Forming close relationships", "Looking back on life with peace", "Exploring many possible careers"] },
+    ] },
+  { name: "Integrity vs. Despair", short: "Integrity", life: "Late adulthood", ages: "About 65 years and older", rel: "Humankind", virtue: "Wisdom",
+    q: "Is it okay to have been me?",
+    read: ["In late adulthood, people often look back over the whole story of their lives. Erikson believed the final challenge is making peace with that story, successes, failures, and all.",
+           "Older adults who feel their life had meaning develop integrity: a sense of fulfillment and acceptance, and the virtue of wisdom. They can face the end of life with less fear. Those who are consumed by regret over missed chances and mistakes they can't undo may fall into despair, feeling bitter about the past and afraid of the time they have left."],
+    up: "Looks back with acceptance and fulfillment; develops wisdom.", down: "Feels regret and bitterness; fears the end of life.",
+    qs: [
+      { t: "An 82-year-old tells his grandchildren, \"I made mistakes, but I'm proud of the life I built.\" Which outcome does this show?", a: "Integrity", o: ["Despair", "Generativity", "Identity"] },
+      { t: "According to the reading, what leads an older adult toward despair?", a: "Being consumed by regret over the past", o: ["Mentoring younger people", "Accepting both successes and failures", "Feeling that life had meaning"] },
+    ] },
+];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// sky shifts from dawn (infancy) to dusk (late adulthood)
+const SKY = ["#ffe3b3", "#ffd7a1", "#fcd08d", "#b9dcf2", "#9fcdea", "#f4c27a", "#ec9a62", "#a7779a"];
+
+let state = fresh();
+function fresh() { return { phase: "intro", s: 0, qi: 0, opts: [], pick: null, peeked: false, pts: 0, stagePts: Array(8).fill(0), log: [], order: [], picked: [], orderPts: 0, name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.phase = "read"; render(); focusMain(); }
+function toQuestions() { state.phase = "q"; state.qi = 0; makeQ(); render(); focusMain(); }
+function makeQ() { const Q = STAGES[state.s].qs[state.qi]; state.opts = shuffle([Q.a, ...Q.o]); state.pick = null; state.peeked = false; }
+function choose(i) {
+  if (state.phase !== "q") return;
+  const Q = STAGES[state.s].qs[state.qi]; state.pick = i;
+  if (state.opts[i] === Q.a) { const p = state.peeked ? 1 : 2; state.pts += p; state.stagePts[state.s] += p; state.gained = p; }
+  else { state.gained = 0; state.log.push({ s: state.s, qi: state.qi }); }
+  state.phase = "qfb"; render(); $("nextBtn").focus();
+}
+function next() {
+  if (state.qi === 0) { state.qi = 1; state.phase = "q"; makeQ(); render(); focusMain(); return; }
+  state.s++;
+  if (state.s >= STAGES.length) { state.phase = "order"; state.order = shuffle(STAGES.map((_, i) => i)); state.picked = []; render(); focusMain(); return; }
+  state.phase = "read"; render(); focusMain();
+}
+function pickTile(i) { if (state.phase !== "order" || state.picked.includes(i)) return; state.picked.push(i); render(); const b = document.querySelector(".pile .tile:not(:disabled)"); if (b) b.focus(); }
+function unpick(k) { if (state.phase !== "order") return; state.picked.splice(k, 1); render(); }
+function checkOrder() {
+  state.orderPts = state.picked.reduce((n, id, pos) => n + (id === pos ? 1 : 0), 0);
+  state.pts += state.orderPts; state.phase = "orderfb"; render(); $("nextBtn").focus();
+}
+function finish() { state.phase = "end"; render(); $("againBtn").focus(); }
+function focusMain() { const b = document.querySelector("#playBox .opt, #playBox .btn"); if (b) b.focus({ preventScroll: true }); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "q" && /^[1-4]$/.test(e.key)) { choose(+e.key - 1); e.preventDefault(); }
+});
+
+/* ---------- rendering ---------- */
+function renderRoad() {
+  const x0 = 40, x1 = 600, y = 58, cur = Math.min(state.s, 7);
+  const sky = state.phase === "intro" ? SKY[0] : state.phase === "order" || state.phase === "orderfb" || state.phase === "end" ? SKY[7] : SKY[cur];
+  let s = `<rect x="0" y="0" width="640" height="120" rx="10" fill="${sky}" opacity=".55"/>`;
+  s += `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" opacity=".7"/>`;
+  STAGES.forEach((st, i) => {
+    const x = x0 + (i / 7) * (x1 - x0);
+    const done = i < state.s || state.phase === "end" || state.phase === "order" || state.phase === "orderfb";
+    const here = !done && i === state.s && state.phase !== "intro";
+    const fill = done ? "var(--accent)" : here ? "var(--warm)" : "var(--panel)";
+    s += `<circle cx="${x}" cy="${y}" r="${here ? 12 : 9}" fill="${fill}" stroke="var(--ink)" stroke-width="2"/>`;
+    if (done) for (let k = 0; k < 2; k++) s += `<text x="${x - 9 + k * 10}" y="${y - 18}" style="font-size:12px;fill:${k < Math.ceil(state.stagePts[i] / 2) ? "var(--warm)" : "var(--muted)"}">★</text>`;
+    // stagger labels on two rows so neighbors never overlap
+    s += `<text x="${x}" y="${y + (i % 2 ? 44 : 28)}" text-anchor="middle" style="font-size:11px">${i + 1}. ${st.short}</text>`;
+  });
+  $("road").innerHTML = s;
+}
+function readingHtml(st) { return st.read.map((p) => `<p>${esc(p)}</p>`).join(""); }
+function render() {
+  $("mStage").textContent = `${state.phase === "intro" ? 0 : Math.min(8, state.s + (["read", "q", "qfb"].includes(state.phase) ? 1 : 0))}/8`;
+  $("mPts").textContent = state.pts;
+  renderRoad();
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  if (state.phase === "end") return renderEnd();
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>A journey through the lifespan</span><span>8 stages · 40 points</span></div>
+      <h2>Every stage of life is a crossroads</h2>
+      <p>Psychologist Erik Erikson believed that at each stage of life, people face a central conflict, a crossroads with two possible directions. How we handle each one shapes the person we become.</p>
+      <ul><li><b>Read</b> a short passage about each stage.</li>
+      <li><b>Answer</b> two questions about it. Answer from memory for 2 points, or look back at the reading for 1 point.</li>
+      <li><b>Finish</b> by putting all eight stages in order: 1 point for each one in the right place.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Begin at birth</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  if (state.phase === "read") {
+    const st = STAGES[state.s];
+    box.innerHTML = `<div class="eyebrow"><span>Stage ${state.s + 1} of 8 · ${esc(st.life)}</span><span>${esc(st.ages)}</span></div>
+      <h2>${esc(st.name.split(" vs. ")[0])} <span class="vs">vs.</span> ${esc(st.name.split(" vs. ")[1])}</h2>
+      <div class="facts"><div class="fact"><b>The big question</b><span>${esc(st.q)}</span></div><div class="fact"><b>Key relationships</b><span>${esc(st.rel)}</span></div><div class="fact"><b>Virtue if resolved</b><span>${esc(st.virtue)}</span></div></div>
+      <div class="reading">${readingHtml(st)}</div>
+      <div class="fork"><div class="path up"><b>If it goes well</b>${esc(st.up)}</div><div class="path down"><b>If it's a struggle</b>${esc(st.down)}</div></div>
+      <div class="row"><button class="btn" id="goBtn">I've read it. Take the questions</button></div>`;
+    $("goBtn").onclick = toQuestions; return;
+  }
+  if (state.phase === "q" || state.phase === "qfb") {
+    const st = STAGES[state.s], Q = st.qs[state.qi], done = state.phase === "qfb";
+    const opts = state.opts.map((o, i) => {
+      let c = "opt";
+      if (done) c += o === Q.a ? " correct" : i === state.pick ? " wrong" : " fade";
+      return `<button class="${c}" data-i="${i}" ${done ? "disabled" : ""}><kbd>${i + 1}</kbd><span>${esc(o)}</span></button>`;
+    }).join("");
+    let fb = "";
+    if (done) {
+      const ok = state.opts[state.pick] === Q.a;
+      const lastStage = state.s === STAGES.length - 1 && state.qi === 1;
+      fb = `<div class="fb ${ok ? "good" : "bad"}"><p><span class="tag">${ok ? `Right! +${state.gained}` : "Not quite."}</span> ${ok ? "" : `The answer is <b>${esc(Q.a)}</b>.`}</p>
+        <button class="btn" id="nextBtn">${state.qi === 0 ? "Next question" : lastStage ? "Final challenge" : "Travel to the next stage"}</button></div>`;
+    }
+    box.innerHTML = `<div class="eyebrow"><span>Stage ${state.s + 1}: ${esc(st.name)}</span><span>Question ${state.qi + 1} of 2</span></div>
+      <p class="ask">From the reading</p><p class="q">${esc(Q.t)}</p>
+      <div class="opts">${opts}</div>
+      ${done ? fb : `<details class="peek" id="peek"><summary>Look back at the reading (answer is worth 1 point instead of 2)</summary><div class="reading">${readingHtml(st)}</div></details>`}`;
+    box.querySelectorAll(".opt").forEach((b) => (b.onclick = () => choose(+b.dataset.i)));
+    if (done) $("nextBtn").onclick = next;
+    else $("peek").addEventListener("toggle", (e) => { if (e.target.open) state.peeked = true; });
+    return;
+  }
+  // final ordering challenge
+  const done = state.phase === "orderfb";
+  const tray = state.picked.map((id, k) => `<button class="tile${done ? (id === k ? " ok" : " no") : ""}" data-k="${k}" ${done ? "disabled" : ""}>${esc(STAGES[id].name)}</button>`).join("");
+  const pile = state.order.map((id) => `<button class="tile" data-i="${id}" ${state.picked.includes(id) || done ? "disabled" : ""}>${esc(STAGES[id].name)}</button>`).join("");
+  box.innerHTML = `<div class="eyebrow"><span>Final challenge</span><span>8 points</span></div>
+    <h2>Put the life story in order</h2>
+    <p>Tap the stages in order from birth to late adulthood. Tap a stage in your list to send it back.</p>
+    <div class="tray${done && state.orderPts === 8 ? " good" : ""}" aria-label="Your order">${tray || '<span class="hint">Your order will appear here.</span>'}</div>
+    ${done ? "" : `<div class="pile" aria-label="Stages">${pile}</div>`}
+    <div class="row" style="margin-top:12px">${done ? `<p style="margin:0"><b>${state.orderPts} of 8</b> in the right place.${state.orderPts < 8 ? " Correct order: " + STAGES.map((s) => s.short).join(", ") + "." : ""}</p><button class="btn" id="nextBtn">See your results</button>`
+      : `<button class="btn" id="checkBtn" ${state.picked.length === 8 ? "" : "disabled"}>Check my order</button><button class="btn ghost" id="clearBtn" ${state.picked.length ? "" : "disabled"}>Clear</button>`}</div>`;
+  box.querySelectorAll(".pile .tile").forEach((b) => (b.onclick = () => pickTile(+b.dataset.i)));
+  box.querySelectorAll(".tray .tile").forEach((b) => (b.onclick = () => unpick(+b.dataset.k)));
+  if (done) $("nextBtn").onclick = finish; else { $("checkBtn").onclick = checkOrder; $("clearBtn").onclick = () => { state.picked = []; render(); }; }
+}
+function renderEnd() {
+  const pct = Math.round((state.pts / 40) * 100);
+  const head = pct >= 90 ? "Integrity achieved: a life well understood." : pct >= 75 ? "A strong journey through the lifespan." : pct >= 55 ? "Some crossroads to revisit." : "Take another trip through the readings.";
+  const chips = STAGES.map((st, i) => `<div class="stage-chip"><span>${i + 1}. ${esc(st.name)}</span><b>${state.stagePts[i]}/4</b></div>`).join("");
+  const review = state.log.map(({ s, qi }) => `<div><b>Stage ${s + 1}: ${esc(STAGES[s].name)}</b><span>${esc(STAGES[s].qs[qi].t)} Answer: ${esc(STAGES[s].qs[qi].a)}.</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>Journey complete</span><span>${pct}%</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${state.pts}/40</b><span>total points</span></div>
+      <div class="stat"><b>${state.stagePts.reduce((a, b) => a + b, 0)}/32</b><span>reading questions</span></div>
+      <div class="stat"><b>${state.orderPts}/8</b><span>stages in order</span></div>
+    </div>
+    <div class="stages">${chips}</div>
+    ${review ? `<p><b>Questions to review</b></p><div class="review">${review}</div>` : `<p>Every reading question answered correctly.</p>`}
+    <div class="who">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Eight Crossroads · 3.6 Erikson's psychosocial stages · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Take the journey again</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Eight Crossroads");
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+render();
+</script>

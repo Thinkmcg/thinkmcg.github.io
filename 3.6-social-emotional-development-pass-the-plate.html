@@ -1,0 +1,290 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pass the Plate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Mulish:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout: a Thanksgiving table seen from above with twelve place settings, the current guest's request, and a buffet of four dishes. */
+:root {
+  --bg: #fbf4e8; --panel: #fffdf8; --ink: #3a2418; --muted: #7a5f4c; --line: #ead9c0;
+  --table: #8a5a3c; --cloth: #f3e1c4; --plate: #ffffff; --pumpkin: #d9661f; --cran: #9e2a2b; --sage: #6b8f4e; --gold: #d7a12c;
+  --f-display: "Yeseva One", Georgia, serif; --f-body: "Mulish", "Segoe UI", system-ui, sans-serif; --f-mono: "Courier Prime", ui-monospace, Consolas, monospace; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1d1510; --panel: #281d16; --ink: #f6eadb; --muted: #c9b29d; --line: #45342a; --table: #6b4329; --cloth: #3a2a20; --plate: #efe5d6; --pumpkin: #f08a43; --cran: #e0686a; --sage: #9ac27a; --gold: #f0c35a; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #1d1510; --panel: #281d16; --ink: #f6eadb; --muted: #c9b29d; --line: #45342a; --table: #6b4329; --cloth: #3a2a20; --plate: #efe5d6; --pumpkin: #f08a43; --cran: #e0686a; --sage: #9ac27a; --gold: #f0c35a; color-scheme: dark; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.wrap { max-width: 1000px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 44px; display: grid; gap: 16px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(38px, 7vw, 60px); line-height: 1; margin: 0; color: var(--pumpkin); }
+.sub { margin: 6px 0 0; font-family: var(--f-mono); font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.meter { display: flex; gap: 18px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.meter div { display: grid; }
+.meter b { font-size: 26px; line-height: 1.1; }
+.meter span { font-size: 12px; color: var(--muted); }
+.room { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.box { box-sizing: border-box; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); min-width: 0; }
+#table { width: 100%; height: auto; display: block; }
+#table text { font-family: var(--f-mono); font-size: 10px; fill: var(--ink); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--cran); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.eyebrow span:last-child { color: var(--muted); }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(26px, 4vw, 34px); line-height: 1.1; margin: 0 0 10px; }
+p { margin: 0 0 12px; max-width: 62ch; }
+ul { margin: 0 0 16px; padding-left: 20px; display: grid; gap: 6px; }
+.guest { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+.avatar { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-display); font-size: 20px; color: #fff; background: var(--c); }
+.bubble { position: relative; background: var(--cloth); border-radius: 14px; padding: 12px 16px; min-width: 0; }
+.bubble .who { font-weight: 800; font-size: 14px; color: var(--muted); display: block; margin-bottom: 2px; }
+.bubble .say { font-size: clamp(18px, 2.4vw, 21px); font-weight: 600; line-height: 1.35; }
+.buffet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.dish { font: inherit; color: var(--ink); text-align: left; cursor: pointer; background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; position: relative; }
+.dish:hover:not(:disabled) { border-color: var(--pumpkin); transform: translateY(-1px); }
+.dish:disabled { cursor: default; }
+.dish .food { font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; display: flex; gap: 6px; align-items: center; }
+.dish .food i { width: 12px; height: 12px; border-radius: 50%; background: var(--fc); display: inline-block; }
+.dish .term { font-weight: 800; font-size: 17px; line-height: 1.25; }
+.dish kbd { position: absolute; top: 8px; right: 10px; }
+.dish.correct { border-color: var(--sage); background: color-mix(in srgb, var(--sage) 15%, var(--panel)); }
+.dish.wrong { border-color: var(--cran); background: color-mix(in srgb, var(--cran) 12%, var(--panel)); }
+.dish.fade { opacity: .5; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; color: var(--muted); }
+.fb { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--line); display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.fb p { margin: 0; flex: 1 1 260px; min-width: 0; }
+.fb .tag { font-weight: 800; }
+.fb.good .tag { color: var(--sage); }
+.fb.bad .tag { color: var(--cran); }
+.btn { font: inherit; font-weight: 800; cursor: pointer; border-radius: 10px; padding: 11px 18px; background: var(--pumpkin); color: #fff; border: 1.5px solid var(--pumpkin); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); }
+.review { margin: 0 0 18px; display: grid; gap: 8px; }
+.review div { border-left: 3px solid var(--cran); padding: 2px 0 2px 12px; }
+.review b { display: block; }
+.review span { color: var(--muted); font-size: 15px; }
+.whoform { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin: 0 0 14px; max-width: 520px; }
+.whoform label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; min-width: 0; }
+.whoform input { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.whoform input.need { border-color: var(--cran); }
+.print-note { font-size: 15px; color: var(--cran); margin: 8px 0 0; }
+.print-only { display: none; }
+details.ref { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 18px; }
+details.ref summary { cursor: pointer; padding: 12px 0; font-weight: 800; }
+.ref-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; padding-bottom: 16px; }
+.ref-grid p { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+.ref-grid p b { color: var(--ink); }
+:focus-visible { outline: 3px solid var(--pumpkin); outline-offset: 2px; }
+@media (max-width: 760px) { .room { grid-template-columns: 1fr; } #tableBox { max-width: 380px; justify-self: center; width: 100%; } .buffet, .ref-grid { grid-template-columns: 1fr; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --ink: #111; --muted: #444; --line: #bbb; --cloth: #f6f6f6; color-scheme: light; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ref, .row, .print-note, #playBox { display: none !important; }
+  .room { grid-template-columns: 260px 1fr; }
+  .print-only { display: block; }
+  .whoform input { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 2px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .dish { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Pass the Plate</h1><p class="sub">3.6 Social-Emotional Development</p></div>
+    <div class="meter" aria-live="polite">
+      <div><b id="mServed">0/12</b><span>guests served</span></div>
+      <div><b id="mSpills">0</b><span>gravy spills</span></div>
+    </div>
+  </header>
+  <div class="room">
+    <section class="box" id="tableBox" aria-label="Thanksgiving table"><svg id="table" viewBox="0 0 360 300" role="img" aria-label="Thanksgiving table with twelve seats"></svg></section>
+    <div style="display:grid;gap:16px;min-width:0">
+      <section class="box" id="playBox" aria-live="polite"></section>
+      <section class="box" id="endBox" hidden></section>
+    </div>
+  </div>
+  <details class="ref"><summary>Study the 34 terms</summary><div class="ref-grid" id="refGrid"></div></details>
+</div>
+
+<script>
+// [term, definition, family] -- distractor dishes come from the same family when possible
+const TERMS = [
+  ["Microsystem", "Groups in direct contact with a person, like family, school, and peers", "eco"],
+  ["Mesosystem", "Relationships between groups in someone's microsystem, like parents and teachers", "eco"],
+  ["Exosystem", "Indirect influences, like a parent's workplace or community services", "eco"],
+  ["Macrosystem", "Cultural influences, like societal norms and laws", "eco"],
+  ["Chronosystem", "A person's stage of life, including life transitions and historical events", "eco"],
+  ["Authoritarian parenting", "Strict rules, high expectations, and little warmth", "parent"],
+  ["Authoritative parenting", "Balanced rules, high expectations, and high warmth", "parent"],
+  ["Permissive parenting", "Few rules, low expectations, and high warmth", "parent"],
+  ["Secure attachment", "Trust and confidence that a caregiver will be there", "attach"],
+  ["Avoidant attachment", "Indifference toward a caregiver, like ignoring them after a separation", "attach"],
+  ["Anxious attachment", "Uncertainty about a caregiver, shown by clinging and being hard to soothe", "attach"],
+  ["Disorganized attachment", "No clear pattern of attachment; confused or contradictory behavior", "attach"],
+  ["Separation anxiety", "Fear or distress when away from a caregiver or near a stranger", "attach"],
+  ["Harlow's monkey studies", "Research showing that comfort matters more than food in attachment", "attach"],
+  ["Parallel play", "Playing alongside other children without interacting", "teen"],
+  ["Pretend play", "Imaginative play with roles, like playing house", "teen"],
+  ["Imaginary audience", "Believing that others are always watching and judging you", "teen"],
+  ["Personal fable", "Believing you are unique and nothing bad can happen to you", "teen"],
+  ["Identity achievement", "Committing to an identity after exploring options", "id"],
+  ["Identity diffusion", "Having no direction and no commitment to an identity", "id"],
+  ["Identity foreclosure", "Committing to an identity without exploring other options", "id"],
+  ["Identity moratorium", "Actively exploring identities without committing yet", "id"],
+  ["Possible selves", "Imagining the different people you might become in the future", "id"],
+  ["Social clock", "Cultural expectations for when major life events, like marriage, should happen", "adult"],
+  ["Emerging adulthood", "A transition period between adolescence and adulthood in some cultures", "adult"],
+  ["Adverse childhood experiences", "Stressful or traumatic childhood events, like abuse or neglect", "adult"],
+  ["Trust vs. mistrust", "Erikson's infancy stage: learning whether caregivers can be relied on", "erik"],
+  ["Autonomy vs. shame and doubt", "Erikson's toddler stage: gaining a sense of independence", "erik"],
+  ["Initiative vs. guilt", "Erikson's early childhood stage: starting activities and enjoying accomplishments", "erik"],
+  ["Industry vs. inferiority", "Erikson's school-age stage: building skills and competence", "erik"],
+  ["Identity vs. role confusion", "Erikson's adolescent stage: developing a sense of self", "erik"],
+  ["Intimacy vs. isolation", "Erikson's young adult stage: forming close relationships", "erik"],
+  ["Generativity vs. stagnation", "Erikson's middle adult stage: contributing to society and helping others", "erik"],
+  ["Integrity vs. despair", "Erikson's late adult stage: looking back on life with fulfillment", "erik"],
+];
+const GUESTS = [
+  ["Grandma Rose", "#b5482f"], ["Uncle Ray", "#6b8f4e"], ["Aunt Dee", "#d7a12c"], ["Cousin Max", "#4d7ea8"],
+  ["Grandpa Lou", "#8a5a3c"], ["Aunt Priya", "#9e2a2b"], ["Cousin Jo", "#7a5fa8"], ["Uncle Sal", "#d9661f"],
+  ["Nana Bea", "#3f8a85"], ["Cousin Ava", "#b5487a"], ["Uncle Ben", "#5a6b2f"], ["Aunt Mei", "#a8634d"],
+];
+const FOODS = [["Roast turkey", "#b8742f"], ["Mashed potatoes", "#e8dcc0"], ["Stuffing", "#a0773f"], ["Cranberry sauce", "#9e2a2b"],
+  ["Green beans", "#6b8f4e"], ["Sweet potatoes", "#d9661f"], ["Dinner rolls", "#d7a12c"], ["Pumpkin pie", "#c8762b"], ["Corn", "#e6c13b"], ["Mac and cheese", "#e8b33a"]];
+const ASKS = ["Could you pass me the dish for this one?", "I'd love some of the dish that means this:", "Pass the plate that matches this, please:", "Save me some of the dish for this:", "Somebody pass me the dish for this:"];
+const ROUNDS = 12;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let state = fresh();
+function fresh() { return { phase: "intro", order: [], n: 0, opts: [], foods: [], pick: null, served: [], spills: 0, log: [], name: "", period: "" }; }
+
+function begin() { state = Object.assign(fresh(), { name: state.name, period: state.period }); state.order = shuffle(TERMS.map((_, i) => i)).slice(0, ROUNDS); state.served = Array(ROUNDS).fill(null); startRound(); }
+function startRound() {
+  const id = state.order[state.n], fam = TERMS[id][2];
+  const same = shuffle(TERMS.map((_, i) => i).filter((i) => i !== id && TERMS[i][2] === fam));
+  const other = shuffle(TERMS.map((_, i) => i).filter((i) => TERMS[i][2] !== fam));
+  state.opts = shuffle([id, ...[...same.slice(0, 2), ...other].slice(0, 3)]);
+  state.foods = shuffle(FOODS).slice(0, 4);
+  state.ask = ASKS[state.n % ASKS.length];
+  state.pick = null; state.phase = "play"; render();
+  const b = document.querySelector(".dish"); if (b) b.focus({ preventScroll: true });
+}
+function choose(i) {
+  if (state.phase !== "play") return;
+  const id = state.order[state.n]; state.pick = i;
+  const ok = state.opts[i] === id;
+  state.served[state.n] = ok;
+  if (!ok) { state.spills++; state.log.push(id); }
+  state.phase = "feedback"; render(); $("nextBtn").focus();
+}
+function next() { state.n++; if (state.n >= ROUNDS) { state.phase = "end"; render(); $("againBtn").focus(); return; } startRound(); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches && e.target.matches("input")) return;
+  if (state.phase === "play" && /^[1-4]$/.test(e.key)) { choose(+e.key - 1); e.preventDefault(); }
+});
+
+/* ---------- rendering ---------- */
+function renderTable() {
+  // oval table with twelve seats; served plates fill with food, spilled ones get a gravy puddle
+  const cx = 180, cy = 150, rx = 120, ry = 78;
+  let s = `<ellipse cx="${cx}" cy="${cy}" rx="${rx + 34}" ry="${ry + 34}" fill="var(--cloth)" opacity=".55"/>`;
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="var(--table)"/>`;
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx - 12}" ry="${ry - 12}" fill="var(--cloth)" opacity=".9"/>`;
+  // centerpiece turkey
+  s += `<ellipse cx="${cx}" cy="${cy + 4}" rx="34" ry="22" fill="#b8742f"/><ellipse cx="${cx}" cy="${cy}" rx="26" ry="15" fill="#d08a45"/><rect x="${cx - 46}" y="${cy + 6}" width="14" height="6" rx="3" fill="#f3e1c4"/><rect x="${cx + 32}" y="${cy + 6}" width="14" height="6" rx="3" fill="#f3e1c4"/>`;
+  for (let i = 0; i < ROUNDS; i++) {
+    const a = -Math.PI / 2 + (i / ROUNDS) * Math.PI * 2;
+    const px = cx + Math.cos(a) * (rx - 30), py = cy + Math.sin(a) * (ry - 22);
+    const sx = cx + Math.cos(a) * (rx + 22), sy = cy + Math.sin(a) * (ry + 20);
+    const [, gc] = GUESTS[i];
+    const active = state.phase !== "intro" && state.phase !== "end" && i === state.n;
+    s += `<circle cx="${sx}" cy="${sy}" r="${active ? 13 : 11}" fill="${gc}" stroke="${active ? "var(--ink)" : "none"}" stroke-width="2.5"/>`;
+    s += `<circle cx="${px}" cy="${py}" r="13" fill="var(--plate)" stroke="var(--line)" stroke-width="1.5"/>`;
+    const st = state.served[i];
+    if (st === true) s += `<circle cx="${px - 3}" cy="${py - 2}" r="5" fill="#d08a45"/><circle cx="${px + 4}" cy="${py + 2}" r="4" fill="#9e2a2b"/><circle cx="${px - 1}" cy="${py + 5}" r="3.5" fill="#6b8f4e"/>`;
+    else if (st === false) s += `<ellipse cx="${px + 6}" cy="${py + 8}" rx="11" ry="5" fill="#8a5a2c" opacity=".85"/>`;
+  }
+  $("table").innerHTML = s;
+}
+function render() {
+  $("mServed").textContent = `${state.served.filter((x) => x === true).length}/${ROUNDS}`;
+  $("mSpills").textContent = state.spills;
+  renderTable();
+  $("playBox").hidden = state.phase === "end"; $("endBox").hidden = state.phase !== "end";
+  if (state.phase === "end") return renderEnd();
+  const box = $("playBox");
+  if (state.phase === "intro") {
+    box.innerHTML = `<div class="eyebrow"><span>Happy Thanksgiving</span><span>12 guests · 4 dishes each</span></div>
+      <h2>Everyone's hungry. Pass the right plate!</h2>
+      <p>Twelve relatives are seated for Thanksgiving dinner, and each one asks for a dish by describing a social-emotional development term. Every dish on the buffet is labeled with a term. Pass the one that matches.</p>
+      <ul><li>Right dish: the guest's plate fills up.</li><li>Wrong dish: gravy spill! You'll see the right answer, and the meal goes on.</li><li>Press <kbd>1</kbd>–<kbd>4</kbd> to pass a dish quickly.</li></ul>
+      <div class="row"><button class="btn" id="startBtn">Let's eat</button></div>`;
+    $("startBtn").onclick = begin; return;
+  }
+  const id = state.order[state.n], done = state.phase === "feedback";
+  const [gname, gcolor] = GUESTS[state.n];
+  const dishes = state.opts.map((o, i) => {
+    let c = "dish";
+    if (done) c += o === id ? " correct" : i === state.pick ? " wrong" : " fade";
+    const [fname, fcol] = state.foods[i];
+    return `<button class="${c}" data-i="${i}" ${done ? "disabled" : ""}><kbd>${i + 1}</kbd><span class="food"><i style="--fc:${fcol}"></i>${esc(fname)}</span><span class="term">${esc(TERMS[o][0])}</span></button>`;
+  }).join("");
+  let fb = "";
+  if (done) {
+    const ok = state.opts[state.pick] === id, last = state.n === ROUNDS - 1;
+    fb = `<div class="fb ${ok ? "good" : "bad"}"><p><span class="tag">${ok ? `${esc(gname.split(" ")[0])}'s plate is full!` : "Gravy spill!"}</span> ${ok ? "" : `${esc(gname)} wanted <b>${esc(TERMS[id][0])}</b>.`}</p>
+      <button class="btn" id="nextBtn">${last ? "Time for pie (results)" : "Next guest"}</button></div>`;
+  }
+  box.innerHTML = `<div class="eyebrow"><span>Guest ${state.n + 1} of ${ROUNDS}</span><span>${state.served.filter((x) => x === true).length} served</span></div>
+    <div class="guest"><span class="avatar" style="--c:${gcolor}">${esc(gname.split(" ").pop()[0])}</span>
+      <div class="bubble"><span class="who">${esc(gname)}: "${esc(state.ask)}"</span><span class="say">${esc(TERMS[id][1])}</span></div></div>
+    <div class="buffet">${dishes}</div>${fb}`;
+  box.querySelectorAll(".dish").forEach((b) => (b.onclick = () => choose(+b.dataset.i)));
+  if (done) $("nextBtn").onclick = next;
+}
+function renderEnd() {
+  const served = state.served.filter((x) => x === true).length;
+  const head = served === ROUNDS ? "A perfect feast. Everyone's full!" : served >= 10 ? "A wonderful Thanksgiving dinner." : served >= 7 ? "Most of the family got fed." : "A few hungry relatives. Time to review!";
+  const review = state.log.map((i) => `<div><b>${esc(TERMS[i][0])}</b><span>${esc(TERMS[i][1])}</span></div>`).join("");
+  $("endBox").innerHTML = `<div class="eyebrow"><span>Dinner is over</span><span>${Math.round((served / ROUNDS) * 100)}%</span></div>
+    <h2>${head}</h2>
+    <div class="stats">
+      <div class="stat"><b>${served}/${ROUNDS}</b><span>guests served</span></div>
+      <div class="stat"><b>${state.spills}</b><span>gravy spills</span></div>
+      <div class="stat"><b>${Math.round((served / ROUNDS) * 100)}%</b><span>of the table fed</span></div>
+    </div>
+    ${review ? `<p><b>Terms to review</b></p><div class="review">${review}</div>` : `<p>Not a single spill.</p>`}
+    <div class="whoform">
+      <label for="stuName">Name<input id="stuName" type="text" autocomplete="name" value="${esc(state.name)}"></label>
+      <label for="stuPeriod">Period<input id="stuPeriod" type="text" value="${esc(state.period)}"></label>
+    </div>
+    <p class="print-only">Pass the Plate · 3.6 Social-Emotional Development · completed ${esc(new Date().toLocaleString())}</p>
+    <div class="row"><button class="btn" id="againBtn">Seconds, anyone? (Play again)</button><button class="btn ghost" id="printBtn">Print / Save as PDF</button></div>
+    <p class="print-note" id="printNote" hidden>Type your name before printing.</p>`;
+  $("againBtn").onclick = begin;
+  $("stuName").oninput = (e) => { state.name = e.target.value; e.target.classList.remove("need"); $("printNote").hidden = true; };
+  $("stuPeriod").oninput = (e) => { state.period = e.target.value; };
+  $("printBtn").onclick = () => {
+    if (!state.name.trim()) { $("stuName").classList.add("need"); $("printNote").hidden = false; $("stuName").focus(); return; }
+    printWithFileName(state.name, state.period, "Pass the Plate");
+  };
+}
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, game) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), game, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+$("refGrid").innerHTML = TERMS.map(([t, d]) => `<p><b>${esc(t)}</b>: ${esc(d)}</p>`).join("");
+render();
+</script>
