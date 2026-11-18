@@ -52,6 +52,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--b
 .q .prompt { font-weight: 600; margin-bottom: 10px; max-width: 72ch; }
 .box { border-left: 4px solid var(--amber); background: color-mix(in srgb, var(--amber) 9%, var(--panel)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 16px 0 14px; }
 .box.find { border-left-color: var(--ink-blue); background: color-mix(in srgb, var(--ink-blue) 9%, var(--panel)); }
+.box.rev { border-left-color: var(--pencil); background: color-mix(in srgb, var(--pencil) 7%, var(--panel)); }
 .box.help { border-left-color: var(--brand); background: color-mix(in srgb, var(--brand) 9%, var(--panel)); }
 .box .h { display: block; font-family: var(--f-mono); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
 .box .t { display: block; font-family: var(--f-display); font-weight: 600; font-size: 19px; margin-bottom: 6px; }
@@ -142,6 +143,15 @@ const KEY = "psychStrangerThanFiction";
 const STAGES = ["Trust vs. Mistrust", "Autonomy vs. Shame and Doubt", "Initiative vs. Guilt", "Industry vs. Inferiority",
   "Identity vs. Role Confusion", "Intimacy vs. Isolation", "Generativity vs. Stagnation", "Integrity vs. Despair"];
 const STATUSES = ["Achievement", "Diffusion", "Foreclosure", "Moratorium"];
+const METHODS = [
+  ["Experiment", "The researcher changes one variable (the independent variable), randomly assigns participants to groups, and measures the effect on another variable. The only method that can show cause and effect."],
+  ["Case study", "An in-depth look at one person or a small group, often over a long period of time."],
+  ["Naturalistic observation", "Watching and recording behavior in its natural setting without interfering."],
+  ["Survey", "Asking many people the same questions about their attitudes, beliefs, or behavior."],
+  ["Correlational study", "Measuring two variables to see whether and how strongly they are related, without changing either one."],
+  ["Longitudinal study", "Following the same group of people over many years to see how they change."],
+  ["Cross-sectional study", "Comparing people of different ages at one point in time."],
+];
 const TRAITS = [["O", "Openness to experience"], ["C", "Conscientiousness"], ["E", "Extraversion"], ["A", "Agreeableness"], ["S", "Emotional stability"]];
 const STATIONS = [
   { id: "story", name: "Story Check", badge: "⌚", pts: 4 },
@@ -155,7 +165,7 @@ const STATIONS = [
 const blank = () => ({
   station: 0,
   q1: "", q2: "", q3: "", q4: "", src4: "",
-  q5stage: "", q5: "", q6stage: "", q6: "", src6: "", q7start: "", q7mid: "", q7: "", q8: "", q9: "",
+  q5stage: "", q5: "", q6stage: "", q6: "", q7eYoung: "", q7eName: "", q7e: "", src6: "", q7start: "", q7mid: "", q7: "", q8: "", q9method: "", q9: "",
   q10type: "", q10: "", b5: { start: { O: 5, C: 5, E: 5, A: 5, S: 5 }, end: { O: 5, C: 5, E: 5, A: 5, S: 5 } }, b5touched: false, q11: "", q12: "", src12: "",
   q13alarm: "", q13resist: "", q13exhaust: "", q13cope: "", q14: "", src14: "",
   claim: "", ev1: "", ev2: "", con1: "", con2: "", essay: "",
@@ -175,7 +185,7 @@ const sentences = (t) => (String(t).trim().match(/[^.!?]+[.!?]+(\s|$)/g) || []).
 function done(i) {
   switch (STATIONS[i].id) {
     case "story": return filled("q1", "q2", "q3", "q4", "src4");
-    case "know": return filled("q5stage", "q5", "q6stage", "q6", "src6", "q7start", "q7mid", "q7", "q8", "q9");
+    case "know": return filled("q5stage", "q5", "q6stage", "q6", "q7eYoung", "q7eName", "q7e", "src6", "q7start", "q7mid", "q7", "q8", "q9method", "q9");
     case "u4": return filled("q10type", "q10", "q11", "q12", "src12") && S.b5touched;
     case "u5": return filled("q13alarm", "q13resist", "q13exhaust", "q13cope", "q14", "src14");
     case "argue": return filled("claim", "ev1", "ev2", "con1", "con2", "essay") && sentences(S.essay) >= 8;
@@ -211,6 +221,7 @@ const text = (k, label, hint = "") => `<label class="f">${label}${hint ? ` <smal
 const pick = (k, label, opts) => `<label class="f">${label}<select id="f_${k}" data-k="${k}"><option value="">Choose one</option>${opts.map((o) => `<option${S[k] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
 const q = (n, prompt, body) => `<div class="q"><div class="prompt"><span class="num">${n}.</span>${prompt}</div>${body}</div>`;
 const learn = (title, body) => `<div class="box"><b class="h">Learn It</b><b class="t">${title}</b>${body}</div>`;
+const review = (title, body) => `<div class="box rev"><b class="h">Quick Review</b><b class="t">${title}</b>${body}</div>`;
 const find = (title, task, where) => `<div class="box find"><b class="h">Find It</b><b class="t">${title}</b><p>${task}</p><p class="where"><b>Where to look:</b> ${where}</p></div>`;
 const nav = () => `<div class="nav"><button class="btn ghost" id="prevBtn" ${S.station === 0 ? "disabled" : ""}>← Back</button><button class="btn" id="nextBtn">${S.station === STATIONS.length - 2 ? "Review my project →" : "Next station →"}</button></div>`;
 const head = (eyebrow, title, lead) => `<div class="eyebrow">${eyebrow}</div><h2>${title}</h2><p class="lead">${lead}</p>`;
@@ -230,26 +241,34 @@ const VIEWS = {
       "These questions use ideas we have already covered, mostly from Topic 3.6. Use the correct vocabulary and back up every claim with a scene from the film.") +
     q(5, "Which of Erikson's psychosocial stages best fits Harold at the start of the film? Explain the conflict of that stage and give two pieces of evidence. Then decide whether Harold resolves the conflict by the end, and explain how you know.",
       pick("q5stage", "Harold's stage", STAGES) + area("q5", "Your explanation", "", 5)) +
-    find("Erikson's Own Identity Crisis", "Erik Erikson came up with the idea of an \"identity crisis.\" Research his own life: what was unusual about his childhood and his family, and what did he do with his name as an adult?",
+    q(6, "Karen Eiffel is a famous author who cannot figure out how to finish her book. Which psychosocial stage best fits her? Explain the conflict of that stage and support your choice with evidence from the film, including how she acts by the end.",
+      pick("q6stage", "Karen's stage", STAGES) + area("q6", "Your explanation", "", 5)) +
+    find("Erikson's Own Identity Crisis", "Erik Erikson came up with the idea of an \"identity crisis.\" Research his own life: what was unusual about his childhood and his family, what did he do as a young man before he became a psychologist, and what did he do with his name as an adult?",
       "Britannica's biography of Erik Erikson (britannica.com), the Erikson section of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA's site (apa.org). Avoid sites that let anyone edit them.") +
-    q(6, "Karen Eiffel is a famous author who cannot figure out how to finish her book. Which psychosocial stage best fits her? Explain using evidence from the film. Then connect your Find It research: how might Erikson's own life explain why identity mattered so much in his theory?",
-      pick("q6stage", "Karen's stage", STAGES) + area("q6", "Your explanation", "", 5) + text("src6", "Source you used", "website name or book title")) +
-    q(7, "Which identity status describes Harold at the very start of the film, and which describes him in the middle, after he starts trying new things? Explain each choice using the ideas of <b>exploration</b> and <b>commitment</b>.",
-      `<div class="grid2">${pick("q7start", "At the start", STATUSES)}${pick("q7mid", "In the middle", STATUSES)}</div>` + area("q7", "Your explanation")) +
-    q(8, "Using the idea of the <b>social clock</b>, explain how Harold's life compares to the typical timing of adult milestones. Then describe one <b>possible self</b> Harold tries on after he hears the narrator, and whether it sticks.", area("q8", "Your answer")) +
-    q(9, "Professor Hilbert studies Harold by asking him many questions and testing one idea at a time, like telling him to stay home and do nothing. Which research method is Hilbert's approach most like? Explain one strength and one weakness of using it to draw conclusions.", area("q9", "Your answer")) + nav(),
+    q(7, "Using your Find It research, which identity status best describes Erikson during his years as a young man before he became a psychologist, and which describes him when he chose his own name? Explain each choice using the ideas of <b>exploration</b> and <b>commitment</b>, and include facts from your research.",
+      `<div class="grid2">${pick("q7eYoung", "As a young man", STATUSES)}${pick("q7eName", "When he chose his name", STATUSES)}</div>` + area("q7e", "Your explanation", "", 5) + text("src6", "Source you used", "website name or book title")) +
+    q(8, "Which identity status describes Harold at the very start of the film, and which describes him in the middle, after he starts trying new things? Explain each choice using exploration and commitment. Then explain how Harold's path is similar to or different from Erikson's.",
+      `<div class="grid2">${pick("q7start", "At the start", STATUSES)}${pick("q7mid", "In the middle", STATUSES)}</div>` + area("q7", "Your explanation", "", 5)) +
+    review("The Social Clock and Possible Selves", `<ul><li>The <b>social clock</b> is a culture's expected timing for major life events, such as finishing school, starting a career, moving out, marrying, having children, or buying a home.</li>
+      <li>People can feel \"on time\" or \"off time\" compared to that schedule, and being off time can bring pressure from family, friends, or themselves.</li>
+      <li>The social clock is set by <b>culture</b>, so it differs between cultures and has changed over time. Some cultures allow a stage called <b>emerging adulthood</b> (roughly ages 18 to 25), a period of trying things out before taking on full adult roles.</li>
+      <li><b>Possible selves</b> are the versions of yourself you imagine you could become, hope to become, or fear becoming. Trying on possible selves is one way people build an identity.</li></ul>`) +
+    q(9, "Using the social clock, explain how Harold's life compares to the typical timing of adult milestones, with at least two specific examples. Then describe one possible self Harold tries on after he hears the narrator, and whether it sticks.", area("q8", "Your answer", "", 5)) +
+    review("Research Methods to Choose From", `<ul>${METHODS.map(([m, d]) => `<li><b>${m}:</b> ${d}</li>`).join("")}</ul>`) +
+    q(10, "Professor Hilbert studies Harold by asking him many questions and testing one idea at a time, like telling him to stay home and do nothing. Which research method from the list above is Hilbert's approach most like? Explain your choice, then give one strength and one weakness of using that method to draw conclusions.",
+      pick("q9method", "Research method", METHODS.map(([m]) => m)) + area("q9", "Your explanation")) + nav(),
 
   u4: () => head("Station 3 · Part 3", "Looking Ahead: Unit 4",
       "Unit 4 is about social psychology and personality. You have not learned these ideas yet, so read each Learn It box before you answer.") +
     learn("Explaining Other People's Behavior", `<ul><li>An <b>attribution</b> is how we explain why someone acted the way they did.</li>
       <li>A <b>dispositional attribution</b> explains behavior by the person's inner qualities, such as their personality or intelligence. A <b>situational attribution</b> explains it by the circumstances they are in.</li>
       <li>The <b>fundamental attribution error</b> is our tendency to overestimate personality and underestimate the situation when we explain other people's behavior.</li></ul>`) +
-    q(10, "When Harold first shows up to audit Ana, she treats him with open hostility. What kind of attribution is she making about him? Explain how this could be the fundamental attribution error, and name the situational factor she ignores.",
+    q(11, "When Harold first shows up to audit Ana, she treats him with open hostility. What kind of attribution is she making about him? Explain how this could be the fundamental attribution error, and name the situational factor she ignores.",
       pick("q10type", "Ana's attribution", ["Dispositional", "Situational"]) + area("q10", "Your explanation")) +
     learn("Personality Traits: The Big Five", `<p><b>Trait theories</b> describe personality as a set of enduring characteristics that lead to typical responses. The <b>Big Five</b> traits are measured with personality inventories:</p>
       <ul><li><b>Openness to experience:</b> curious and open to new ideas, or traditional and routine-loving.</li><li><b>Conscientiousness:</b> organized and careful, or flexible and spontaneous.</li>
       <li><b>Extraversion:</b> outgoing and energized by people, or reserved.</li><li><b>Agreeableness:</b> warm and cooperative, or critical and competitive.</li><li><b>Emotional stability:</b> calm and secure, or anxious and easily upset.</li></ul>`) +
-    q(11, "Rate Harold on each trait at the <b>start</b> and the <b>end</b> of the film (1 = very low, 10 = very high). Then explain the two traits that changed the most, using a scene for each. Finally, since trait theories call traits \"enduring,\" how surprising is Harold's change, and what might explain it?",
+    q(12, "Rate Harold on each trait at the <b>start</b> and the <b>end</b> of the film (1 = very low, 10 = very high). Then explain the two traits that changed the most, using a scene for each. Finally, since trait theories call traits \"enduring,\" how surprising is Harold's change, and what might explain it?",
       `<div class="traits"><div class="trait head"><span>Trait</span><span>Start of film</span><span>End of film</span></div>
       ${TRAITS.map(([k, n]) => `<div class="trait"><span>${n}</span>
         <label><input type="range" min="1" max="10" data-b5="start.${k}" value="${S.b5.start[k]}" aria-label="${n}, start of film"><output id="o_start_${k}">${S.b5.start[k]}</output></label>
@@ -259,7 +278,7 @@ const VIEWS = {
       <li>Lewin described <b>motivational conflicts</b>: <b>approach-approach</b> (two good options), <b>avoidance-avoidance</b> (two bad options), and <b>approach-avoidance</b> (one option with both good and bad sides).</li></ul>`) +
     find("Self-Determination Theory", "Psychologists Edward Deci and Richard Ryan created <b>self-determination theory</b>. Find the three basic psychological needs it says people must meet to feel intrinsically motivated, and what each one means.",
       "The theory's official site (selfdeterminationtheory.org), the motivation chapter of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA Dictionary of Psychology (dictionary.apa.org).") +
-    q(12, "Compare what motivates Harold to audit taxes with what motivates him to learn the guitar. Use your Find It research to explain which of the three needs the guitar meets. Then identify one motivational conflict Harold faces later in the film and name its type.",
+    q(13, "Compare what motivates Harold to audit taxes with what motivates him to learn the guitar. Use your Find It research to explain which of the three needs the guitar meets. Then identify one motivational conflict Harold faces later in the film and name its type.",
       area("q12", "Your answer", "", 5) + text("src12", "Source you used", "website name or book title")) + nav(),
 
   u5: () => head("Station 4 · Part 4", "Looking Ahead: Unit 5",
@@ -267,14 +286,14 @@ const VIEWS = {
     learn("Stress and Coping", `<ul><li>A <b>stressor</b> can be a major or traumatic event, or a pile-up of daily hassles.</li>
       <li>The <b>general adaptation syndrome</b> describes how the body responds to stress in three phases: <b>alarm</b> (the first fight-flight-freeze reaction), <b>resistance</b> (the body and mind work to confront the stressor), and <b>exhaustion</b> (resources run out, and people are most likely to get sick).</li>
       <li><b>Problem-focused coping</b> treats stress as a problem to solve. <b>Emotion-focused coping</b> manages the feelings instead, for example with deep breathing or meditation.</li></ul>`) +
-    q(13, "Trace Harold through the three phases of the general adaptation syndrome after he learns he is going to die, with a scene for each phase. Then describe one problem-focused and one emotion-focused way Harold copes, and decide which one helps him more.",
+    q(14, "Trace Harold through the three phases of the general adaptation syndrome after he learns he is going to die, with a scene for each phase. Then describe one problem-focused and one emotion-focused way Harold copes, and decide which one helps him more.",
       `<div class="grid3">${area("q13alarm", "Alarm", "", 4)}${area("q13resist", "Resistance", "", 4)}${area("q13exhaust", "Exhaustion", "", 4)}</div>` + area("q13cope", "Coping strategies and your decision", "", 4)) +
     learn("Defining a Psychological Disorder", `<ul><li>Psychologists consider three factors when deciding whether behavior may be a disorder: the level of <b>dysfunction</b> (does it interfere with daily life?), <b>distress</b> (does it cause suffering?), and <b>deviation</b> from social norms.</li>
       <li>Diagnosis requires specialized training and evidence-based tools such as the <b>DSM</b>, published by the American Psychiatric Association.</li>
       <li><b>Schizophrenia spectrum disorders</b> can include <b>hallucinations</b> (false perceptions, such as hearing voices), <b>delusions</b> (false beliefs), disorganized thinking or speech, disorganized movement, and <b>negative symptoms</b> (a loss of normal functions, such as flat emotion).</li></ul>`) +
     find("How Is Schizophrenia Actually Diagnosed?", "Hearing a voice alone is not enough for a diagnosis. Find out what else a professional looks for: how many kinds of symptoms, and for how long.",
       "The National Institute of Mental Health's schizophrenia page (nimh.nih.gov), the National Alliance on Mental Illness (nami.org), or the schizophrenia section of OpenStax <i>Psychology 2e</i> (free at openstax.org).") +
-    q(14, "After a short conversation, Harold's therapist suggests he may have schizophrenia and offers medication. Using the three factors from the Learn It box and your Find It research, evaluate her reasoning: what was reasonable about her suggestion, and what information was she missing? How does the rest of the film complicate her conclusion?",
+    q(15, "After a short conversation, Harold's therapist suggests he may have schizophrenia and offers medication. Using the three factors from the Learn It box and your Find It research, evaluate her reasoning: what was reasonable about her suggestion, and what information was she missing? How does the rest of the film complicate her conclusion?",
       area("q14", "Your answer", "", 5) + text("src14", "Source you used", "website name or book title")) +
     `<div class="box help"><b class="h">If this topic hits close to home</b><p>Karen Eiffel's struggles in the film can be hard to watch. If you or someone you know is having a hard time, talk to a school counselor or a trusted adult, or call or text <b>988</b> (the Suicide &amp; Crisis Lifeline) any time.</p></div>` + nav(),
 
@@ -301,10 +320,11 @@ function reviewBody() {
   const sec = (title, rows) => `<h3>${title}</h3><dl class="review">${rows.map(([l, v]) => `<dt>${l}</dt><dd>${String(v ?? "").trim() ? esc(v) : '<span class="missing">Missing</span>'}</dd>`).join("")}</dl>`;
   const b5 = S.b5touched ? TRAITS.map(([k, n]) => `${n}: ${S.b5.start[k]} → ${S.b5.end[k]}`).join("\n") : "";
   return sec("Part 1: Story Check", [["1. Harold's routine", S.q1], ["2. The narrator and who Harold asks for help", S.q2], ["3. Harold and Ana", S.q3], ["4. Comedy or tragedy", S.q4], ["Source", S.src4]]) +
-    sec("Part 2: What You Already Know", [["5. Harold's Erikson stage", S.q5stage], ["Explanation", S.q5], ["6. Karen's Erikson stage", S.q6stage], ["Explanation and Erikson's own life", S.q6], ["Source", S.src6],
-      ["7. Identity status (start → middle)", S.q7start || S.q7mid ? `${S.q7start || "?"} → ${S.q7mid || "?"}` : ""], ["Explanation", S.q7], ["8. Social clock and possible selves", S.q8], ["9. Hilbert's research method", S.q9]]) +
-    sec("Part 3: Looking Ahead, Unit 4", [["10. Ana's attribution", S.q10type], ["Explanation", S.q10], ["11. Big Five ratings (start → end)", b5], ["Explanation", S.q11], ["12. Motivation", S.q12], ["Source", S.src12]]) +
-    sec("Part 4: Looking Ahead, Unit 5", [["13. Alarm", S.q13alarm], ["Resistance", S.q13resist], ["Exhaustion", S.q13exhaust], ["Coping", S.q13cope], ["14. Evaluating the therapist's reasoning", S.q14], ["Source", S.src14]]) +
+    sec("Part 2: What You Already Know", [["5. Harold's Erikson stage", S.q5stage], ["Explanation", S.q5], ["6. Karen's Erikson stage", S.q6stage], ["Explanation", S.q6],
+      ["7. Erikson's identity status (young man → choosing his name)", S.q7eYoung || S.q7eName ? `${S.q7eYoung || "?"} → ${S.q7eName || "?"}` : ""], ["Explanation", S.q7e], ["Source", S.src6],
+      ["8. Harold's identity status (start → middle)", S.q7start || S.q7mid ? `${S.q7start || "?"} → ${S.q7mid || "?"}` : ""], ["Explanation and comparison to Erikson", S.q7], ["9. Social clock and possible selves", S.q8], ["10. Hilbert's research method", S.q9method], ["Explanation", S.q9]]) +
+    sec("Part 3: Looking Ahead, Unit 4", [["11. Ana's attribution", S.q10type], ["Explanation", S.q10], ["12. Big Five ratings (start → end)", b5], ["Explanation", S.q11], ["13. Motivation", S.q12], ["Source", S.src12]]) +
+    sec("Part 4: Looking Ahead, Unit 5", [["14. Alarm", S.q13alarm], ["Resistance", S.q13resist], ["Exhaustion", S.q13exhaust], ["Coping", S.q13cope], ["15. Evaluating the therapist's reasoning", S.q14], ["Source", S.src14]]) +
     sec("Part 5: Final Argument", [["Claim", S.claim], ["Evidence 1", S.ev1], ["Evidence 2", S.ev2], ["Concept 1", S.con1], ["Concept 2", S.con2], ["Argument", S.essay]]);
 }
 
