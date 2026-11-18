@@ -1,0 +1,360 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Little Did He Know</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter+Tight:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout: a two-column film lab. Station tabs and the active station on the left; Harold's live case file and badges on the right (stacks on phones). */
+:root {
+  --bg: #f3f1ec; --panel: #ffffff; --soft: #ece9e1; --ink: #1d2124; --muted: #5d625f; --line: #d8d3c7;
+  --brand: #2f6b55; --brand-ink: #ffffff; --pencil: #c2412d; --amber: #c98a12; --ink-blue: #2c4f8c;
+  --f-display: "Fraunces", Georgia, serif; --f-body: "Inter Tight", "Segoe UI", system-ui, sans-serif; --f-mono: "Courier Prime", "Courier New", monospace; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #13161a; --panel: #1b1f25; --soft: #232831; --ink: #ebe8e1; --muted: #a7ada9; --line: #323944; --brand: #6cc3a0; --brand-ink: #13161a; --pencil: #ff8a73; --amber: #f2bb4b; --ink-blue: #8fb0ef; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #13161a; --panel: #1b1f25; --soft: #232831; --ink: #ebe8e1; --muted: #a7ada9; --line: #323944; --brand: #6cc3a0; --brand-ink: #13161a; --pencil: #ff8a73; --amber: #f2bb4b; --ink-blue: #8fb0ef; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 16px; }
+header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(32px, 5.5vw, 52px); line-height: 1; margin: 0; letter-spacing: -.01em; }
+h1 em { font-style: italic; color: var(--brand); }
+.sub { margin: 8px 0 0; font-family: var(--f-mono); font-size: 14px; color: var(--muted); }
+.xp { min-width: 240px; display: grid; gap: 6px; }
+.xp .row { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 14px; color: var(--muted); }
+.xp .row b { color: var(--ink); }
+.bar { height: 12px; border-radius: 6px; background: var(--soft); overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--ink-blue)); transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tab { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 7px 12px; display: inline-flex; gap: 8px; align-items: center; }
+.tab .n { font-family: var(--f-mono); font-size: 13px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
+.tab.on { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, var(--panel)); }
+.tab.done .n { background: var(--brand); color: var(--brand-ink); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); }
+.eyebrow { font-family: var(--f-mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 32px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 17px; margin: 22px 0 8px; }
+p { margin: 0 0 12px; max-width: 72ch; }
+.lead { color: var(--muted); }
+label.f { display: grid; gap: 5px; font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+label.f small { font-weight: 400; color: var(--muted); }
+input[type=text], textarea, select { font: inherit; font-size: 15.5px; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 11px; width: 100%; min-width: 0; }
+textarea { min-height: 84px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+.q { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 14px; }
+.q .num { font-family: var(--f-mono); font-weight: 700; color: var(--pencil); margin-right: 6px; }
+.q .prompt { font-weight: 600; margin-bottom: 10px; max-width: 72ch; }
+.box { border-left: 4px solid var(--amber); background: color-mix(in srgb, var(--amber) 9%, var(--panel)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 16px 0 14px; }
+.box.find { border-left-color: var(--ink-blue); background: color-mix(in srgb, var(--ink-blue) 9%, var(--panel)); }
+.box.help { border-left-color: var(--brand); background: color-mix(in srgb, var(--brand) 9%, var(--panel)); }
+.box .h { display: block; font-family: var(--f-mono); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+.box .t { display: block; font-family: var(--f-display); font-weight: 600; font-size: 19px; margin-bottom: 6px; }
+.box ul { margin: 4px 0 6px; padding-left: 20px; }
+.box li { margin-bottom: 4px; }
+.box p:last-child, .box ul:last-child { margin-bottom: 0; }
+.where { font-size: 14.5px; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 14px; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; }
+.chip.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.traits { display: grid; gap: 10px; margin-bottom: 12px; }
+.trait { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14.5px; }
+.trait.head { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.trait input[type=range] { width: 100%; }
+.trait output { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.count { font-family: var(--f-mono); font-size: 13.5px; color: var(--muted); margin: -6px 0 12px; }
+.count.ok { color: var(--brand); }
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; padding: 10px 16px; background: var(--brand); color: var(--brand-ink); border: 1.5px solid var(--brand); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+aside { position: sticky; top: 12px; display: grid; gap: 12px; }
+.file { background: var(--panel); border: 1.5px solid var(--ink); border-radius: 6px; padding: 18px; box-shadow: 6px 6px 0 var(--soft); }
+.file .stamp { display: inline-block; font-family: var(--f-mono); font-weight: 700; font-size: 12px; letter-spacing: .1em; color: var(--pencil); border: 2px solid var(--pencil); padding: 2px 8px; transform: rotate(-3deg); margin-bottom: 8px; }
+.file .nm { font-family: var(--f-display); font-weight: 800; font-size: 22px; margin: 2px 0 2px; }
+.file .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; font-family: var(--f-mono); }
+.file dl { margin: 0; display: grid; gap: 8px; font-size: 14px; }
+.file dt { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.file dd { margin: 0; }
+.file .empty { color: var(--muted); font-style: italic; }
+.mini { display: grid; gap: 4px; margin-top: 2px; }
+.mini .r { display: grid; grid-template-columns: 22px 1fr; gap: 6px; align-items: center; font-family: var(--f-mono); font-size: 12px; }
+.mini .bars { display: grid; gap: 2px; }
+.mini .bars i { display: block; height: 5px; border-radius: 3px; background: var(--muted); opacity: .45; }
+.mini .bars i + i { background: var(--brand); opacity: 1; }
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.badge { text-align: center; border: 1.5px dashed var(--line); border-radius: 12px; padding: 8px 4px; font-size: 12px; color: var(--muted); }
+.badge .e { font-size: 24px; display: block; filter: grayscale(1); opacity: .45; }
+.badge.got { border-style: solid; border-color: var(--brand); color: var(--ink); }
+.badge.got .e { filter: none; opacity: 1; }
+.review dt { font-weight: 700; margin-top: 10px; }
+.review dd { margin: 2px 0 0; white-space: pre-wrap; }
+.missing { color: var(--pencil); }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; max-width: 520px; margin: 14px 0; }
+.print-only { display: none; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+@media (max-width: 920px) { .layout { grid-template-columns: 1fr; } aside { position: static; } }
+@media (max-width: 600px) { .grid2, .grid3, .who { grid-template-columns: 1fr; } .trait { grid-template-columns: 1fr 1fr; } .trait > span:first-child { grid-column: 1 / -1; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --soft: #f3f3f3; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .tabs, .nav, .xp, .btn, .noprint, #station, aside { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  #reviewPrint { display: block !important; }
+  .print-only { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><h1>Little Did He <em>Know</em></h1><p class="sub">Stranger Than Fiction (2006) · Psych Film Project · after Topic 3.6</p></div>
+    <div class="xp" aria-live="polite">
+      <div class="row"><span>Project progress</span><b id="xpText">0%</b></div>
+      <div class="bar"><i id="xpBar"></i></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <nav class="tabs" id="tabs" aria-label="Stations"></nav>
+      <section class="card" id="station"></section>
+      <section class="card" id="reviewPrint" hidden></section>
+    </main>
+    <aside>
+      <div class="file" id="file" aria-live="polite"></div>
+      <div class="card" style="padding:14px">
+        <div class="eyebrow">Badges</div>
+        <div class="badges" id="badges"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const KEY = "psychStrangerThanFiction";
+const STAGES = ["Trust vs. Mistrust", "Autonomy vs. Shame and Doubt", "Initiative vs. Guilt", "Industry vs. Inferiority",
+  "Identity vs. Role Confusion", "Intimacy vs. Isolation", "Generativity vs. Stagnation", "Integrity vs. Despair"];
+const STATUSES = ["Achievement", "Diffusion", "Foreclosure", "Moratorium"];
+const TRAITS = [["O", "Openness to experience"], ["C", "Conscientiousness"], ["E", "Extraversion"], ["A", "Agreeableness"], ["S", "Emotional stability"]];
+const STATIONS = [
+  { id: "story", name: "Story Check", badge: "⌚", pts: 4 },
+  { id: "know", name: "What You Know", badge: "📖", pts: 9 },
+  { id: "u4", name: "Unit 4 Preview", badge: "🧩", pts: 6 },
+  { id: "u5", name: "Unit 5 Preview", badge: "🩺", pts: 6 },
+  { id: "argue", name: "Final Argument", badge: "✍️", pts: 5 },
+  { id: "review", name: "Review and Submit", badge: "🏁" },
+];
+
+const blank = () => ({
+  station: 0,
+  q1: "", q2: "", q3: "", q4: "", src4: "",
+  q5stage: "", q5: "", q6stage: "", q6: "", src6: "", q7start: "", q7mid: "", q7: "", q8: "", q9: "",
+  q10type: "", q10: "", b5: { start: { O: 5, C: 5, E: 5, A: 5, S: 5 }, end: { O: 5, C: 5, E: 5, A: 5, S: 5 } }, b5touched: false, q11: "", q12: "", src12: "",
+  q13alarm: "", q13resist: "", q13exhaust: "", q13cope: "", q14: "", src14: "",
+  claim: "", ev1: "", ev2: "", con1: "", con2: "", essay: "",
+  name: "", period: "",
+});
+let S = load() || blank();
+function load() {
+  try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); if (!v) return null; const b = blank(); return Object.assign(b, v, { b5: Object.assign(b.b5, v.b5 || {}) }); } catch (e) { return null; }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const filled = (...k) => k.every((x) => String(S[x] ?? "").trim().length > 0);
+const sentences = (t) => (String(t).trim().match(/[^.!?]+[.!?]+(\s|$)/g) || []).length;
+
+function done(i) {
+  switch (STATIONS[i].id) {
+    case "story": return filled("q1", "q2", "q3", "q4", "src4");
+    case "know": return filled("q5stage", "q5", "q6stage", "q6", "src6", "q7start", "q7mid", "q7", "q8", "q9");
+    case "u4": return filled("q10type", "q10", "q11", "q12", "src12") && S.b5touched;
+    case "u5": return filled("q13alarm", "q13resist", "q13exhaust", "q13cope", "q14", "src14");
+    case "argue": return filled("claim", "ev1", "ev2", "con1", "con2", "essay") && sentences(S.essay) >= 8;
+    case "review": return [0, 1, 2, 3, 4].every(done) && filled("name");
+  }
+}
+
+/* ---------- case file and badges ---------- */
+function renderFile() {
+  const line = (label, v) => `<div><dt>${label}</dt><dd>${String(v).trim() ? esc(v) : '<span class="empty">not yet</span>'}</dd></div>`;
+  const bars = S.b5touched ? `<div class="mini">${TRAITS.map(([k]) => `<div class="r"><span>${k}</span><span class="bars"><i style="width:${S.b5.start[k] * 10}%"></i><i style="width:${S.b5.end[k] * 10}%"></i></span></div>`).join("")}<small style="color:var(--muted)">grey = start of film · green = end</small></div>` : '<span class="empty">not yet</span>';
+  const status = S.q7start || S.q7mid ? `${S.q7start || "?"} → ${S.q7mid || "?"}` : "";
+  $("file").innerHTML = `<span class="stamp">CASE FILE</span>
+    <div class="nm">Harold Crick</div>
+    <div class="meta">IRS auditor · counts his brushstrokes</div>
+    <dl>${line("Erikson stage (Harold)", S.q5stage)}${line("Erikson stage (Karen)", S.q6stage)}${line("Identity status", status)}
+    <div><dt>Big Five profile</dt><dd>${bars}</dd></div>
+    ${line("Ana's first attribution", S.q10type)}${line("Your claim", S.claim)}</dl>`;
+  $("badges").innerHTML = STATIONS.map((s, i) => `<div class="badge${done(i) ? " got" : ""}"><span class="e" aria-hidden="true">${s.badge}</span>${s.name}</div>`).join("");
+  const pct = Math.round((STATIONS.filter((_, i) => done(i)).length / STATIONS.length) * 100);
+  $("xpText").textContent = pct + "%"; $("xpBar").style.width = pct + "%";
+}
+function renderTabs() {
+  $("tabs").innerHTML = STATIONS.map((s, i) => `<button class="tab${i === S.station ? " on" : ""}${done(i) ? " done" : ""}" data-i="${i}" aria-current="${i === S.station ? "step" : "false"}"><span class="n">${done(i) ? "✓" : i + 1}</span>${s.name}</button>`).join("");
+  $("tabs").querySelectorAll(".tab").forEach((b) => (b.onclick = () => go(+b.dataset.i)));
+}
+function renderTabsLite() { $("tabs").querySelectorAll(".tab").forEach((b, i) => { b.classList.toggle("done", !!done(i)); b.querySelector(".n").textContent = done(i) ? "✓" : i + 1; }); }
+function go(i) { S.station = Math.max(0, Math.min(STATIONS.length - 1, i)); save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+/* ---------- field helpers ---------- */
+const area = (k, label, hint = "", rows = 4) => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<textarea id="f_${k}" data-k="${k}" rows="${rows}">${esc(S[k])}</textarea></label>`;
+const text = (k, label, hint = "") => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<input type="text" id="f_${k}" data-k="${k}" value="${esc(S[k])}"></label>`;
+const pick = (k, label, opts) => `<label class="f">${label}<select id="f_${k}" data-k="${k}"><option value="">Choose one</option>${opts.map((o) => `<option${S[k] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+const q = (n, prompt, body) => `<div class="q"><div class="prompt"><span class="num">${n}.</span>${prompt}</div>${body}</div>`;
+const learn = (title, body) => `<div class="box"><b class="h">Learn It</b><b class="t">${title}</b>${body}</div>`;
+const find = (title, task, where) => `<div class="box find"><b class="h">Find It</b><b class="t">${title}</b><p>${task}</p><p class="where"><b>Where to look:</b> ${where}</p></div>`;
+const nav = () => `<div class="nav"><button class="btn ghost" id="prevBtn" ${S.station === 0 ? "disabled" : ""}>← Back</button><button class="btn" id="nextBtn">${S.station === STATIONS.length - 2 ? "Review my project →" : "Next station →"}</button></div>`;
+const head = (eyebrow, title, lead) => `<div class="eyebrow">${eyebrow}</div><h2>${title}</h2><p class="lead">${lead}</p>`;
+
+/* ---------- stations ---------- */
+const VIEWS = {
+  story: () => head("Station 1 · Part 1", "Story Check",
+      "You just watched <i>Stranger Than Fiction</i>: Harold Crick, an IRS auditor who lives by his wristwatch, starts hearing a woman's voice narrating his life. Answer in complete sentences and use specific scenes. Your work saves automatically in this browser.") +
+    q(1, "Describe Harold's daily routine at the start of the film. Give two specific examples that show how exact or rigid it is.", area("q1", "Your answer")) +
+    q(2, "What does the narrator say that changes everything for Harold? Then describe the two different people he goes to for help and how each one responds.", area("q2", "Your answer")) +
+    q(3, "How does Harold's relationship with Ana Pascal change from their first meeting to the end of the film? Describe at least two turning points.", area("q3", "Your answer")) +
+    find("Comedy or Tragedy?", "Professor Hilbert keeps asking whether Harold is living in a comedy or a tragedy. Research what those two words mean in <b>literature</b>. They do not simply mean \"funny\" and \"sad.\"",
+      "Britannica's entries for <i>comedy</i> and <i>tragedy</i> (britannica.com), a literature textbook or your English teacher, or the school library databases. A summary of how Aristotle described tragedy is a good starting point.") +
+    q(4, "Using your Find It research, explain the literary difference between a comedy and a tragedy. Then decide which one Harold's story turns out to be, and explain why.", area("q4", "Your answer") + text("src4", "Source you used", "website name or book title")) + nav(),
+
+  know: () => head("Station 2 · Part 2", "What You Already Know",
+      "These questions use ideas we have already covered, mostly from Topic 3.6. Use the correct vocabulary and back up every claim with a scene from the film.") +
+    q(5, "Which of Erikson's psychosocial stages best fits Harold at the start of the film? Explain the conflict of that stage and give two pieces of evidence. Then decide whether Harold resolves the conflict by the end, and explain how you know.",
+      pick("q5stage", "Harold's stage", STAGES) + area("q5", "Your explanation", "", 5)) +
+    find("Erikson's Own Identity Crisis", "Erik Erikson came up with the idea of an \"identity crisis.\" Research his own life: what was unusual about his childhood and his family, and what did he do with his name as an adult?",
+      "Britannica's biography of Erik Erikson (britannica.com), the Erikson section of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA's site (apa.org). Avoid sites that let anyone edit them.") +
+    q(6, "Karen Eiffel is a famous author who cannot figure out how to finish her book. Which psychosocial stage best fits her? Explain using evidence from the film. Then connect your Find It research: how might Erikson's own life explain why identity mattered so much in his theory?",
+      pick("q6stage", "Karen's stage", STAGES) + area("q6", "Your explanation", "", 5) + text("src6", "Source you used", "website name or book title")) +
+    q(7, "Which identity status describes Harold at the very start of the film, and which describes him in the middle, after he starts trying new things? Explain each choice using the ideas of <b>exploration</b> and <b>commitment</b>.",
+      `<div class="grid2">${pick("q7start", "At the start", STATUSES)}${pick("q7mid", "In the middle", STATUSES)}</div>` + area("q7", "Your explanation")) +
+    q(8, "Using the idea of the <b>social clock</b>, explain how Harold's life compares to the typical timing of adult milestones. Then describe one <b>possible self</b> Harold tries on after he hears the narrator, and whether it sticks.", area("q8", "Your answer")) +
+    q(9, "Professor Hilbert studies Harold by asking him many questions and testing one idea at a time, like telling him to stay home and do nothing. Which research method is Hilbert's approach most like? Explain one strength and one weakness of using it to draw conclusions.", area("q9", "Your answer")) + nav(),
+
+  u4: () => head("Station 3 · Part 3", "Looking Ahead: Unit 4",
+      "Unit 4 is about social psychology and personality. You have not learned these ideas yet, so read each Learn It box before you answer.") +
+    learn("Explaining Other People's Behavior", `<ul><li>An <b>attribution</b> is how we explain why someone acted the way they did.</li>
+      <li>A <b>dispositional attribution</b> explains behavior by the person's inner qualities, such as their personality or intelligence. A <b>situational attribution</b> explains it by the circumstances they are in.</li>
+      <li>The <b>fundamental attribution error</b> is our tendency to overestimate personality and underestimate the situation when we explain other people's behavior.</li></ul>`) +
+    q(10, "When Harold first shows up to audit Ana, she treats him with open hostility. What kind of attribution is she making about him? Explain how this could be the fundamental attribution error, and name the situational factor she ignores.",
+      pick("q10type", "Ana's attribution", ["Dispositional", "Situational"]) + area("q10", "Your explanation")) +
+    learn("Personality Traits: The Big Five", `<p><b>Trait theories</b> describe personality as a set of enduring characteristics that lead to typical responses. The <b>Big Five</b> traits are measured with personality inventories:</p>
+      <ul><li><b>Openness to experience:</b> curious and open to new ideas, or traditional and routine-loving.</li><li><b>Conscientiousness:</b> organized and careful, or flexible and spontaneous.</li>
+      <li><b>Extraversion:</b> outgoing and energized by people, or reserved.</li><li><b>Agreeableness:</b> warm and cooperative, or critical and competitive.</li><li><b>Emotional stability:</b> calm and secure, or anxious and easily upset.</li></ul>`) +
+    q(11, "Rate Harold on each trait at the <b>start</b> and the <b>end</b> of the film (1 = very low, 10 = very high). Then explain the two traits that changed the most, using a scene for each. Finally, since trait theories call traits \"enduring,\" how surprising is Harold's change, and what might explain it?",
+      `<div class="traits"><div class="trait head"><span>Trait</span><span>Start of film</span><span>End of film</span></div>
+      ${TRAITS.map(([k, n]) => `<div class="trait"><span>${n}</span>
+        <label><input type="range" min="1" max="10" data-b5="start.${k}" value="${S.b5.start[k]}" aria-label="${n}, start of film"><output id="o_start_${k}">${S.b5.start[k]}</output></label>
+        <label><input type="range" min="1" max="10" data-b5="end.${k}" value="${S.b5.end[k]}" aria-label="${n}, end of film"><output id="o_end_${k}">${S.b5.end[k]}</output></label></div>`).join("")}</div>` +
+      area("q11", "Your explanation", "", 5)) +
+    learn("What Drives Behavior: Motivation", `<ul><li><b>Intrinsic motivation</b> comes from inside: you do something because you enjoy it or find it meaningful. <b>Extrinsic motivation</b> comes from outside, such as pay, grades, or rules. <b>Incentive theory</b> focuses on how rewards motivate behavior.</li>
+      <li>Lewin described <b>motivational conflicts</b>: <b>approach-approach</b> (two good options), <b>avoidance-avoidance</b> (two bad options), and <b>approach-avoidance</b> (one option with both good and bad sides).</li></ul>`) +
+    find("Self-Determination Theory", "Psychologists Edward Deci and Richard Ryan created <b>self-determination theory</b>. Find the three basic psychological needs it says people must meet to feel intrinsically motivated, and what each one means.",
+      "The theory's official site (selfdeterminationtheory.org), the motivation chapter of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA Dictionary of Psychology (dictionary.apa.org).") +
+    q(12, "Compare what motivates Harold to audit taxes with what motivates him to learn the guitar. Use your Find It research to explain which of the three needs the guitar meets. Then identify one motivational conflict Harold faces later in the film and name its type.",
+      area("q12", "Your answer", "", 5) + text("src12", "Source you used", "website name or book title")) + nav(),
+
+  u5: () => head("Station 4 · Part 4", "Looking Ahead: Unit 5",
+      "Unit 5 is about mental and physical health. Read each Learn It box first. Remember: only trained, licensed professionals diagnose anyone. In this station you evaluate the reasoning of the people in the film; you do not diagnose the characters.") +
+    learn("Stress and Coping", `<ul><li>A <b>stressor</b> can be a major or traumatic event, or a pile-up of daily hassles.</li>
+      <li>The <b>general adaptation syndrome</b> describes how the body responds to stress in three phases: <b>alarm</b> (the first fight-flight-freeze reaction), <b>resistance</b> (the body and mind work to confront the stressor), and <b>exhaustion</b> (resources run out, and people are most likely to get sick).</li>
+      <li><b>Problem-focused coping</b> treats stress as a problem to solve. <b>Emotion-focused coping</b> manages the feelings instead, for example with deep breathing or meditation.</li></ul>`) +
+    q(13, "Trace Harold through the three phases of the general adaptation syndrome after he learns he is going to die, with a scene for each phase. Then describe one problem-focused and one emotion-focused way Harold copes, and decide which one helps him more.",
+      `<div class="grid3">${area("q13alarm", "Alarm", "", 4)}${area("q13resist", "Resistance", "", 4)}${area("q13exhaust", "Exhaustion", "", 4)}</div>` + area("q13cope", "Coping strategies and your decision", "", 4)) +
+    learn("Defining a Psychological Disorder", `<ul><li>Psychologists consider three factors when deciding whether behavior may be a disorder: the level of <b>dysfunction</b> (does it interfere with daily life?), <b>distress</b> (does it cause suffering?), and <b>deviation</b> from social norms.</li>
+      <li>Diagnosis requires specialized training and evidence-based tools such as the <b>DSM</b>, published by the American Psychiatric Association.</li>
+      <li><b>Schizophrenia spectrum disorders</b> can include <b>hallucinations</b> (false perceptions, such as hearing voices), <b>delusions</b> (false beliefs), disorganized thinking or speech, disorganized movement, and <b>negative symptoms</b> (a loss of normal functions, such as flat emotion).</li></ul>`) +
+    find("How Is Schizophrenia Actually Diagnosed?", "Hearing a voice alone is not enough for a diagnosis. Find out what else a professional looks for: how many kinds of symptoms, and for how long.",
+      "The National Institute of Mental Health's schizophrenia page (nimh.nih.gov), the National Alliance on Mental Illness (nami.org), or the schizophrenia section of OpenStax <i>Psychology 2e</i> (free at openstax.org).") +
+    q(14, "After a short conversation, Harold's therapist suggests he may have schizophrenia and offers medication. Using the three factors from the Learn It box and your Find It research, evaluate her reasoning: what was reasonable about her suggestion, and what information was she missing? How does the rest of the film complicate her conclusion?",
+      area("q14", "Your answer", "", 5) + text("src14", "Source you used", "website name or book title")) +
+    `<div class="box help"><b class="h">If this topic hits close to home</b><p>Karen Eiffel's struggles in the film can be hard to watch. If you or someone you know is having a hard time, talk to a school counselor or a trusted adult, or call or text <b>988</b> (the Suicide &amp; Crisis Lifeline) any time.</p></div>` + nav(),
+
+  argue: () => head("Station 5 · Part 5", "Final Argument",
+      "Prompt: <b>Did Harold change because of who he is, or because of what happened to him?</b> Plan your argument below, then write it out. Either side can earn full credit if you support it well.") +
+    area("claim", "Your claim", "one sentence that answers the prompt", 2) +
+    `<div class="grid2">${area("ev1", "Evidence 1 from the film", "a specific scene", 3)}${area("ev2", "Evidence 2 from the film", "a different scene", 3)}</div>` +
+    `<div class="grid2">${area("con1", "Psychology concept 1", "from Unit 3 (or earlier)", 3)}${area("con2", "Psychology concept 2", "from a Learn It box in this project", 3)}</div>` +
+    area("essay", "Your argument (8–12 sentences)", "state your claim, use both pieces of evidence and both concepts, and explain how each one supports your claim", 10) +
+    `<div class="count" id="essayCount"></div>` + nav(),
+
+  review: () => {
+    const missing = STATIONS.slice(0, 5).map((s, i) => (done(i) ? null : s.name)).filter(Boolean);
+    return `<div class="eyebrow">Station 6 · Wrap-up</div><h2>Review and Submit</h2>
+      ${missing.length ? `<div class="box"><b class="h">Almost there</b>Finish these stations before you submit: <b>${missing.join(", ")}</b>.</div>` : `<div class="box help"><b class="h">Project complete</b>Every station is done. Add your name and period, then save your PDF and upload it to Canvas.</div>`}
+      <div class="who noprint"><label class="f">Name<input type="text" data-k="name" value="${esc(S.name)}"></label><label class="f">Period<input type="text" data-k="period" value="${esc(S.period)}"></label></div>
+      <div class="nav noprint"><button class="btn ghost" id="prevBtn">← Back</button><span><button class="btn ghost" id="resetBtn">Start over</button> <button class="btn" id="printBtn">Print / Save as PDF</button></span></div>
+      <p class="noprint" id="printNote" style="color:var(--pencil)" hidden>Type your name before saving your PDF.</p>
+      <div id="reviewBody">${reviewBody()}</div>`;
+  },
+};
+
+function reviewBody() {
+  const sec = (title, rows) => `<h3>${title}</h3><dl class="review">${rows.map(([l, v]) => `<dt>${l}</dt><dd>${String(v ?? "").trim() ? esc(v) : '<span class="missing">Missing</span>'}</dd>`).join("")}</dl>`;
+  const b5 = S.b5touched ? TRAITS.map(([k, n]) => `${n}: ${S.b5.start[k]} → ${S.b5.end[k]}`).join("\n") : "";
+  return sec("Part 1: Story Check", [["1. Harold's routine", S.q1], ["2. The narrator and who Harold asks for help", S.q2], ["3. Harold and Ana", S.q3], ["4. Comedy or tragedy", S.q4], ["Source", S.src4]]) +
+    sec("Part 2: What You Already Know", [["5. Harold's Erikson stage", S.q5stage], ["Explanation", S.q5], ["6. Karen's Erikson stage", S.q6stage], ["Explanation and Erikson's own life", S.q6], ["Source", S.src6],
+      ["7. Identity status (start → middle)", S.q7start || S.q7mid ? `${S.q7start || "?"} → ${S.q7mid || "?"}` : ""], ["Explanation", S.q7], ["8. Social clock and possible selves", S.q8], ["9. Hilbert's research method", S.q9]]) +
+    sec("Part 3: Looking Ahead, Unit 4", [["10. Ana's attribution", S.q10type], ["Explanation", S.q10], ["11. Big Five ratings (start → end)", b5], ["Explanation", S.q11], ["12. Motivation", S.q12], ["Source", S.src12]]) +
+    sec("Part 4: Looking Ahead, Unit 5", [["13. Alarm", S.q13alarm], ["Resistance", S.q13resist], ["Exhaustion", S.q13exhaust], ["Coping", S.q13cope], ["14. Evaluating the therapist's reasoning", S.q14], ["Source", S.src14]]) +
+    sec("Part 5: Final Argument", [["Claim", S.claim], ["Evidence 1", S.ev1], ["Evidence 2", S.ev2], ["Concept 1", S.con1], ["Concept 2", S.con2], ["Argument", S.essay]]);
+}
+
+/* ---------- render and wiring ---------- */
+function essayCount() {
+  const el = $("essayCount"); if (!el) return;
+  const n = sentences(S.essay);
+  el.textContent = `${n} sentence${n === 1 ? "" : "s"} · aim for 8–12`;
+  el.classList.toggle("ok", n >= 8 && n <= 12);
+}
+function render() {
+  renderTabs(); renderFile();
+  $("station").innerHTML = VIEWS[STATIONS[S.station].id]();
+  wire(); essayCount();
+}
+function wire() {
+  const box = $("station");
+  box.querySelectorAll("[data-k]").forEach((el) => el.addEventListener("input", () => {
+    S[el.dataset.k] = el.value; save(); renderFile(); renderTabsLite();
+    if (el.dataset.k === "essay") essayCount();
+    if (el.dataset.k === "name") $("printNote").hidden = true;
+  }));
+  box.querySelectorAll("[data-b5]").forEach((el) => el.addEventListener("input", () => {
+    const [when, k] = el.dataset.b5.split(".");
+    S.b5[when][k] = +el.value; S.b5touched = true; $(`o_${when}_${k}`).textContent = el.value;
+    save(); renderFile(); renderTabsLite();
+  }));
+  const prev = $("prevBtn"); if (prev) prev.onclick = () => go(S.station - 1);
+  const next = $("nextBtn"); if (next) next.onclick = () => go(S.station + 1);
+  const pr = $("printBtn"); if (pr) pr.onclick = () => {
+    if (!S.name.trim()) { $("printNote").hidden = false; box.querySelector('[data-k="name"]').focus(); return; }
+    $("reviewPrint").innerHTML = `<p class="print-only"><b>${esc(S.name)}</b>${S.period ? " · Period " + esc(S.period.replace(/^period\s*/i, "")) : ""} · Little Did He Know: Stranger Than Fiction Film Project · ${esc(new Date().toLocaleDateString())}</p>` + $("reviewBody").innerHTML;
+    printWithFileName(S.name, S.period, "Stranger Than Fiction");
+  };
+  const rs = $("resetBtn"); if (rs) rs.onclick = () => {
+    if (rs.dataset.armed) { try { localStorage.removeItem(KEY); } catch (e) {} S = blank(); render(); return; }
+    rs.dataset.armed = "1"; rs.textContent = "Click again to erase everything";
+    setTimeout(() => { if (rs.isConnected) { delete rs.dataset.armed; rs.textContent = "Start over"; } }, 4000);
+  };
+}
+
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, label) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), label, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+render();
+</script>
