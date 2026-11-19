@@ -1,0 +1,406 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Good Morning, Lucy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a two-column memory lab. Station tabs and the active station on the left; Lucy's morning-tape card and badges on the right (stacks on phones). Header is a VHS tape label. */
+:root {
+  --bg: #f4f7f6; --panel: #ffffff; --soft: #e8f0ee; --ink: #15282b; --muted: #536a6c; --line: #cfdedb;
+  --brand: #0d7a7c; --brand-ink: #ffffff; --coral: #d4553f; --sun: #e09b1c; --lagoon: #2f6fa3;
+  --f-display: "DM Serif Display", Georgia, serif; --f-body: "Nunito Sans", "Segoe UI", system-ui, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1a1c; --panel: #162426; --soft: #1d2f32; --ink: #e6f1ef; --muted: #9db4b3; --line: #2b4245; --brand: #4fc6c4; --brand-ink: #0f1a1c; --coral: #ff8a73; --sun: #f6c25a; --lagoon: #7fb6e6; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0f1a1c; --panel: #162426; --soft: #1d2f32; --ink: #e6f1ef; --muted: #9db4b3; --line: #2b4245; --brand: #4fc6c4; --brand-ink: #0f1a1c; --coral: #ff8a73; --sun: #f6c25a; --lagoon: #7fb6e6; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); margin: 0; }
+body { font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 16px; }
+
+/* header: the "Good Morning Lucy" tape label */
+header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px 24px; }
+.tape { background: var(--panel); border: 2px solid var(--ink); border-radius: 10px; padding: 14px 18px 12px; position: relative; overflow: hidden; min-width: 0; }
+.tape::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 7px; background: linear-gradient(90deg, var(--sun), var(--coral), var(--lagoon), var(--brand)); }
+.tape .lbl { font-family: var(--f-mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(34px, 6vw, 56px); line-height: 1; margin: 6px 0 4px; }
+h1 em { color: var(--coral); }
+.sub { margin: 0; font-family: var(--f-mono); font-size: 13.5px; color: var(--muted); }
+.xp { min-width: 240px; display: grid; gap: 6px; }
+.xp .row { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 13.5px; color: var(--muted); }
+.xp .row b { color: var(--ink); }
+.bar { height: 12px; border-radius: 6px; background: var(--soft); overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--sun), var(--coral), var(--brand)); transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tab { font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 7px 12px; display: inline-flex; gap: 8px; align-items: center; }
+.tab .n { font-family: var(--f-mono); font-size: 13px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
+.tab.on { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, var(--panel)); }
+.tab.done .n { background: var(--brand); color: var(--brand-ink); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(16px, 3vw, 26px); }
+.eyebrow { font-family: var(--f-mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(26px, 3.6vw, 34px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 17px; margin: 22px 0 8px; }
+p { margin: 0 0 12px; max-width: 72ch; }
+.lead { color: var(--muted); }
+label.f { display: grid; gap: 5px; font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+label.f small { font-weight: 400; color: var(--muted); }
+input[type=text], textarea, select { font: inherit; font-size: 15.5px; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 11px; width: 100%; min-width: 0; }
+textarea { min-height: 84px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.q { border-top: 1px dashed var(--line); padding-top: 14px; margin-top: 14px; }
+.q .num { font-family: var(--f-mono); font-weight: 600; color: var(--coral); margin-right: 6px; }
+.q .prompt { font-weight: 700; margin-bottom: 10px; max-width: 72ch; }
+.box { border-left: 4px solid var(--sun); background: color-mix(in srgb, var(--sun) 10%, var(--panel)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 16px 0 14px; }
+.box.find { border-left-color: var(--lagoon); background: color-mix(in srgb, var(--lagoon) 9%, var(--panel)); }
+.box.rev { border-left-color: var(--coral); background: color-mix(in srgb, var(--coral) 7%, var(--panel)); }
+.box.step { border-left-color: var(--brand); background: color-mix(in srgb, var(--brand) 8%, var(--panel)); }
+.box .h { display: block; font-family: var(--f-mono); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+.box .t { display: block; font-family: var(--f-display); font-weight: 400; font-size: 21px; margin-bottom: 6px; }
+.box ul, .box ol { margin: 4px 0 6px; padding-left: 20px; }
+.box li { margin-bottom: 4px; }
+.box p:last-child, .box ul:last-child { margin-bottom: 0; }
+.where { font-size: 14.5px; color: var(--muted); }
+.where a, .src a { color: var(--brand); font-weight: 700; text-underline-offset: 2px; }
+.ex { display: grid; gap: 6px; margin: 8px 0 4px; }
+.ex div { border-radius: 8px; padding: 8px 12px; font-size: 15px; }
+.ex .no { background: color-mix(in srgb, var(--coral) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--coral) 35%, var(--line)); }
+.ex .yes { background: color-mix(in srgb, var(--brand) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--line)); }
+.ex b { font-family: var(--f-mono); font-size: 12.5px; letter-spacing: .05em; text-transform: uppercase; display: block; }
+.sortrow { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.source { border: 1.5px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; background: var(--panel); }
+.source .sh { font-family: var(--f-mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--lagoon); font-weight: 600; }
+.source h4 { font-family: var(--f-display); font-weight: 400; font-size: 20px; margin: 2px 0 8px; }
+.source p { font-size: 15.5px; }
+.source .cite { font-size: 13px; color: var(--muted); margin-bottom: 0; }
+.warn { color: var(--coral); font-size: 14px; margin: -6px 0 12px; }
+.check { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 6px; }
+.check li { display: flex; gap: 8px; align-items: baseline; font-size: 15px; }
+.check li::before { content: "○"; color: var(--muted); }
+.check li.ok::before { content: "●"; color: var(--brand); }
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.btn { font: inherit; font-weight: 800; cursor: pointer; border-radius: 10px; padding: 10px 16px; background: var(--brand); color: var(--brand-ink); border: 1.5px solid var(--brand); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+aside { position: sticky; top: 12px; display: grid; gap: 12px; }
+.morning { background: var(--panel); border: 1.5px solid var(--ink); border-radius: 12px; padding: 18px; }
+.morning .rec { display: inline-flex; gap: 6px; align-items: center; font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--coral); }
+.morning .rec::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--coral); }
+.morning .nm { font-family: var(--f-display); font-size: 23px; margin: 6px 0 2px; }
+.morning .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; font-family: var(--f-mono); }
+.morning dl { margin: 0; display: grid; gap: 8px; font-size: 14px; }
+.morning dt { font-family: var(--f-mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.morning dd { margin: 0; }
+.morning .empty { color: var(--muted); font-style: italic; }
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.badge { text-align: center; border: 1.5px dashed var(--line); border-radius: 12px; padding: 8px 4px; font-size: 12px; color: var(--muted); }
+.badge .e { font-size: 24px; display: block; filter: grayscale(1); opacity: .45; }
+.badge.got { border-style: solid; border-color: var(--brand); color: var(--ink); }
+.badge.got .e { filter: none; opacity: 1; }
+.review dt { font-weight: 800; margin-top: 10px; }
+.review dd { margin: 2px 0 0; white-space: pre-wrap; }
+.missing { color: var(--coral); }
+.who { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; max-width: 520px; margin: 14px 0; }
+.print-only { display: none; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+@media (max-width: 920px) { .layout { grid-template-columns: 1fr; } aside { position: static; } }
+@media (max-width: 600px) { .grid2, .who, .sortrow { grid-template-columns: 1fr; } }
+@media print {
+  :root { --bg: #fff; --panel: #fff; --soft: #f3f3f3; --ink: #111; --muted: #444; --line: #bbb; color-scheme: light; }
+  html, body { background: #fff !important; }
+  .tabs, .nav, .xp, .btn, .noprint, #station, aside { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  #reviewPrint { display: block !important; }
+  .print-only { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="tape">
+      <div class="lbl">Tape 1 · Play every morning</div>
+      <h1>Good Morning, <em>Lucy</em></h1>
+      <p class="sub">50 First Dates (2004) · AP Psychology · Memory, Topics 2.3–2.5</p>
+    </div>
+    <div class="xp" aria-live="polite">
+      <div class="row"><span>Project progress</span><b id="xpText">0%</b></div>
+      <div class="bar"><i id="xpBar"></i></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <nav class="tabs" id="tabs" aria-label="Stations"></nav>
+      <section class="card" id="station"></section>
+      <section class="card" id="reviewPrint" hidden></section>
+    </main>
+    <aside>
+      <div class="morning" id="morning" aria-live="polite"></div>
+      <div class="card" style="padding:14px">
+        <div class="eyebrow">Badges</div>
+        <div class="badges" id="badges"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const KEY = "apPsych50FirstDates";
+const MEM_ITEMS = [
+  ["m1", "Lucy can describe the morning she and her dad left the house, before the accident."],
+  ["m2", "Lucy still knows what words mean, how to read, and what a waffle is."],
+  ["m3", "Lucy can still paint after the accident."],
+  ["m4", "Henry has to remember to leave on his research trip to Alaska."],
+];
+const MEM_TYPES = ["Episodic (explicit)", "Semantic (explicit)", "Procedural (implicit)", "Prospective"];
+const BREAKS = ["Sensory memory", "Short-term or working memory", "Moving information from short-term into long-term memory", "Retrieving old long-term memories"];
+const AMNESIA = ["Anterograde amnesia", "Retrograde amnesia", "Both", "Neither"];
+const SOURCES = ["Source 1 (H.M.)", "Source 2 (Clive Wearing)", "Source 3 (Amnesia at the Movies)"];
+const STATIONS = [
+  { id: "story", name: "Story Check", badge: "🍍", pts: 4 },
+  { id: "lab", name: "Memory Lab", badge: "🧠", pts: 10 },
+  { id: "brain", name: "Brain and Sleep", badge: "🌙", pts: 4 },
+  { id: "ahead", name: "Looking Ahead", badge: "🔭", pts: 5 },
+  { id: "ebq", name: "EBQ Practice", badge: "📝", pts: 7 },
+  { id: "review", name: "Review and Submit", badge: "📼" },
+];
+
+const blank = () => ({
+  station: 0,
+  q1: "", q2: "", q3: "", q4: "", src4: "",
+  m1: "", m2: "", m3: "", m4: "", q5: "", q6break: "", q6: "", q7type: "", q7: "", q8: "", q9: "", q10: "",
+  q11: "", src11: "", q12: "",
+  q13: "", q14: "", q15: "",
+  n1: "", n2: "", n3: "", claim: "", bSrc: "", bEv: "", bConcept: "", bExp: "", cSrc: "", cEv: "", cConcept: "", cExp: "",
+  name: "", period: "",
+});
+let S = load() || blank();
+function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v ? Object.assign(blank(), v) : null; } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const filled = (...k) => k.every((x) => String(S[x] ?? "").trim().length > 0);
+
+function done(i) {
+  switch (STATIONS[i].id) {
+    case "story": return filled("q1", "q2", "q3", "q4", "src4");
+    case "lab": return filled("m1", "m2", "m3", "m4", "q5", "q6break", "q6", "q7type", "q7", "q8", "q9", "q10");
+    case "brain": return filled("q11", "src11", "q12");
+    case "ahead": return filled("q13", "q14", "q15");
+    case "ebq": return filled("claim", "bSrc", "bEv", "bConcept", "bExp", "cSrc", "cEv", "cConcept", "cExp") && S.bSrc !== S.cSrc && S.bConcept.trim().toLowerCase() !== S.cConcept.trim().toLowerCase();
+    case "review": return [0, 1, 2, 3, 4].every(done) && filled("name");
+  }
+}
+
+/* ---------- side card and badges ---------- */
+function renderSide() {
+  const line = (label, v) => `<div><dt>${label}</dt><dd>${String(v).trim() ? esc(v) : '<span class="empty">not yet</span>'}</dd></div>`;
+  const sorted = MEM_ITEMS.filter(([k]) => S[k]).length;
+  $("morning").innerHTML = `<span class="rec">REC · MORNING TAPE</span>
+    <div class="nm">Lucy Whitmore</div>
+    <div class="meta">Memory resets every night</div>
+    <dl>${line("Memory examples sorted", sorted ? `${sorted} of 4` : "")}${line("Where memory breaks down", S.q6break)}${line("Type of amnesia", S.q7type)}
+    ${line("EBQ claim", S.claim)}${line("EBQ sources used", S.bSrc || S.cSrc ? [S.bSrc, S.cSrc].filter(Boolean).map((s) => s.split(" (")[0]).join(" + ") : "")}</dl>`;
+  $("badges").innerHTML = STATIONS.map((s, i) => `<div class="badge${done(i) ? " got" : ""}"><span class="e" aria-hidden="true">${s.badge}</span>${s.name}</div>`).join("");
+  const pct = Math.round((STATIONS.filter((_, i) => done(i)).length / STATIONS.length) * 100);
+  $("xpText").textContent = pct + "%"; $("xpBar").style.width = pct + "%";
+}
+function renderTabs() {
+  $("tabs").innerHTML = STATIONS.map((s, i) => `<button class="tab${i === S.station ? " on" : ""}${done(i) ? " done" : ""}" data-i="${i}" aria-current="${i === S.station ? "step" : "false"}"><span class="n">${done(i) ? "✓" : i + 1}</span>${s.name}</button>`).join("");
+  $("tabs").querySelectorAll(".tab").forEach((b) => (b.onclick = () => go(+b.dataset.i)));
+}
+function renderTabsLite() { $("tabs").querySelectorAll(".tab").forEach((b, i) => { b.classList.toggle("done", !!done(i)); b.querySelector(".n").textContent = done(i) ? "✓" : i + 1; }); }
+function go(i) { S.station = Math.max(0, Math.min(STATIONS.length - 1, i)); save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+/* ---------- field helpers ---------- */
+const area = (k, label, hint = "", rows = 4) => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<textarea id="f_${k}" data-k="${k}" rows="${rows}">${esc(S[k])}</textarea></label>`;
+const text = (k, label, hint = "") => `<label class="f">${label}${hint ? ` <small>${hint}</small>` : ""}<input type="text" id="f_${k}" data-k="${k}" value="${esc(S[k])}"></label>`;
+const pick = (k, label, opts) => `<label class="f">${label}<select id="f_${k}" data-k="${k}"><option value="">Choose one</option>${opts.map((o) => `<option${S[k] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+const q = (n, prompt, body) => `<div class="q"><div class="prompt"><span class="num">${n}.</span>${prompt}</div>${body}</div>`;
+const box = (cls, h, title, body) => `<div class="box ${cls}"><b class="h">${h}</b><b class="t">${title}</b>${body}</div>`;
+const learn = (title, body) => box("", "Learn It", title, body);
+const review = (title, body) => box("rev", "Quick Review", title, body);
+const step = (n, title, body) => box("step", `EBQ Step ${n}`, title, body);
+const a = (url, label) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
+const find = (title, task, where) => `<div class="box find"><b class="h">Find It</b><b class="t">${title}</b><p>${task}</p><p class="where"><b>Where to look:</b> ${where}</p></div>`;
+const nav = () => `<div class="nav"><button class="btn ghost" id="prevBtn" ${S.station === 0 ? "disabled" : ""}>← Back</button><button class="btn" id="nextBtn">${S.station === STATIONS.length - 2 ? "Review my project →" : "Next station →"}</button></div>`;
+const head = (eyebrow, title, lead) => `<div class="eyebrow">${eyebrow}</div><h2>${title}</h2><p class="lead">${lead}</p>`;
+
+/* ---------- EBQ sources (summaries written for this project) ---------- */
+const SRC = [
+  { h: "Source 1", t: "Patient H.M.: Memory Without the Hippocampus",
+    body: `<p><b>Introduction:</b> In 1953, a 27-year-old man known in research as H.M. (Henry Molaison) had brain surgery to stop severe epileptic seizures. Surgeons removed the hippocampus and nearby tissue on both sides of his brain.</p>
+      <p><b>Method:</b> Neuropsychologist Brenda Milner studied H.M. for decades with memory and intelligence tests. In one task, he traced a star while seeing only his hand and the star in a mirror. He practiced the task 10 times a day for three days.</p>
+      <p><b>Results:</b> H.M.'s seizures improved, but he could no longer form new long-term memories of facts or events. He did not recognize people he met after the surgery, even after seeing them many times. He also lost some memories from the years just before the surgery. His intelligence, attention, and short-term memory stayed in the normal range, and he could hold a conversation as long as he was not distracted. On the mirror task, he got faster and more accurate every day, yet each time he said he had never done the task before.</p>`,
+    cite: `Based on Scoville, W. B., &amp; Milner, B. (1957). Loss of recent memory after bilateral hippocampal lesions. <i>Journal of Neurology, Neurosurgery, and Psychiatry, 20</i>(1), 11–21, and Milner's later mirror-drawing studies. Student-level summary: ${a("https://www.snexplores.org/article/pursuit-memory", "Science News Explores")}.` },
+  { h: "Source 2", t: "Clive Wearing: A Musician Who Lives in the Present",
+    body: `<p><b>Introduction:</b> Clive Wearing was a successful British musician and conductor. In 1985, a brain infection called herpes simplex encephalitis severely damaged his hippocampus and other parts of his temporal lobes.</p>
+      <p><b>Method:</b> Psychologists studied Wearing for years using memory tests, interviews, observation, and his own diary.</p>
+      <p><b>Results:</b> Wearing developed severe anterograde amnesia: new experiences fade from his memory within seconds to minutes. He also lost most memories of his earlier life (retrograde amnesia). He filled his diary with entries such as "Now I am really awake," crossing out earlier entries he did not remember writing. Each time his wife walked into the room, he greeted her with joy, as if they had been apart for years. Even so, he could still read music, play the piano, and conduct a choir, and he still recognized and loved his wife.</p>`,
+    cite: `Based on Wilson, B. A., Baddeley, A. D., &amp; Kapur, N. (1995). Dense amnesia in a professional musician following herpes simplex virus encephalitis. <i>Journal of Clinical and Experimental Neuropsychology, 17</i>(5), 668–681, and Sacks, O. (2007), "The Abyss," <i>The New Yorker</i>.` },
+  { h: "Source 3", t: "Amnesia at the Movies",
+    body: `<p><b>Introduction:</b> Neuropsychologist Sallie Baxendale studies memory disorders. She wanted to know whether movies show amnesia the way it happens in real patients.</p>
+      <p><b>Method:</b> She reviewed films that featured characters with amnesia, from silent movies to films released in 2004, and compared them with what is known from real patients with brain injuries.</p>
+      <p><b>Results:</b> Baxendale concluded that most movie amnesia bears little relation to reality. She wrote that <i>50 First Dates</i> continues a movie tradition of an amnesia syndrome with no relation to any known neurological or psychiatric condition. Real patients with this kind of brain damage usually keep their intelligence and attention but have severe, lasting difficulty learning new information; their memory does not reset overnight. She named the fish Dory in <i>Finding Nemo</i> as one of the more accurate portrayals of memory loss. She warned that because movies shape what the public believes, misleading portrayals can give patients and families false expectations.</p>`,
+    cite: `Based on Baxendale, S. (2004). Memories aren't made of this: Amnesia at the movies. <i>BMJ, 329</i>, 1480–1483. ${a("https://pmc.ncbi.nlm.nih.gov/articles/PMC535990/", "Free full text")}.` },
+];
+const sourceCards = () => SRC.map((s) => `<div class="source"><div class="sh">${s.h}</div><h4>${s.t}</h4>${s.body}<p class="cite">${s.cite}</p></div>`).join("");
+
+/* ---------- stations ---------- */
+const VIEWS = {
+  story: () => head("Station 1", "Story Check",
+      "In <i>50 First Dates</i>, Lucy Whitmore wakes up every morning believing it is the day of her car accident. Henry Roth has to win her over again, every day. Answer in complete sentences and use specific scenes. Your work saves automatically in this browser.") +
+    q(1, "Describe Lucy's accident and what happens each morning when she wakes up. What do her father and brother do every day, and why?", area("q1", "Your answer")) +
+    q(2, "Who is Ten-Second Tom, and how is his memory problem different from Lucy's?", area("q2", "Your answer")) +
+    q(3, "Describe two different ways Henry tries to win Lucy over. What long-term solution does he finally come up with, and why does it work better?", area("q3", "Your answer")) +
+    find("Is \"Goldfield Syndrome\" Real?", "Dr. Keats names Lucy's condition \"Goldfield syndrome.\" Find out whether that is a real diagnosis, which real type of memory loss it is closest to, and how real cases differ from Lucy's.",
+      `${a("https://pmc.ncbi.nlm.nih.gov/articles/PMC535990/", "Baxendale, \"Memories aren't made of this: amnesia at the movies\" (BMJ)")}. Look for what it says about <i>50 First Dates</i>; this one is challenging reading, so focus on that part. Then read ${a("https://my.clevelandclinic.org/health/diseases/23221-anterograde-amnesia", "Cleveland Clinic: Anterograde Amnesia")} and ${a("https://www.mayoclinic.org/diseases-conditions/amnesia/symptoms-causes/syc-20353360", "Mayo Clinic: Amnesia")}.`) +
+    q(4, "Using your Find It research, is Goldfield syndrome a real diagnosis? Name the real condition it is closest to, and explain one important way the movie's version is different from real cases.", area("q4", "Your answer") + text("src4", "Sources you used", "website names")) + nav(),
+
+  lab: () => head("Station 2", "Memory Lab: Topics 2.3–2.5",
+      "These questions use what you have already learned about memory. Use the correct vocabulary and support every answer with a scene from the film.") +
+    q(5, "Sort each example by the type of memory it shows. Then explain which memory systems still work for Lucy and which one is damaged, using the terms <b>explicit</b> and <b>implicit</b>.",
+      MEM_ITEMS.map(([k, t]) => `<div class="sortrow"><span>${t}</span><select data-k="${k}" aria-label="Memory type: ${esc(t)}"><option value="">Choose a type</option>${MEM_TYPES.map((o) => `<option${S[k] === o ? " selected" : ""}>${o}</option>`).join("")}</select></div>`).join("") +
+      `<div style="height:12px"></div>` + area("q5", "Your explanation")) +
+    q(6, "Using the multi-store model, where does Lucy's memory break down? Support your answer with evidence that shows what still works. Then explain which part of the working memory model lets her follow a conversation all day.",
+      pick("q6break", "Where it breaks down", BREAKS) + area("q6", "Your explanation", "", 5)) +
+    q(7, "Which type of amnesia does Lucy have? Use evidence about what she remembers from before the accident and what she cannot remember after it.",
+      pick("q7type", "Type of amnesia", AMNESIA) + area("q7", "Your explanation")) +
+    q(8, "Henry shows up again and again, so Lucy's brain gets the same experience over and over. Using <b>long-term potentiation</b>, explain why repetition normally builds a memory, and what that suggests about why it does not work for Lucy.", area("q8", "Your answer")) +
+    q(9, "Henry's morning tape uses a personal, emotional video instead of a simple list of facts. Using the <b>levels of processing</b> model (structural, phonemic, semantic) and what you know about <b>autobiographical memory</b>, explain why the tape is a smart way to give Lucy information.", area("q9", "Your answer")) +
+    q(10, "Ten-Second Tom forgets everything after about ten seconds. What does Tom show about the <b>duration of short-term memory</b>? Could <b>maintenance rehearsal</b> help him hold on to a name? Explain what would happen if someone interrupted him.", area("q10", "Your answer")) + nav(),
+
+  brain: () => head("Station 3", "Brain and Sleep",
+      "Two connections back to Unit 1. Use the Quick Review boxes to refresh your memory.") +
+    review("The Limbic System and Memory", `<ul><li>The <b>limbic system</b> sits deep in the brain and includes the thalamus, hypothalamus, pituitary gland, <b>hippocampus</b>, and amygdala.</li>
+      <li>The <b>hippocampus</b> helps form new explicit memories (facts and events). Skills and habits rely more on other areas, such as the cerebellum.</li></ul>`) +
+    find("Patient H.M.", "Research the famous patient H.M.: what was removed from his brain and why, what he could no longer do afterward, and what he could still learn in the mirror-drawing (star-tracing) task.",
+      `${a("https://www.snexplores.org/article/pursuit-memory", "Science News Explores: In pursuit of memory")} (the easiest read) and ${a("https://www.simplypsychology.org/henry-molaison-patient-hm.html", "Simply Psychology: Patient H.M.")}. Your textbook connection: ${a("https://openstax.org/books/psychology-2e/pages/8-2-parts-of-the-brain-involved-with-memory", "OpenStax Psychology 2e, 8.2")}.`) +
+    q(11, "Which brain structure was most likely damaged in Lucy's accident? Use your Find It research on H.M. to support your answer, and connect what H.M. could still learn to a specific scene with Lucy.", area("q11", "Your answer", "", 5) + text("src11", "Sources you used", "website names")) +
+    review("Sleep and Memory", `<ul><li>During sleep, the brain <b>consolidates</b> memories, strengthening and organizing what we learned during the day.</li>
+      <li>Some theories propose that sleep, especially REM sleep, helps transfer new memories into long-term storage.</li></ul>`) +
+    q(12, "In the movie, Lucy's memories of each day are erased while she sleeps. Using what you learned about sleep and memory consolidation, explain why this is the opposite of what sleep normally does for memory.", area("q12", "Your answer")) + nav(),
+
+  ahead: () => head("Station 4", "Looking Ahead",
+      "These ideas come up soon (2.6, 2.7, and 3.7). You have not learned them yet, so read each Learn It box before you answer.") +
+    learn("Retrieving Memories (2.6)", `<ul><li><b>Recall</b> is remembering without hints, like a fill-in-the-blank question. <b>Recognition</b> uses <b>retrieval cues</b>, like a multiple-choice question where you pick the answer you have seen before. Recognition is usually much easier than recall.</li>
+      <li>Retrieval is easier when you are in the same place (<b>context-dependent memory</b>), mood (<b>mood-congruent memory</b>), or physical state (<b>state-dependent memory</b>) as when you learned something.</li></ul>`) +
+    q(13, "When Lucy meets Henry again each morning, is she failing at recall, recognition, or both? What does that tell you about how severe her memory problem is? Then decide: is Henry's tape a <b>retrieval cue</b> that unlocks an old memory, or is it teaching her the information from scratch? Explain.", area("q13", "Your answer", "", 5)) +
+    learn("Forgetting and Memory Errors (2.7)", `<ul><li><b>Encoding failure:</b> the information never got into long-term memory in the first place.</li>
+      <li><b>Interference:</b> old learning disrupts new learning (<b>proactive</b>), or new learning disrupts old memories (<b>retroactive</b>).</li>
+      <li><b>Misinformation effect:</b> misleading information received <i>after</i> an event changes a person's memory of that event.</li>
+      <li><b>Constructive memory:</b> we rebuild memories each time we recall them, which can add errors.</li></ul>`) +
+    q(14, "Every day, Lucy's family reprints the same newspaper and recreates the same day so Lucy won't realize time has passed. Is this an example of the <b>misinformation effect</b>? Defend your answer using the definition. Then name the Learn It term that best explains why Lucy cannot remember yesterday, and explain why.", area("q14", "Your answer", "", 5)) +
+    learn("Classical Conditioning (3.7) and Claparède's Pin", `<p>In <b>classical conditioning</b>, a <b>neutral stimulus</b> (NS) is paired with an <b>unconditioned stimulus</b> (US) that naturally causes an <b>unconditioned response</b> (UR). After pairing, the neutral stimulus becomes a <b>conditioned stimulus</b> (CS) that causes a <b>conditioned response</b> (CR) by itself.</p>
+      <p><b>A famous case:</b> In 1911, Swiss psychologist Édouard Claparède worked with a woman who had severe amnesia; she could not remember him from one meeting to the next. One day he hid a pin in his hand and pricked her when they shook hands. The next time they met, she did not remember him or the pin, but she refused to shake his hand. When he asked why, she could not explain, and said only that sometimes people hide pins in their hands. Her conscious memory was gone, but her body had still learned to avoid the handshake.</p>`) +
+    q(15, "Identify the NS, US, UR, CS, and CR in Claparède's pin experiment. Then describe a scene where Lucy reacts to Henry or to something about him as if part of her remembers. Could classical conditioning help explain it, even though she has no explicit memory of him?", area("q15", "Your answer", "", 5)) + nav(),
+
+  ebq: () => head("Station 5", "EBQ Practice: Is the Movie Realistic?",
+      "On the AP Psychology exam, one free-response question is an <b>Evidence-Based Question (EBQ)</b>. You will get three short research sources and build an argument from them. This station walks you through it one step at a time.") +
+    step(1, "What Is an EBQ?", `<ul><li>You read <b>three summarized research sources</b> on one topic.</li>
+      <li>You write a <b>claim</b> (your argument), then support it with <b>evidence from two different sources</b>.</li>
+      <li>For each piece of evidence, you <b>explain</b> how it supports your claim using a <b>psychology concept</b>, and the two concepts must be different.</li>
+      <li>Every time you use a source, you must <b>cite it</b>: "(Source 1)" or "According to Source 2, ..."</li></ul>
+      <p>It is worth <b>7 points</b>: Claim (1) · Evidence #1 (1) · Explanation #1 (2) · Evidence #2 (1) · Explanation #2 (2).</p>`) +
+    `<div class="box step"><b class="h">The Question</b><b class="t">Using the sources provided, develop and justify an argument about whether <i>50 First Dates</i> accurately portrays how memory works after brain damage.</b></div>` +
+    step(2, "Read the Three Sources", `<p>Read each source carefully. As you read, jot down: <b>what was damaged</b>, <b>what was lost</b>, and <b>what still worked</b>. Your notes are for you and are not graded.</p>`) +
+    sourceCards() +
+    `<div class="grid2">${area("n1", "My notes on Source 1", "optional", 3)}${area("n2", "My notes on Source 2", "optional", 3)}</div>${area("n3", "My notes on Source 3", "optional", 3)}` +
+    step(3, "Write Your Claim (Part A)", `<p>A claim takes a <b>clear, specific side</b> that someone could disagree with. A topic or a fact is not a claim. Here is an example on a <b>different topic</b>: "Should students be allowed to use phones during class?"</p>
+      <div class="ex"><div class="no"><b>Does not earn the point</b>"Phones in class are a complicated issue." (no side taken)</div><div class="no"><b>Does not earn the point</b>"Teenagers use phones a lot." (a fact, not an argument)</div><div class="yes"><b>Earns the point</b>"Schools should require students to put phones away during class."</div></div>`) +
+    area("claim", "Part A: My claim", "one sentence that answers the question", 2) +
+    step(4, "Evidence + Explanation #1 (Part B)", `<p><b>B (i) Evidence:</b> pick one specific fact from <b>one</b> source and cite it. <b>B (ii) Explanation:</b> explain how that fact supports your claim <b>using a psychology concept</b>. Example on the phone topic:</p>
+      <div class="ex"><div class="yes"><b>Evidence, cited</b>"Students who had phones on their desks scored lower on a quiz than students whose phones were in another room (Source 1)."</div>
+      <div class="no"><b>Explanation, 1 of 2 points</b>"This shows phones are bad for learning, so they should be put away." (explains, but uses no psychology concept)</div>
+      <div class="yes"><b>Explanation, 2 of 2 points</b>"This supports putting phones away because a phone pulls <i>attention</i> away from the lesson, and information we do not pay attention to is never <i>encoded</i> into memory."</div></div>`) +
+    `<div class="grid2">${pick("bSrc", "Source I am using", SOURCES)}${text("bConcept", "Psychology concept I will use", "e.g., a term from Unit 1 or Unit 2")}</div>` +
+    area("bEv", "Part B (i): My evidence, with a citation", "", 3) + area("bExp", "Part B (ii): My explanation using the concept", "", 4) +
+    step(5, "Evidence + Explanation #2 (Part C)", `<p>Do it again, but this time you must use a <b>different source</b> and a <b>different psychology concept</b> than in Part B.</p>`) +
+    `<div class="grid2">${pick("cSrc", "Source I am using", SOURCES)}${text("cConcept", "Psychology concept I will use", "must be different from Part B")}</div>` +
+    `<p class="warn" id="ebqWarn" hidden></p>` +
+    area("cEv", "Part C (i): My evidence, with a citation", "", 3) + area("cExp", "Part C (ii): My explanation using the concept", "", 4) +
+    step(6, "Check Your Work", `<ul class="check" id="ebqCheck"></ul>`) + nav(),
+
+  review: () => {
+    const missing = STATIONS.slice(0, 5).map((s, i) => (done(i) ? null : s.name)).filter(Boolean);
+    return `<div class="eyebrow">Station 6 · Wrap-up</div><h2>Review and Submit</h2>
+      ${missing.length ? `<div class="box"><b class="h">Almost there</b>Finish these stations before you submit: <b>${missing.join(", ")}</b>.</div>` : `<div class="box step"><b class="h">Project complete</b>Every station is done. Add your name and period, then save your PDF and upload it to Canvas.</div>`}
+      <div class="who noprint"><label class="f">Name<input type="text" data-k="name" value="${esc(S.name)}"></label><label class="f">Period<input type="text" data-k="period" value="${esc(S.period)}"></label></div>
+      <div class="nav noprint"><button class="btn ghost" id="prevBtn">← Back</button><span><button class="btn ghost" id="resetBtn">Start over</button> <button class="btn" id="printBtn">Print / Save as PDF</button></span></div>
+      <p class="noprint" id="printNote" style="color:var(--coral)" hidden>Type your name before saving your PDF.</p>
+      <div id="reviewBody">${reviewBody()}</div>`;
+  },
+};
+
+function ebqCheck() {
+  const items = [
+    [filled("claim"), "My claim takes a clear side on whether the movie is accurate."],
+    [filled("bSrc", "bEv") && /source\s*[123]/i.test(S.bEv), "Part B evidence is specific and cites a source, like (Source 1)."],
+    [filled("bConcept", "bExp"), "Part B explanation uses a psychology concept."],
+    [filled("cSrc", "cEv") && /source\s*[123]/i.test(S.cEv), "Part C evidence is specific and cites a source."],
+    [filled("cSrc", "bSrc") && S.cSrc !== S.bSrc, "Part C uses a different source than Part B."],
+    [filled("cConcept", "bConcept") && S.cConcept.trim().toLowerCase() !== S.bConcept.trim().toLowerCase() && filled("cExp"), "Part C explanation uses a different psychology concept than Part B."],
+  ];
+  const ul = $("ebqCheck"); if (ul) ul.innerHTML = items.map(([ok, t]) => `<li class="${ok ? "ok" : ""}">${t}</li>`).join("");
+  const w = $("ebqWarn"); if (!w) return;
+  const msgs = [];
+  if (S.bSrc && S.cSrc && S.bSrc === S.cSrc) msgs.push("Part C must use a different source than Part B.");
+  if (S.bConcept.trim() && S.cConcept.trim() && S.bConcept.trim().toLowerCase() === S.cConcept.trim().toLowerCase()) msgs.push("Part C must use a different psychology concept than Part B.");
+  w.textContent = msgs.join(" "); w.hidden = !msgs.length;
+}
+
+function reviewBody() {
+  const sec = (title, rows) => `<h3>${title}</h3><dl class="review">${rows.map(([l, v]) => `<dt>${l}</dt><dd>${String(v ?? "").trim() ? esc(v) : '<span class="missing">Missing</span>'}</dd>`).join("")}</dl>`;
+  const sorted = MEM_ITEMS.map(([k, t]) => `${t} → ${S[k] || "?"}`).join("\n");
+  return sec("Station 1: Story Check", [["1. The accident and Lucy's mornings", S.q1], ["2. Ten-Second Tom", S.q2], ["3. How Henry wins Lucy over", S.q3], ["4. Is Goldfield syndrome real?", S.q4], ["Sources", S.src4]]) +
+    sec("Station 2: Memory Lab", [["5. Memory types", MEM_ITEMS.some(([k]) => S[k]) ? sorted : ""], ["Explanation", S.q5], ["6. Where memory breaks down", S.q6break], ["Explanation", S.q6], ["7. Type of amnesia", S.q7type], ["Explanation", S.q7], ["8. Long-term potentiation", S.q8], ["9. Levels of processing and the tape", S.q9], ["10. Ten-Second Tom and short-term memory", S.q10]]) +
+    sec("Station 3: Brain and Sleep", [["11. Brain structure and H.M.", S.q11], ["Sources", S.src11], ["12. Sleep and consolidation", S.q12]]) +
+    sec("Station 4: Looking Ahead", [["13. Recall, recognition, and the tape", S.q13], ["14. The newspaper and forgetting", S.q14], ["15. Classical conditioning", S.q15]]) +
+    sec("Station 5: EBQ", [["Part A: Claim", S.claim], ["Part B source and concept", [S.bSrc, S.bConcept].filter(Boolean).join(" · ")], ["Part B (i): Evidence", S.bEv], ["Part B (ii): Explanation", S.bExp],
+      ["Part C source and concept", [S.cSrc, S.cConcept].filter(Boolean).join(" · ")], ["Part C (i): Evidence", S.cEv], ["Part C (ii): Explanation", S.cExp]]);
+}
+
+/* ---------- render and wiring ---------- */
+function render() {
+  renderTabs(); renderSide();
+  $("station").innerHTML = VIEWS[STATIONS[S.station].id]();
+  wire(); ebqCheck();
+}
+function wire() {
+  const boxEl = $("station");
+  boxEl.querySelectorAll("[data-k]").forEach((el) => el.addEventListener("input", () => {
+    S[el.dataset.k] = el.value; save(); renderSide(); renderTabsLite(); ebqCheck();
+    if (el.dataset.k === "name") $("printNote").hidden = true;
+  }));
+  const prev = $("prevBtn"); if (prev) prev.onclick = () => go(S.station - 1);
+  const next = $("nextBtn"); if (next) next.onclick = () => go(S.station + 1);
+  const pr = $("printBtn"); if (pr) pr.onclick = () => {
+    if (!S.name.trim()) { $("printNote").hidden = false; boxEl.querySelector('[data-k="name"]').focus(); return; }
+    $("reviewPrint").innerHTML = `<p class="print-only"><b>${esc(S.name)}</b>${S.period ? " · Period " + esc(S.period.replace(/^period\s*/i, "")) : ""} · Good Morning, Lucy: 50 First Dates Memory Project · ${esc(new Date().toLocaleDateString())}</p>` + $("reviewBody").innerHTML;
+    printWithFileName(S.name, S.period, "50 First Dates");
+  };
+  const rs = $("resetBtn"); if (rs) rs.onclick = () => {
+    if (rs.dataset.armed) { try { localStorage.removeItem(KEY); } catch (e) {} S = blank(); render(); return; }
+    rs.dataset.armed = "1"; rs.textContent = "Click again to erase everything";
+    setTimeout(() => { if (rs.isConnected) { delete rs.dataset.armed; rs.textContent = "Start over"; } }, 4000);
+  };
+}
+
+// Chrome uses the page title as the default PDF file name, so set it just for the print.
+function printWithFileName(name, period, label) {
+  const clean = (s) => String(s || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim();
+  const d = new Date(), date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const p = clean(period);
+  const parts = [clean(name), p && (/^\d+$/.test(p) ? "Period " + p : p), label, date].filter(Boolean);
+  const old = document.title; document.title = parts.join(" - ");
+  addEventListener("afterprint", () => { document.title = old; }, { once: true });
+  window.print();
+}
+render();
+</script>
