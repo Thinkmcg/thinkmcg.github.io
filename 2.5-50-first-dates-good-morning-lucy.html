@@ -264,6 +264,7 @@ const SRC = [
       <p><b>Results:</b> Baxendale concluded that most movie amnesia bears little relation to reality. She wrote that <i>50 First Dates</i> continues a movie tradition of an amnesia syndrome with no relation to any known neurological or psychiatric condition. Real patients with this kind of brain damage usually keep their intelligence and attention but have severe, lasting difficulty learning new information; their memory does not reset overnight. She named the fish Dory in <i>Finding Nemo</i> as one of the more accurate portrayals of memory loss. She warned that because movies shape what the public believes, misleading portrayals can give patients and families false expectations.</p>`,
     cite: `Based on Baxendale, S. (2004). Memories aren't made of this: Amnesia at the movies. <i>BMJ, 329</i>, 1480–1483. ${a("https://pmc.ncbi.nlm.nih.gov/articles/PMC535990/", "Free full text")}.` },
 ];
+const EBQ_QUESTION = `<div class="box step"><b class="h">The Question</b><b class="t">Using the sources provided, develop and justify an argument about whether <i>50 First Dates</i> accurately portrays how memory works after brain damage.</b></div>`;
 const sourceCards = () => SRC.map((s) => `<div class="source"><div class="sh">${s.h}</div><h4>${s.t}</h4>${s.body}<p class="cite">${s.cite}</p></div>`).join("");
 
 /* ---------- stations ---------- */
@@ -324,12 +325,13 @@ const VIEWS = {
       <li>For each piece of evidence, you <b>explain</b> how it supports your claim using a <b>psychology concept</b>, and the two concepts must be different.</li>
       <li>Every time you use a source, you must <b>cite it</b>: "(Source 1)" or "According to Source 2, ..."</li></ul>
       <p>It is worth <b>7 points</b>: Claim (1) · Evidence #1 (1) · Explanation #1 (2) · Evidence #2 (1) · Explanation #2 (2).</p>`) +
-    `<div class="box step"><b class="h">The Question</b><b class="t">Using the sources provided, develop and justify an argument about whether <i>50 First Dates</i> accurately portrays how memory works after brain damage.</b></div>` +
+    EBQ_QUESTION +
     step(2, "Read the Three Sources", `<p>Read each source carefully. As you read, jot down: <b>what was damaged</b>, <b>what was lost</b>, and <b>what still worked</b>. Your notes are for you and are not graded.</p>`) +
     sourceCards() +
     `<div class="grid2">${area("n1", "My notes on Source 1", "optional", 3)}${area("n2", "My notes on Source 2", "optional", 3)}</div>${area("n3", "My notes on Source 3", "optional", 3)}` +
     step(3, "Write Your Claim (Part A)", `<p>A claim takes a <b>clear, specific side</b> that someone could disagree with. A topic or a fact is not a claim. Here is an example on a <b>different topic</b>: "Should students be allowed to use phones during class?"</p>
       <div class="ex"><div class="no"><b>Does not earn the point</b>"Phones in class are a complicated issue." (no side taken)</div><div class="no"><b>Does not earn the point</b>"Teenagers use phones a lot." (a fact, not an argument)</div><div class="yes"><b>Earns the point</b>"Schools should require students to put phones away during class."</div></div>`) +
+    EBQ_QUESTION.replace('<b class="h">The Question</b>', '<b class="h">Your claim answers this question</b>') +
     area("claim", "Part A: My claim", "one sentence that answers the question", 2) +
     step(4, "Evidence + Explanation #1 (Part B)", `<p><b>B (i) Evidence:</b> pick one specific fact from <b>one</b> source and cite it. <b>B (ii) Explanation:</b> explain how that fact supports your claim <b>using a psychology concept</b>. Example on the phone topic:</p>
       <div class="ex"><div class="yes"><b>Evidence, cited</b>"Students who had phones on their desks scored lower on a quiz than students whose phones were in another room (Source 1)."</div>
