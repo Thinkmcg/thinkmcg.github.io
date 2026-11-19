@@ -7,13 +7,13 @@
 <style>
 /* Layout: a two-column film lab. Station tabs and the active station on the left; Harold's live case file and badges on the right (stacks on phones). */
 :root {
-  --bg: #f3f1ec; --panel: #ffffff; --soft: #ece9e1; --ink: #1d2124; --muted: #5d625f; --line: #d8d3c7;
-  --brand: #2f6b55; --brand-ink: #ffffff; --pencil: #c2412d; --amber: #c98a12; --ink-blue: #2c4f8c;
+  --bg: #f7efe3; --panel: #fffaf2; --soft: #f1e3cf; --ink: #2b1d14; --muted: #6e5848; --line: #e3cdb2;
+  --brand: #b4531d; --brand-ink: #ffffff; --pencil: #962f2f; --amber: #c38a12; --ink-blue: #5c6b2a;
   --f-display: "Fraunces", Georgia, serif; --f-body: "Inter Tight", "Segoe UI", system-ui, sans-serif; --f-mono: "Courier Prime", "Courier New", monospace; --r: 14px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #13161a; --panel: #1b1f25; --soft: #232831; --ink: #ebe8e1; --muted: #a7ada9; --line: #323944; --brand: #6cc3a0; --brand-ink: #13161a; --pencil: #ff8a73; --amber: #f2bb4b; --ink-blue: #8fb0ef; color-scheme: dark; } }
-:root[data-theme="dark"] { --bg: #13161a; --panel: #1b1f25; --soft: #232831; --ink: #ebe8e1; --muted: #a7ada9; --line: #323944; --brand: #6cc3a0; --brand-ink: #13161a; --pencil: #ff8a73; --amber: #f2bb4b; --ink-blue: #8fb0ef; color-scheme: dark; }
+  --bg: #1a130e; --panel: #241a12; --soft: #2f231a; --ink: #f3e7d8; --muted: #c4ad96; --line: #46352a; --brand: #f0904f; --brand-ink: #1a130e; --pencil: #ec8676; --amber: #f2c14e; --ink-blue: #b9c77c; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #1a130e; --panel: #241a12; --soft: #2f231a; --ink: #f3e7d8; --muted: #c4ad96; --line: #46352a; --brand: #f0904f; --brand-ink: #1a130e; --pencil: #ec8676; --amber: #f2c14e; --ink-blue: #b9c77c; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); margin: 0; }
 body { font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
@@ -26,7 +26,7 @@ h1 em { font-style: italic; color: var(--brand); }
 .xp .row { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 14px; color: var(--muted); }
 .xp .row b { color: var(--ink); }
 .bar { height: 12px; border-radius: 6px; background: var(--soft); overflow: hidden; border: 1px solid var(--line); }
-.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--ink-blue)); transition: width .4s; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ink-blue), var(--amber), var(--brand), var(--pencil)); transition: width .4s; }
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
@@ -60,6 +60,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--b
 .box li { margin-bottom: 4px; }
 .box p:last-child, .box ul:last-child { margin-bottom: 0; }
 .where { font-size: 14.5px; color: var(--muted); }
+.where a { color: var(--brand); font-weight: 600; text-underline-offset: 2px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .chip { font: inherit; font-size: 14px; cursor: pointer; border-radius: 999px; border: 1.5px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; }
 .chip.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
@@ -110,11 +111,25 @@ aside { position: sticky; top: 12px; display: grid; gap: 12px; }
   #reviewPrint { display: block !important; }
   .print-only { display: block; }
 }
+/* falling leaves in the header: decorative only */
+header.top { position: relative; overflow: hidden; }
+.leaves { position: absolute; inset: 0; pointer-events: none; }
+.leaves svg { position: absolute; top: -30px; width: 22px; height: 22px; opacity: .85; animation: fall linear infinite; }
+.leaves svg:nth-child(1) { left: 34%; color: var(--brand); animation-duration: 11s; }
+.leaves svg:nth-child(2) { left: 52%; color: var(--amber); animation-duration: 14s; animation-delay: -5s; width: 18px; height: 18px; }
+.leaves svg:nth-child(3) { left: 66%; color: var(--pencil); animation-duration: 12s; animation-delay: -8s; }
+.leaves svg:nth-child(4) { left: 78%; color: var(--ink-blue); animation-duration: 16s; animation-delay: -2s; width: 16px; height: 16px; }
+.leaves svg:nth-child(5) { left: 90%; color: var(--brand); animation-duration: 13s; animation-delay: -10s; width: 19px; height: 19px; }
+@keyframes fall { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(170px) rotate(320deg); } }
+header.top > div { position: relative; }
+@media (prefers-reduced-motion: reduce) { .leaves svg { animation: none; top: 12px; } }
+@media print { .leaves { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
 <div class="wrap">
   <header class="top">
+    <div class="leaves" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg></div>
     <div><h1>Little Did He <em>Know</em></h1><p class="sub">Stranger Than Fiction (2006) · Psych Film Project · after Topic 3.6</p></div>
     <div class="xp" aria-live="polite">
       <div class="row"><span>Project progress</span><b id="xpText">0%</b></div>
@@ -234,7 +249,7 @@ const VIEWS = {
     q(2, "What does the narrator say that changes everything for Harold? Then describe the two different people he goes to for help and how each one responds.", area("q2", "Your answer")) +
     q(3, "How does Harold's relationship with Ana Pascal change from their first meeting to the end of the film? Describe at least two turning points.", area("q3", "Your answer")) +
     find("Comedy or Tragedy?", "Professor Hilbert keeps asking whether Harold is living in a comedy or a tragedy. Research what those two words mean in <b>literature</b>. They do not simply mean \"funny\" and \"sad.\"",
-      "Britannica's entries for <i>comedy</i> and <i>tragedy</i> (britannica.com), a literature textbook or your English teacher, or the school library databases. A summary of how Aristotle described tragedy is a good starting point.") +
+      "<a href='https://literarydevices.net/tragedy/' target='_blank' rel='noopener'>Literary Devices: Tragedy</a> and <a href='https://literarydevices.net/comedy/' target='_blank' rel='noopener'>Literary Devices: Comedy</a>. Read the definition at the top of each page. Your English teacher is another great source.") +
     q(4, "Using your Find It research, explain the literary difference between a comedy and a tragedy. Then decide which one Harold's story turns out to be, and explain why.", area("q4", "Your answer") + text("src4", "Source you used", "website name or book title")) + nav(),
 
   know: () => head("Station 2 · Part 2", "What You Already Know",
@@ -244,7 +259,7 @@ const VIEWS = {
     q(6, "Karen Eiffel is a famous author who cannot figure out how to finish her book. Which psychosocial stage best fits her? Explain the conflict of that stage and support your choice with evidence from the film, including how she acts by the end.",
       pick("q6stage", "Karen's stage", STAGES) + area("q6", "Your explanation", "", 5)) +
     find("Erikson's Own Identity Crisis", "Erik Erikson came up with the idea of an \"identity crisis.\" Research his own life: what was unusual about his childhood and his family, what did he do as a young man before he became a psychologist, and what did he do with his name as an adult?",
-      "Britannica's biography of Erik Erikson (britannica.com), the Erikson section of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA's site (apa.org). Avoid sites that let anyone edit them.") +
+      "<a href='https://socialsci.libretexts.org/Bookshelves/Psychology/Culture_and_Community/Personality_Theory_in_a_Cultural_Context_(Kelland)/12%3A_Erik_Erikson/12.02%3A_Brief_Biography_of_Erik_Erikson' target='_blank' rel='noopener'>Brief Biography of Erik Erikson (LibreTexts open textbook)</a> covers his family, his years wandering Europe, and how he chose his name. <a href='https://news.harvard.edu/gazette/story/2002/03/erik-erikson/' target='_blank' rel='noopener'>The Harvard Gazette</a> has a shorter version.") +
     q(7, "Using your Find It research, which identity status best describes Erikson during his years as a young man before he became a psychologist, and which describes him when he chose his own name? Explain each choice using the ideas of <b>exploration</b> and <b>commitment</b>, and include facts from your research.",
       `<div class="grid2">${pick("q7eYoung", "As a young man", STATUSES)}${pick("q7eName", "When he chose his name", STATUSES)}</div>` + area("q7e", "Your explanation", "", 5) + text("src6", "Source you used", "website name or book title")) +
     q(8, "Which identity status describes Harold at the very start of the film, and which describes him in the middle, after he starts trying new things? Explain each choice using exploration and commitment. Then explain how Harold's path is similar to or different from Erikson's.",
@@ -277,7 +292,7 @@ const VIEWS = {
     learn("What Drives Behavior: Motivation", `<ul><li><b>Intrinsic motivation</b> comes from inside: you do something because you enjoy it or find it meaningful. <b>Extrinsic motivation</b> comes from outside, such as pay, grades, or rules. <b>Incentive theory</b> focuses on how rewards motivate behavior.</li>
       <li>Lewin described <b>motivational conflicts</b>: <b>approach-approach</b> (two good options), <b>avoidance-avoidance</b> (two bad options), and <b>approach-avoidance</b> (one option with both good and bad sides).</li></ul>`) +
     find("Self-Determination Theory", "Psychologists Edward Deci and Richard Ryan created <b>self-determination theory</b>. Find the three basic psychological needs it says people must meet to feel intrinsically motivated, and what each one means.",
-      "The theory's official site (selfdeterminationtheory.org), the motivation chapter of OpenStax <i>Psychology 2e</i> (free at openstax.org), or the APA Dictionary of Psychology (dictionary.apa.org).") +
+      "<a href='https://www.simplypsychology.org/self-determination-theory.html' target='_blank' rel='noopener'>Simply Psychology: Self-Determination Theory</a> defines all three needs in plain language. The theory's official site, <a href='https://selfdeterminationtheory.org/theory/' target='_blank' rel='noopener'>selfdeterminationtheory.org</a>, is harder reading.") +
     q(13, "Compare what motivates Harold to audit taxes with what motivates him to learn the guitar. Use your Find It research to explain which of the three needs the guitar meets. Then identify one motivational conflict Harold faces later in the film and name its type.",
       area("q12", "Your answer", "", 5) + text("src12", "Source you used", "website name or book title")) + nav(),
 
@@ -292,7 +307,7 @@ const VIEWS = {
       <li>Diagnosis requires specialized training and evidence-based tools such as the <b>DSM</b>, published by the American Psychiatric Association.</li>
       <li><b>Schizophrenia spectrum disorders</b> can include <b>hallucinations</b> (false perceptions, such as hearing voices), <b>delusions</b> (false beliefs), disorganized thinking or speech, disorganized movement, and <b>negative symptoms</b> (a loss of normal functions, such as flat emotion).</li></ul>`) +
     find("How Is Schizophrenia Actually Diagnosed?", "Hearing a voice alone is not enough for a diagnosis. Find out what else a professional looks for: how many kinds of symptoms, and for how long.",
-      "The National Institute of Mental Health's schizophrenia page (nimh.nih.gov), the National Alliance on Mental Illness (nami.org), or the schizophrenia section of OpenStax <i>Psychology 2e</i> (free at openstax.org).") +
+      "<a href='https://www.psychiatry.org/patients-families/schizophrenia/what-is-schizophrenia' target='_blank' rel='noopener'>American Psychiatric Association: What Is Schizophrenia?</a> (look for how long symptoms must last) and <a href='https://my.clevelandclinic.org/health/diseases/4568-schizophrenia' target='_blank' rel='noopener'>Cleveland Clinic: Schizophrenia</a> (see the Diagnosis and Tests section for what doctors rule out first).") +
     q(15, "After a short conversation, Harold's therapist suggests he may have schizophrenia and offers medication. Using the three factors from the Learn It box and your Find It research, evaluate her reasoning: what was reasonable about her suggestion, and what information was she missing? How does the rest of the film complicate her conclusion?",
       area("q14", "Your answer", "", 5) + text("src14", "Source you used", "website name or book title")) +
     `<div class="box help"><b class="h">If this topic hits close to home</b><p>Karen Eiffel's struggles in the film can be hard to watch. If you or someone you know is having a hard time, talk to a school counselor or a trusted adult, or call or text <b>988</b> (the Suicide &amp; Crisis Lifeline) any time.</p></div>` + nav(),
