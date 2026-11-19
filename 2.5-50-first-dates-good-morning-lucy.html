@@ -7,13 +7,13 @@
 <style>
 /* Layout: a two-column memory lab. Station tabs and the active station on the left; Lucy's morning-tape card and badges on the right (stacks on phones). Header is a VHS tape label. */
 :root {
-  --bg: #f4f7f6; --panel: #ffffff; --soft: #e8f0ee; --ink: #15282b; --muted: #536a6c; --line: #cfdedb;
-  --brand: #0d7a7c; --brand-ink: #ffffff; --coral: #d4553f; --sun: #e09b1c; --lagoon: #2f6fa3;
+  --bg: #f7efe3; --panel: #fffaf2; --soft: #f1e3cf; --ink: #2b1d14; --muted: #6e5848; --line: #e3cdb2;
+  --brand: #b4531d; --brand-ink: #ffffff; --coral: #962f2f; --sun: #c38a12; --lagoon: #5c6b2a;
   --f-display: "DM Serif Display", Georgia, serif; --f-body: "Nunito Sans", "Segoe UI", system-ui, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; --r: 14px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1a1c; --panel: #162426; --soft: #1d2f32; --ink: #e6f1ef; --muted: #9db4b3; --line: #2b4245; --brand: #4fc6c4; --brand-ink: #0f1a1c; --coral: #ff8a73; --sun: #f6c25a; --lagoon: #7fb6e6; color-scheme: dark; } }
-:root[data-theme="dark"] { --bg: #0f1a1c; --panel: #162426; --soft: #1d2f32; --ink: #e6f1ef; --muted: #9db4b3; --line: #2b4245; --brand: #4fc6c4; --brand-ink: #0f1a1c; --coral: #ff8a73; --sun: #f6c25a; --lagoon: #7fb6e6; color-scheme: dark; }
+  --bg: #1a130e; --panel: #241a12; --soft: #2f231a; --ink: #f3e7d8; --muted: #c4ad96; --line: #46352a; --brand: #f0904f; --brand-ink: #1a130e; --coral: #ec8676; --sun: #f2c14e; --lagoon: #b9c77c; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #1a130e; --panel: #241a12; --soft: #2f231a; --ink: #f3e7d8; --muted: #c4ad96; --line: #46352a; --brand: #f0904f; --brand-ink: #1a130e; --coral: #ec8676; --sun: #f2c14e; --lagoon: #b9c77c; color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); margin: 0; }
 body { font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
@@ -117,11 +117,25 @@ aside { position: sticky; top: 12px; display: grid; gap: 12px; }
   #reviewPrint { display: block !important; }
   .print-only { display: block; }
 }
+/* falling leaves in the header: decorative only */
+header.top { position: relative; overflow: hidden; }
+.leaves { position: absolute; inset: 0; pointer-events: none; }
+.leaves svg { position: absolute; top: -30px; width: 22px; height: 22px; opacity: .85; animation: fall linear infinite; }
+.leaves svg:nth-child(1) { left: 56%; color: var(--brand); animation-duration: 11s; }
+.leaves svg:nth-child(2) { left: 64%; color: var(--sun); animation-duration: 14s; animation-delay: -5s; width: 18px; height: 18px; }
+.leaves svg:nth-child(3) { left: 72%; color: var(--coral); animation-duration: 12s; animation-delay: -8s; }
+.leaves svg:nth-child(4) { left: 82%; color: var(--lagoon); animation-duration: 16s; animation-delay: -2s; width: 16px; height: 16px; }
+.leaves svg:nth-child(5) { left: 92%; color: var(--brand); animation-duration: 13s; animation-delay: -10s; width: 19px; height: 19px; }
+@keyframes fall { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(190px) rotate(320deg); } }
+header.top > div:not(.leaves) { position: relative; }
+@media (prefers-reduced-motion: reduce) { .leaves svg { animation: none; top: 12px; } }
+@media print { .leaves { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
 <div class="wrap">
   <header class="top">
+    <div class="leaves" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c3 3 7 4 9 3-1 6-4 11-9 14-5-3-8-8-9-14 2 1 6 0 9-3z"/><path d="M12 6v17" stroke="#00000033" stroke-width="1.2" fill="none"/></svg></div>
     <div class="tape">
       <div class="lbl">Tape 1 · Play every morning</div>
       <h1>Good Morning, <em>Lucy</em></h1>

@@ -121,7 +121,7 @@ header.top { position: relative; overflow: hidden; }
 .leaves svg:nth-child(4) { left: 78%; color: var(--ink-blue); animation-duration: 16s; animation-delay: -2s; width: 16px; height: 16px; }
 .leaves svg:nth-child(5) { left: 90%; color: var(--brand); animation-duration: 13s; animation-delay: -10s; width: 19px; height: 19px; }
 @keyframes fall { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(170px) rotate(320deg); } }
-header.top > div { position: relative; }
+header.top > div:not(.leaves) { position: relative; }
 @media (prefers-reduced-motion: reduce) { .leaves svg { animation: none; top: 12px; } }
 @media print { .leaves { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
